@@ -1,0 +1,9 @@
+- [x] Verify that the copilot-instructions.md file in the .github directory is created.
+- [x] Clarify Project Requirements (Next.js App Router + TypeScript + Tailwind + shadcn/ui + Framer Motion).
+- [x] Scaffold the Project (manual in-place scaffold due uppercase folder name restriction in create-next-app).
+- [x] Customize the Project (senior-looking portfolio starter sections and UI primitives).
+- [x] Install Required Extensions (none required by setup info).
+- [x] Compile the Project (`npm run build` passes).
+- [x] Create and Run Task (created and ran `dev` task).
+- [x] Launch the Project (launched via task; running on available port 3001 because 3000 was occupied).
+- [x] Ensure Documentation is Complete (`README.md` updated and this file cleaned of HTML comments).
