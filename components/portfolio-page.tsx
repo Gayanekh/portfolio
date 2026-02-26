@@ -43,7 +43,9 @@ export default function PortfolioPage() {
           transition={{ duration: 0.5 }}
           className="space-y-8"
         >
-          <p className="text-sm font-medium text-primary">Senior Engineer</p>
+          <p className="text-sm font-medium text-primary">
+            Gayane Khachatryan Senior Engineer
+          </p>
           <h1 className="max-w-3xl text-4xl font-semibold tracking-tight md:text-6xl">
             I design and ship resilient product experiences at scale.
           </h1>
