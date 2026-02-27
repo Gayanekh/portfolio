@@ -51,5 +51,10 @@
 
   body {
     @apply min-h-screen;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .font-mono {
+    font-family: 'DM Mono', monospace;
   }
 }
