@@ -1,4 +1,5 @@
 import ScrollIndicator from "@/components/ScrollIndicator";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface PortfolioAsideProps {
   progress: number;
@@ -6,18 +7,24 @@ interface PortfolioAsideProps {
 
 const PortfolioAside = ({ progress }: PortfolioAsideProps) => {
   return (
-    <div className="w-[34%] sticky top-0 h-screen flex flex-col justify-end pb-20 pl-12 pr-10 z-10">
+    <div
+      id="about"
+      className="w-full lg:w-[40%] lg:sticky lg:top-0 lg:h-screen flex flex-col justify-start lg:justify-end pt-6 lg:pt-0 pb-6 lg:pb-20 lg:pl-10 xl:pl-20 lg:pr-6 xl:pr-10 z-10 gap-40"
+    >
       <div className="space-y-8">
-        <div className="flex items-center gap-4">
-          <div className="h-14 w-14 rounded-full border border-border bg-muted flex items-center justify-center text-sm font-mono text-foreground/70">
-            AG
-          </div>
+        <div className="flex flex-col gap-4">
+          <Avatar className="h-40 w-40 border border-border">
+            <AvatarImage src="/avatar.png" alt="Gayane Khachatryan" />
+            <AvatarFallback className="text-sm font-mono text-foreground/70">
+              AG
+            </AvatarFallback>
+          </Avatar>
           <div>
             <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground mb-1">
               Portfolio
             </p>
             <p className="text-2xl font-light tracking-tight text-foreground">
-              Alex Gayane
+              Gayane Khachatryan
             </p>
           </div>
         </div>
@@ -37,7 +44,8 @@ const PortfolioAside = ({ progress }: PortfolioAsideProps) => {
             Role
           </p>
           <p className="text-sm text-foreground/70">
-            Product Designer · Frontend Developer
+            Senior UI/UX Designer & Design-to-Code Specialist | Scalable React
+            Design Systems
           </p>
         </div>
 
