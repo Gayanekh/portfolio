@@ -9,11 +9,11 @@ const PortfolioAside = ({ progress }: PortfolioAsideProps) => {
   return (
     <div
       id="about"
-      className="w-full lg:w-[40%] lg:sticky lg:top-0 lg:h-screen flex flex-col justify-start lg:justify-end pt-6 lg:pt-0 pb-6 lg:pb-20 lg:pl-10 xl:pl-20 lg:pr-6 xl:pr-10 z-10 gap-40"
+      className="w-full lg:max-w-[40%] lg:sticky lg:top-0 lg:h-screen flex flex-col justify-start lg:justify-end pt-4 sm:pt-6 lg:pt-0 pb-6 sm:pb-8 lg:pb-10 lg:pl-8 xl:pl-20 lg:pr-4 xl:pr-10 z-10 gap-10 sm:gap-12 lg:gap-32 xl:gap-30"
     >
       <div className="space-y-8">
         <div className="flex flex-col gap-4">
-          <Avatar className="h-40 w-40 border border-border">
+          <Avatar className="h-24 w-24 sm:h-30 sm:w-30 lg:h-32 lg:w-32 border border-border">
             <AvatarImage src="/avatar.png" alt="Gayane Khachatryan" />
             <AvatarFallback className="text-sm font-mono text-foreground/70">
               AG

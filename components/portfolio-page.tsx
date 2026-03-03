@@ -82,13 +82,13 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="bg-[#f8f8f8] min-h-screen px-4 sm:px-6 lg:px-16 xl:px-24 2xl:px-40">
+    <div className="bg-[#f8f8f8] min-h-screen px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24 2xl:px-40">
       <PortfolioNav />
-      <div className="flex flex-col gap-10 lg:flex-row lg:gap-20 pt-16 lg:pt-0">
+      <div className="flex flex-col gap-8 sm:gap-10 md:gap-12 lg:flex-row lg:gap-16 xl:gap-20 pt-14 sm:pt-16 lg:pt-0">
         <PortfolioAside progress={progress} />
         <div
           id="works"
-          className="grid gap-10 lg:gap-20 w-full pt-4 lg:pt-[350px] pb-10 lg:pb-20"
+          className="grid gap-8 sm:gap-10 lg:gap-16 xl:gap-20 w-full pt-2 sm:pt-4 lg:pt-[320px] xl:pt-[350px] pb-8 sm:pb-10 lg:pb-20"
         >
           {projects.map((project, i) => (
             <ProjectSection
