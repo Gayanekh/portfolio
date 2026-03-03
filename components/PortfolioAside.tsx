@@ -16,7 +16,7 @@ const PortfolioAside = ({ progress }: PortfolioAsideProps) => {
           <Avatar className="h-24 w-24 sm:h-30 sm:w-30 lg:h-32 lg:w-32 border border-border">
             <AvatarImage src="/avatar.png" alt="Gayane Khachatryan" />
             <AvatarFallback className="text-sm font-mono text-foreground/70">
-              AG
+              A
             </AvatarFallback>
           </Avatar>
           <div>
