@@ -19,18 +19,23 @@ interface ProjectSectionProps {
 }
 
 const ProjectSection = ({ project, index }: ProjectSectionProps) => {
-  const imageSrc =
-    typeof project.image === "string" ? project.image : project.image.src;
+  const imageSrc = (
+    typeof project.image === "string" ? project.image : project.image.src
+  ).trim();
 
   return (
     <div className="flex">
       <div className="relative aspect-[1.92/1.2] w-full overflow-hidden rounded-lg">
-        <img
-          src={imageSrc}
-          alt={project.title}
-          className="w-full h-full object-cover absolute"
-          style={{ filter: "grayscale(100%)" }}
-        />
+        {imageSrc ? (
+          <img
+            src={imageSrc}
+            alt={project.title}
+            className="w-full h-full object-cover absolute"
+            style={{ filter: "grayscale(100%)" }}
+          />
+        ) : (
+          <div className="absolute inset-0 bg-muted" />
+        )}
       </div>
       <span className="text-xs tracking-widest text-foreground/70 ml-3 mt-1">
         {String(index + 1).padStart(2, "0")}

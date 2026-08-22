@@ -21,9 +21,28 @@ const LenisProvider = ({ children }: LenisProviderProps) => {
       animationFrameId = requestAnimationFrame(raf);
     };
 
+    const updateLenisState = () => {
+      const isLocked = document.documentElement.dataset.scrollLocked === "true";
+
+      if (isLocked) {
+        lenis.stop();
+      } else {
+        lenis.start();
+      }
+    };
+
+    const observer = new MutationObserver(updateLenisState);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-scroll-locked"],
+    });
+
+    updateLenisState();
+
     animationFrameId = requestAnimationFrame(raf);
 
     return () => {
+      observer.disconnect();
       cancelAnimationFrame(animationFrameId);
       lenis.destroy();
     };
