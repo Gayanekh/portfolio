@@ -6,8 +6,9 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Senior Portfolio Starter",
-  description: "Production-ready Next.js portfolio starter.",
+  title: "Portory | Build a portfolio worth sharing",
+  description:
+    "Choose a template, customize your work, and build a portfolio worth sharing.",
 };
 
 export default function RootLayout({

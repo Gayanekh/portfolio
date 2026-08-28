@@ -1,5 +1,5 @@
-import PortfolioPage from "@/components/portfolio-page";
+import PortoryLanding from "@/components/landing/PortoryLanding";
 
 export default function Page() {
-  return <PortfolioPage />;
+  return <PortoryLanding />;
 }

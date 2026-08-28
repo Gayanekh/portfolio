@@ -3,17 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Check, ExternalLink } from "lucide-react";
-
-export interface TemplateData {
-  id: string;
-  name: string;
-  tagline: string;
-  description: string;
-  badge: string;
-  theme: "light" | "dark";
-  previewImages: string[];
-  demoHref: string;
-}
+import type { TemplateData } from "@/components/templates/template-data";
 
 interface TemplateCardProps {
   template: TemplateData;

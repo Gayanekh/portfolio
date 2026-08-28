@@ -114,6 +114,35 @@ const Index = () => {
           </section>
 
           <section
+            id="about"
+            className="scroll-mt-24 pt-8 lg:pt-12 border-t border-border"
+          >
+            <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground mb-4">
+              About
+            </p>
+            <div className="grid gap-6 sm:grid-cols-2">
+              <p className="text-sm text-foreground/70 leading-relaxed max-w-2xl">
+                I design and build minimalist digital experiences focused on
+                visual storytelling, motion, and clean interaction.
+              </p>
+              <div className="space-y-4 text-sm text-foreground/70">
+                <div>
+                  <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground mb-1">
+                    Role
+                  </p>
+                  <p>Senior UI/UX Designer &amp; Design-to-Code Specialist</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground mb-1">
+                    Location
+                  </p>
+                  <p>Yerevan, Armenia</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section
             id="contact"
             className="pt-8 lg:pt-12 border-t border-border"
           >

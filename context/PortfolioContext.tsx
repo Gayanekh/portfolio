@@ -8,6 +8,17 @@ export interface ProjectData {
   image: string;
 }
 
+export interface PortfolioNavigation {
+  enabled: boolean;
+  links: {
+    work: boolean;
+    about: boolean;
+    services: boolean;
+    contact: boolean;
+  };
+  showAvailability: boolean;
+}
+
 export interface PortfolioData {
   name: string;
   role: string;
@@ -17,5 +28,8 @@ export interface PortfolioData {
   aboutHeading: string;
   aboutBody: string;
   services: string[];
+  skills: string[];
+  navigation: PortfolioNavigation;
+  showScrollProgress: boolean;
   projects: ProjectData[];
 }
