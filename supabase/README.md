@@ -11,9 +11,15 @@ production state, the access model and the known issues.
 | `scripts/export-schema-ddl.sql` | Read-only query that prints the current `public` schema as DDL. Used to capture the baseline. |
 | `migrations/20260926233831_baseline.sql` | Snapshot of production as it was before any tracked change, known problems included. **Never run it against production.** |
 | `migrations/<timestamp>_<name>.sql` | Every later schema, policy or grant change, one per file, each with a rollback script. |
+| `rollbacks/<timestamp>_<name>.down.sql` | Undoes the migration with the same timestamp. Kept out of `migrations/` so the CLI never runs it. |
+| `tests/<name>_verify.sql` | Read-only checks for a change, run before and after applying it. |
 
 Migration files must be named `<YYYYMMDDHHMMSS>_<name>.sql` (UTC); the CLI
 silently skips anything else. Use LF line endings.
+
+Roll back in reverse order: undo the newest applied migration first. Each
+rollback file states what must be true before it runs, such as which code
+must be deployed or reverted.
 
 There is no `config.toml` yet. It will be added with `supabase init` when the
 Supabase CLI and Docker are set up for local development.
