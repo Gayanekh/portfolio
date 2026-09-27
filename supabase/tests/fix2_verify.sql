@@ -80,15 +80,35 @@ rollback;
 -- Re-run A2. Expect the same result.
 
 -- B4. A signed-in user sees only their own row.
--- <user-uuid>: e.g. user A's id from auth.users.
--- Expect: visible_rows = 1 for a user with a portfolio, other_users_rows = 0.
+-- Replace <user-email> in all three places. Both request.jwt.claim.sub and
+-- request.jwt.claims are set, because auth.uid() may read either, and they are
+-- set before switching role because authenticated cannot read auth.users.
+-- Expect: identity_ok = true, running_as = authenticated,
+--         visible_rows = 1 and own_rows = 1 for a user with a portfolio,
+--         other_users_rows = 0.
+-- identity_ok = false means the impersonation failed; the counts are then
+-- meaningless (RLS returns 0 rows for a missing identity).
 begin read only;
+select set_config('portory.test_user_id',
+         coalesce((select id::text from auth.users
+                   where email = '<user-email>'), 'NOT FOUND'), true),
+       set_config('request.jwt.claim.sub',
+         coalesce((select id::text from auth.users
+                   where email = '<user-email>'), ''), true),
+       set_config('request.jwt.claims',
+         json_build_object(
+           'sub',  (select id::text from auth.users
+                    where email = '<user-email>'),
+           'role', 'authenticated')::text, true);
 set local role authenticated;
-select set_config('request.jwt.claims',
-                  json_build_object('sub', '<user-uuid>', 'role', 'authenticated')::text,
-                  true);
-select count(*)                                                 as visible_rows,
-       count(*) filter (where user_id <> '<user-uuid>'::uuid)   as other_users_rows
+select current_setting('portory.test_user_id')                   as looked_up_id,
+       current_user                                              as running_as,
+       auth.uid()                                                as auth_uid,
+       auth.uid()::text = current_setting('portory.test_user_id') as identity_ok,
+       count(*)                                                  as visible_rows,
+       count(*) filter (where user_id =  auth.uid())             as own_rows,
+       count(*) filter (where user_id <> auth.uid())             as other_users_rows,
+       string_agg(slug, ', ' order by slug)                      as visible_slugs
 from public.portfolios;
 rollback;
 
