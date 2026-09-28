@@ -182,7 +182,7 @@ export default function AuthControls() {
   }
 
   return (
-    <div className="hidden items-center gap-4 sm:flex">
+    <div className="flex items-center gap-4">
       <Link
         href="/login"
         className="text-xs text-foreground/55 transition-colors hover:text-foreground"

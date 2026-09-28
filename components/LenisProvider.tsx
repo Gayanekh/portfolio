@@ -2,13 +2,20 @@
 
 import { ReactNode, useEffect } from "react";
 import Lenis from "lenis";
+import { usePathname } from "next/navigation";
+import { useReducedMotion } from "framer-motion";
 
 interface LenisProviderProps {
   children: ReactNode;
 }
 
 const LenisProvider = ({ children }: LenisProviderProps) => {
+  const pathname = usePathname();
+  const reducedMotion = useReducedMotion();
+  const isAuthPage = ["/login", "/register", "/verify-email"].includes(pathname);
+
   useEffect(() => {
+    if (isAuthPage || reducedMotion) return;
     const lenis = new Lenis({
       smoothWheel: true,
       syncTouch: true,
@@ -46,7 +53,7 @@ const LenisProvider = ({ children }: LenisProviderProps) => {
       cancelAnimationFrame(animationFrameId);
       lenis.destroy();
     };
-  }, []);
+  }, [isAuthPage, reducedMotion]);
 
   return <>{children}</>;
 };

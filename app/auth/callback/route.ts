@@ -48,7 +48,10 @@ export async function GET(request: Request) {
       if (profileError) {
         console.error("Profile creation failed during auth callback", {
           userId: user.id,
+          message: profileError.message,
           code: profileError.code,
+          details: profileError.details,
+          hint: profileError.hint,
         });
       }
     } else {

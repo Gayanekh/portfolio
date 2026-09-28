@@ -69,7 +69,12 @@ export default function VerifyEmailForm({ email, next }: VerifyEmailFormProps) {
       if (profileError) {
         console.error("Profile creation failed after email OTP verification", {
           userId: data.user.id,
+          message: profileError.message,
           code: profileError.code,
+          details: profileError.details,
+          hint: profileError.hint,
+          hasSession: Boolean(data.session),
+          sessionMatchesUser: data.session?.user.id === data.user.id,
         });
       }
     } else {

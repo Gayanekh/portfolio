@@ -18,7 +18,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   if (user) redirect(next);
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#fafafa] px-6 py-16">
+    <main className="login-page text-foreground">
       <AuthForm mode="login" next={next} verified={params.verified === "1"} />
     </main>
   );

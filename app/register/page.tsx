@@ -20,7 +20,7 @@ export default async function RegisterPage({
   if (user) redirect(next);
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#fafafa] px-6 py-16">
+    <main className="login-page text-foreground">
       <AuthForm mode="register" next={next} />
     </main>
   );
