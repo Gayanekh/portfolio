@@ -13,11 +13,11 @@ export default async function PublicPortfolioPage({
   const { slug } = await params;
   const supabase = await createClient();
   const { data: portfolio, error } = await supabase
-    .from("portfolios")
-    .select("template_id, published_portfolio_data")
-    .eq("slug", slug)
-    .eq("status", "published")
-    .maybeSingle();
+    .rpc("get_published_portfolio", { p_slug: slug })
+    .maybeSingle<{
+      template_id: string;
+      published_portfolio_data: PortfolioData | null;
+    }>();
 
   if (error || !portfolio?.published_portfolio_data) notFound();
 

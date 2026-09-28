@@ -24,26 +24,16 @@ export function createSlug(name: string) {
   return slug || "portfolio";
 }
 
-export async function getUniqueSlug(
-  supabase: SupabaseClient,
-  baseSlug: string,
-  currentId?: string,
-) {
+export async function getUniqueSlug(supabase: SupabaseClient, baseSlug: string) {
   let candidate = baseSlug;
   let suffix = 2;
 
   while (true) {
-    let query = supabase
-      .from("portfolios")
-      .select("id")
-      .eq("slug", candidate)
-      .limit(1);
-
-    if (currentId) query = query.neq("id", currentId);
-
-    const { data, error } = await query.maybeSingle();
+    const { data: available, error } = await supabase.rpc("is_slug_available", {
+      p_slug: candidate,
+    });
     if (error) throw error;
-    if (!data) return candidate;
+    if (available) return candidate;
 
     candidate = `${baseSlug}-${suffix}`;
     suffix += 1;
