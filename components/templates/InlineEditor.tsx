@@ -1,13 +1,30 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type SetStateAction } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, Plus, Trash2, Upload, X } from "lucide-react";
 import { PortfolioData, ProjectData } from "@/context/PortfolioContext";
+import {
+  ACCEPTED_IMAGE_TYPES,
+  uploadPortfolioImage,
+  validatePortfolioImage,
+} from "@/lib/portfolio-images";
 
 interface InlineEditorProps {
   data: PortfolioData;
-  onChange: (data: PortfolioData) => void;
+  // Accepts an updater so async image uploads merge into the latest state.
+  onChange: (update: SetStateAction<PortfolioData>) => void;
+  onUploadStart?: () => void;
+  onUploadEnd?: () => void;
+}
+
+// Image fields: "avatar" or "project-<index>".
+type ImageField = string;
+
+function withoutKey<T>(record: Record<string, T>, key: string) {
+  const next = { ...record };
+  delete next[key];
+  return next;
 }
 
 interface SectionHeaderProps {
@@ -47,10 +64,22 @@ const NavigationToggle = ({
   </label>
 );
 
-export default function InlineEditor({ data, onChange }: InlineEditorProps) {
+export default function InlineEditor({
+  data,
+  onChange,
+  onUploadStart,
+  onUploadEnd,
+}: InlineEditorProps) {
   const [openProject, setOpenProject] = useState<number | null>(0);
   const fileRefs = useRef<(HTMLInputElement | null)[]>([]);
   const avatarRef = useRef<HTMLInputElement | null>(null);
+  const [uploading, setUploading] = useState<Record<ImageField, boolean>>({});
+  const [uploadErrors, setUploadErrors] = useState<Record<ImageField, string>>(
+    {},
+  );
+  // Projects are addressed by index, so removing one while an upload runs
+  // could attach the image to the wrong project.
+  const anyUploadActive = Object.keys(uploading).length > 0;
 
   const updateField = (key: keyof PortfolioData, value: string) => {
     onChange({ ...data, [key]: value });
@@ -140,6 +169,7 @@ export default function InlineEditor({ data, onChange }: InlineEditorProps) {
   };
 
   const removeProject = (index: number) => {
+    if (anyUploadActive) return;
     onChange({
       ...data,
       projects: data.projects
@@ -149,25 +179,50 @@ export default function InlineEditor({ data, onChange }: InlineEditorProps) {
     setOpenProject(null);
   };
 
-  const handleImageUpload = (projectIndex: number, file: File) => {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      updateProject(
-        projectIndex,
-        "image",
-        (event.target?.result as string) || "",
-      );
-    };
-    reader.readAsDataURL(file);
+  // Uploads the selected file to Storage and stores only its public URL.
+  const uploadImage = async (
+    field: ImageField,
+    input: HTMLInputElement,
+    apply: (prev: PortfolioData, url: string) => PortfolioData,
+  ) => {
+    const file = input.files?.[0];
+    input.value = "";
+    if (!file || uploading[field]) return;
+
+    const invalid = validatePortfolioImage(file);
+    if (invalid) {
+      setUploadErrors((errors) => ({ ...errors, [field]: invalid }));
+      return;
+    }
+
+    setUploadErrors((errors) => withoutKey(errors, field));
+    setUploading((current) => ({ ...current, [field]: true }));
+    onUploadStart?.();
+    try {
+      const url = await uploadPortfolioImage(file);
+      onChange((prev) => apply(prev, url));
+    } catch (error) {
+      setUploadErrors((errors) => ({
+        ...errors,
+        [field]:
+          error instanceof Error ? error.message : "Image upload failed.",
+      }));
+    } finally {
+      setUploading((current) => withoutKey(current, field));
+      onUploadEnd?.();
+    }
   };
 
-  const handleAvatarUpload = (file: File) => {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      onChange({ ...data, avatar: (event.target?.result as string) || "" });
-    };
-    reader.readAsDataURL(file);
-  };
+  const handleImageUpload = (projectIndex: number, input: HTMLInputElement) =>
+    uploadImage(`project-${projectIndex}`, input, (prev, url) => ({
+      ...prev,
+      projects: prev.projects.map((p, i) =>
+        i === projectIndex ? { ...p, image: url } : p,
+      ),
+    }));
+
+  const handleAvatarUpload = (input: HTMLInputElement) =>
+    uploadImage("avatar", input, (prev, url) => ({ ...prev, avatar: url }));
 
   const inputClass =
     "w-full bg-white border border-border/60 rounded-lg px-3.5 py-2.5 text-sm font-light text-foreground/75 outline-none focus:border-foreground/35 focus:ring-1 focus:ring-foreground/10 transition-all placeholder:text-foreground/30";
@@ -190,11 +245,14 @@ export default function InlineEditor({ data, onChange }: InlineEditorProps) {
                 role="button"
                 tabIndex={0}
                 aria-label="Upload profile photo"
-                onClick={() => avatarRef.current?.click()}
+                aria-busy={uploading.avatar === true}
+                onClick={() => {
+                  if (!uploading.avatar) avatarRef.current?.click();
+                }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
-                    avatarRef.current?.click();
+                    if (!uploading.avatar) avatarRef.current?.click();
                   }
                 }}
               >
@@ -209,19 +267,33 @@ export default function InlineEditor({ data, onChange }: InlineEditorProps) {
                     <Upload className="w-4 h-4 text-foreground/40" />
                   </div>
                 )}
-                <div className="absolute inset-0 bg-foreground/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-full flex items-center justify-center">
-                  <Upload className="w-4 h-4 text-white" />
-                </div>
+                {uploading.avatar ? (
+                  <div className="absolute inset-0 bg-foreground/50 rounded-full flex items-center justify-center text-[9px] font-mono uppercase tracking-[0.08em] text-white">
+                    Uploading
+                  </div>
+                ) : (
+                  <div className="absolute inset-0 bg-foreground/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-full flex items-center justify-center">
+                    <Upload className="w-4 h-4 text-white" />
+                  </div>
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-light text-foreground/45 leading-relaxed">
-                  Click to upload a profile photo.
+                  {uploading.avatar
+                    ? "Uploading photo..."
+                    : "Click to upload a profile photo."}
                 </p>
+                {uploadErrors.avatar && (
+                  <p role="alert" className="mt-1 text-xs text-red-600">
+                    {uploadErrors.avatar}
+                  </p>
+                )}
                 {data.avatar && (
                   <button
                     onClick={() => onChange({ ...data, avatar: "" })}
                     type="button"
-                    className="text-[10px] font-mono tracking-[0.1em] uppercase text-red-500/70 hover:text-red-600 transition-colors mt-1"
+                    disabled={uploading.avatar === true}
+                    className="text-[10px] font-mono tracking-[0.1em] uppercase text-red-500/70 hover:text-red-600 transition-colors mt-1 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     Remove
                   </button>
@@ -229,12 +301,10 @@ export default function InlineEditor({ data, onChange }: InlineEditorProps) {
               </div>
               <input
                 type="file"
-                accept="image/*"
+                accept={ACCEPTED_IMAGE_TYPES}
                 className="hidden"
                 ref={avatarRef}
-                onChange={(e) =>
-                  e.target.files?.[0] && handleAvatarUpload(e.target.files[0])
-                }
+                onChange={(e) => handleAvatarUpload(e.currentTarget)}
               />
             </div>
           </div>
@@ -493,7 +563,12 @@ export default function InlineEditor({ data, onChange }: InlineEditorProps) {
                         <label className={labelClass}>Image</label>
                         <div
                           className="relative w-full h-28 bg-foreground/[0.02] border border-dashed border-border/40 rounded-lg overflow-hidden cursor-pointer group"
-                          onClick={() => fileRefs.current[pi]?.click()}
+                          aria-busy={uploading[`project-${pi}`] === true}
+                          onClick={() => {
+                            if (!uploading[`project-${pi}`]) {
+                              fileRefs.current[pi]?.click();
+                            }
+                          }}
                         >
                           {proj.image ? (
                             <img
@@ -509,20 +584,30 @@ export default function InlineEditor({ data, onChange }: InlineEditorProps) {
                               </p>
                             </div>
                           )}
-                          <div className="absolute inset-0 bg-foreground/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                            <Upload className="w-5 h-5 text-white" />
-                          </div>
+                          {uploading[`project-${pi}`] ? (
+                            <div className="absolute inset-0 bg-foreground/50 rounded-lg flex items-center justify-center text-[10px] font-mono uppercase tracking-[0.1em] text-white">
+                              Uploading...
+                            </div>
+                          ) : (
+                            <div className="absolute inset-0 bg-foreground/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                              <Upload className="w-5 h-5 text-white" />
+                            </div>
+                          )}
                         </div>
+                        {uploadErrors[`project-${pi}`] && (
+                          <p role="alert" className="mt-1 text-xs text-red-600">
+                            {uploadErrors[`project-${pi}`]}
+                          </p>
+                        )}
                         <input
                           type="file"
-                          accept="image/*"
+                          accept={ACCEPTED_IMAGE_TYPES}
                           className="hidden"
                           ref={(el) => {
                             fileRefs.current[pi] = el;
                           }}
                           onChange={(e) =>
-                            e.target.files?.[0] &&
-                            handleImageUpload(pi, e.target.files[0])
+                            handleImageUpload(pi, e.currentTarget)
                           }
                         />
                       </div>
@@ -584,7 +669,13 @@ export default function InlineEditor({ data, onChange }: InlineEditorProps) {
                       <button
                         onClick={() => removeProject(pi)}
                         type="button"
-                        className="flex items-center gap-1.5 text-[10px] font-mono tracking-[0.1em] uppercase text-red-500/70 hover:text-red-600 transition-colors mt-1"
+                        disabled={anyUploadActive}
+                        title={
+                          anyUploadActive
+                            ? "Wait for image uploads to finish"
+                            : undefined
+                        }
+                        className="flex items-center gap-1.5 text-[10px] font-mono tracking-[0.1em] uppercase text-red-500/70 hover:text-red-600 transition-colors mt-1 disabled:cursor-not-allowed disabled:opacity-40"
                       >
                         <Trash2 className="w-3 h-3" /> Remove
                       </button>

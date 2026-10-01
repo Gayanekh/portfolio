@@ -57,6 +57,58 @@ type PageState =
   | { step: "select"; selected: string | null }
   | { step: "customize"; templateId: string };
 
+/* ─── save/publish responses ─── */
+
+// Carries a message that is safe to show to the user.
+class RequestError extends Error {}
+
+// Reads the body as text first, so a non-JSON response (such as a 413 page)
+// cannot throw while handling an error.
+async function readResponse(response: Response) {
+  const text = await response.text();
+  try {
+    return JSON.parse(text) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
+function failureMessage(
+  action: "save" | "publish",
+  status: number,
+  body: Record<string, unknown> | null,
+) {
+  if (status === 413) {
+    return `Unable to ${action}: the portfolio is too large (HTTP 413).`;
+  }
+  if (status === 401) {
+    return `Your session has expired. Sign in again to ${action}.`;
+  }
+  const serverError = typeof body?.error === "string" ? body.error : null;
+  return `${serverError ?? `Unable to ${action}.`} (HTTP ${status})`;
+}
+
+async function sendPortfolio(
+  action: "save" | "publish",
+  templateId: string,
+  portfolioData: PortfolioData,
+) {
+  const response = await fetch(`/api/portfolios/${action}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ templateId, portfolioData }),
+  });
+  const body = await readResponse(response);
+  if (!response.ok) {
+    throw new RequestError(failureMessage(action, response.status, body));
+  }
+  const portfolio = body?.portfolio as { slug?: unknown } | undefined;
+  if (typeof portfolio?.slug !== "string") {
+    throw new RequestError(`Unable to ${action}: unexpected server response.`);
+  }
+  return { slug: portfolio.slug };
+}
+
 /* ═══════════════════════════════════════════════
    TEMPLATE PAGE
    ═══════════════════════════════════════════════ */
@@ -92,6 +144,13 @@ export default function TemplateBuilderPage({
   >("idle");
   const [feedback, setFeedback] = useState("");
   const [copied, setCopied] = useState(false);
+  // "failed" means the saved portfolio could not be read; saving then would
+  // overwrite it with whatever the editor shows.
+  const [loadState, setLoadState] = useState<"loading" | "loaded" | "failed">(
+    "loading",
+  );
+  const [activeUploads, setActiveUploads] = useState(0);
+  const canPersist = loadState === "loaded" && activeUploads === 0;
   const isDirty =
     pageState.step === "customize" &&
     (JSON.stringify(data) !== savedData ||
@@ -116,11 +175,13 @@ export default function TemplateBuilderPage({
 
     fetch("/api/portfolios")
       .then(async (response) => {
-        if (!response.ok) return null;
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const result = await response.json();
-        return result.portfolio;
+        return result.portfolio ?? null;
       })
       .then((portfolio) => {
+        setLoadState("loaded");
+        // No row yet: a new user starts from the default data.
         if (!portfolio) return;
         setData(portfolio.portfolio_data);
         setSavedData(JSON.stringify(portfolio.portfolio_data));
@@ -136,7 +197,7 @@ export default function TemplateBuilderPage({
           portfolio.status === "published" ? "published" : "idle",
         );
       })
-      .catch(() => undefined);
+      .catch(() => setLoadState("failed"));
   }, [requestedTemplate, router, shouldEdit, supabase.auth]);
 
   const continueToEditor = async (templateId: string) => {
@@ -150,54 +211,46 @@ export default function TemplateBuilderPage({
   const savePortfolio = async () => {
     if (!isDirty || saveState === "saving") return;
     if (pageState.step !== "customize") return;
+    if (!canPersist) return;
     setSaveState("saving");
     setFeedback("");
     try {
-      const response = await fetch("/api/portfolios/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          templateId: pageState.templateId,
-          portfolioData: data,
-        }),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error);
+      const result = await sendPortfolio("save", pageState.templateId, data);
       setSavedData(JSON.stringify(data));
       setSavedTemplateId(pageState.templateId);
-      setPortfolioSlug(result.portfolio.slug);
+      setPortfolioSlug(result.slug);
       setSaveState("saved");
       setPublishState("idle");
-    } catch {
+    } catch (error) {
       setSaveState("error");
-      setFeedback("Unable to save. Please try again.");
+      setFeedback(
+        error instanceof RequestError
+          ? error.message
+          : "Unable to save. Check your connection and try again.",
+      );
     }
   };
 
   const publishPortfolio = async () => {
     if (publishState === "publishing") return;
     if (pageState.step !== "customize") return;
+    if (!canPersist) return;
     setPublishState("publishing");
     setFeedback("");
     try {
-      const response = await fetch("/api/portfolios/publish", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          templateId: pageState.templateId,
-          portfolioData: data,
-        }),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error);
+      const result = await sendPortfolio("publish", pageState.templateId, data);
       setSavedData(JSON.stringify(data));
       setSavedTemplateId(pageState.templateId);
-      setPortfolioSlug(result.portfolio.slug);
+      setPortfolioSlug(result.slug);
       setPublishState("published");
       setSaveState("saved");
-    } catch {
+    } catch (error) {
       setPublishState("error");
-      setFeedback("Unable to publish. Please try again.");
+      setFeedback(
+        error instanceof RequestError
+          ? error.message
+          : "Unable to publish. Check your connection and try again.",
+      );
     }
   };
 
@@ -381,17 +434,23 @@ export default function TemplateBuilderPage({
             </span>
             <div className="flex items-center gap-2">
               <span className="hidden text-[10px] font-mono uppercase tracking-[0.1em] text-foreground/45 sm:inline">
-                {feedback ||
-                  (isDirty
-                    ? "Unsaved changes"
-                    : saveState === "saving"
-                      ? "Saving..."
-                      : "Saved")}
+                {loadState === "loading"
+                  ? "Loading..."
+                  : loadState === "failed"
+                    ? "Not loaded"
+                    : activeUploads > 0
+                      ? "Uploading image..."
+                      : feedback ||
+                        (isDirty
+                          ? "Unsaved changes"
+                          : saveState === "saving"
+                            ? "Saving..."
+                            : "Saved")}
               </span>
               <button
                 type="button"
                 onClick={savePortfolio}
-                disabled={!isDirty || saveState === "saving"}
+                disabled={!isDirty || saveState === "saving" || !canPersist}
                 className="rounded-md border border-border/70 px-3 py-1.5 text-[10px] font-mono uppercase tracking-[0.1em] text-foreground transition disabled:cursor-not-allowed disabled:opacity-35"
               >
                 {saveState === "saving" ? "Saving..." : "Save"}
@@ -399,7 +458,7 @@ export default function TemplateBuilderPage({
               <button
                 type="button"
                 onClick={publishPortfolio}
-                disabled={publishState === "publishing"}
+                disabled={publishState === "publishing" || !canPersist}
                 className="rounded-md bg-foreground px-3 py-1.5 text-[10px] font-mono uppercase tracking-[0.1em] text-primary-foreground transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {publishState === "publishing"
@@ -411,6 +470,25 @@ export default function TemplateBuilderPage({
             </div>
           </div>
         </div>
+
+        {loadState === "failed" && (
+          <div
+            role="alert"
+            className="shrink-0 flex flex-wrap items-center justify-between gap-3 border-b border-red-200 bg-red-50 px-5 py-2 text-[11px] text-red-700 sm:px-6"
+          >
+            <span>
+              Your saved portfolio could not be loaded. Saving and publishing
+              are turned off so your saved work is not overwritten.
+            </span>
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="rounded-md border border-red-300 px-3 py-1 font-mono uppercase tracking-[0.1em] hover:bg-red-100"
+            >
+              Reload
+            </button>
+          </div>
+        )}
 
         {publishState === "published" && portfolioSlug && !isDirty && (
           <div className="shrink-0 flex flex-wrap items-center justify-end gap-3 border-b border-border/40 bg-white px-5 py-2 text-[10px] font-mono uppercase tracking-[0.1em] text-foreground/50 sm:px-6">
@@ -459,7 +537,14 @@ export default function TemplateBuilderPage({
                   Fill in your details. The preview updates live.
                 </p>
               </div>
-              <InlineEditor data={data} onChange={setData} />
+              <InlineEditor
+                data={data}
+                onChange={setData}
+                onUploadStart={() => setActiveUploads((count) => count + 1)}
+                onUploadEnd={() =>
+                  setActiveUploads((count) => Math.max(0, count - 1))
+                }
+              />
             </div>
           </motion.aside>
 

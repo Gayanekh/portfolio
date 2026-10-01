@@ -40,6 +40,26 @@ export async function getUniqueSlug(supabase: SupabaseClient, baseSlug: string) 
   }
 }
 
+// Image fields hold "" or an https:// URL (Supabase Storage). data:image/
+// values are legacy Base64 images, still accepted until they are migrated.
+// Anything else, such as blob: URLs, is rejected.
+function isImageValue(value: unknown) {
+  return (
+    typeof value === "string" &&
+    (value === "" ||
+      value.startsWith("https://") ||
+      value.startsWith("data:image/"))
+  );
+}
+
+function hasValidProjectImages(projects: unknown[]) {
+  return projects.every((project) => {
+    if (!project || typeof project !== "object") return false;
+    const image = (project as { image?: unknown }).image;
+    return image === undefined || isImageValue(image);
+  });
+}
+
 export function isPortfolioData(value: unknown): value is PortfolioData {
   if (!value || typeof value !== "object") return false;
   const data = value as Partial<PortfolioData>;
@@ -49,12 +69,13 @@ export function isPortfolioData(value: unknown): value is PortfolioData {
     typeof data.role === "string" &&
     typeof data.availableYear === "string" &&
     typeof data.email === "string" &&
-    typeof data.avatar === "string" &&
+    isImageValue(data.avatar) &&
     typeof data.aboutHeading === "string" &&
     typeof data.aboutBody === "string" &&
     Array.isArray(data.services) &&
     Array.isArray(data.skills) &&
     Array.isArray(data.projects) &&
+    hasValidProjectImages(data.projects) &&
     data.navigation !== undefined &&
     typeof data.showScrollProgress === "boolean"
   );
