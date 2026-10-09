@@ -19,9 +19,5 @@ export default async function RegisterPage({
 
   if (user) redirect(next);
 
-  return (
-    <main className="login-page text-foreground">
-      <AuthForm mode="register" next={next} />
-    </main>
-  );
+  return <AuthForm mode="register" next={next} />;
 }

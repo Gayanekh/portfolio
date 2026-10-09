@@ -66,7 +66,7 @@ export default function TemplateCard({
         <div
           className={`
             relative aspect-[16/10] overflow-hidden
-            ${isDark ? "bg-[#0e0e0e]" : "bg-[#f5f5f3]"}
+            ${isDark ? "bg-foreground" : "bg-card"}
           `}
         >
           {isDark ? (

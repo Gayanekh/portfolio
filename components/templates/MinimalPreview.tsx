@@ -16,10 +16,10 @@ export default function MinimalPreview({
   const hasWork = data.projects.length > 0;
 
   return (
-    <div className="min-h-full bg-[#f8f8f8] px-6 sm:px-10 lg:px-14 py-10">
+    <div className="min-h-full bg-card px-6 sm:px-10 lg:px-14 py-10">
       {data.navigation.enabled && (
         <nav
-          className="sticky top-0 z-20 mb-10 grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-4 border-b border-border/40 bg-[#f8f8f8]/95 px-2 text-[9px] font-sans font-medium uppercase tracking-[0.1em] text-foreground/70 backdrop-blur-sm"
+          className="sticky top-0 z-20 mb-10 grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-4 border-b border-border/40 bg-card/95 px-2 text-[9px] font-sans font-medium uppercase tracking-[0.1em] text-foreground/70 backdrop-blur-sm"
           aria-label="Portfolio navigation"
         >
           <span className="truncate">{data.name || "Your Name"}</span>
@@ -56,7 +56,7 @@ export default function MinimalPreview({
               <summary className="cursor-pointer list-none rounded px-2 py-1 text-[9px] tracking-[0.1em] hover:bg-foreground/5">
                 Menu
               </summary>
-              <div className="absolute right-0 top-9 z-30 min-w-32 space-y-2 rounded-md border border-border/50 bg-[#f8f8f8] p-3 shadow-lg shadow-black/5">
+              <div className="absolute right-0 top-9 z-30 min-w-32 space-y-2 rounded-md border border-border/50 bg-card p-3 shadow-lg shadow-black/5">
                 {data.navigation.links.work && hasWork && (
                   <a href="#work" className="block hover:opacity-60">
                     Work

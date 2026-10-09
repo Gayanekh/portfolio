@@ -82,7 +82,7 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="bg-[#f8f8f8] min-h-screen px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24 2xl:px-40">
+    <div className="bg-card min-h-screen px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24 2xl:px-40">
       <PortfolioNav />
       <div className="flex flex-col gap-8 sm:gap-10 md:gap-12 lg:flex-row lg:gap-16 xl:gap-20 pt-14 sm:pt-16 lg:pt-0">
         <PortfolioAside progress={progress} />

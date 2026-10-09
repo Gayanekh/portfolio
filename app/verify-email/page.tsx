@@ -13,7 +13,7 @@ export default async function VerifyEmailPage({
   const next = getSafeNext(params.next);
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#fafafa] px-6 py-16">
+    <main className="flex min-h-screen items-center justify-center bg-background px-6 py-16">
       <VerifyEmailForm email={email} next={next} />
     </main>
   );

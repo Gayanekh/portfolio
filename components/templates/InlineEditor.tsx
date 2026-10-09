@@ -3,6 +3,8 @@
 import { useRef, useState, type SetStateAction } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, Plus, Trash2, Upload, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { PortfolioData, ProjectData } from "@/context/PortfolioContext";
 import {
   ACCEPTED_IMAGE_TYPES,
@@ -225,7 +227,7 @@ export default function InlineEditor({
     uploadImage("avatar", input, (prev, url) => ({ ...prev, avatar: url }));
 
   const inputClass =
-    "w-full bg-white border border-border/60 rounded-lg px-3.5 py-2.5 text-sm font-light text-foreground/75 outline-none focus:border-foreground/35 focus:ring-1 focus:ring-foreground/10 transition-all placeholder:text-foreground/30";
+    "w-full px-3.5 py-2.5 text-sm font-light text-foreground/75 placeholder:text-foreground/30";
   const labelClass =
     "text-[10px] font-mono font-normal tracking-[0.1em] uppercase text-foreground/50 block mb-1";
   const sectionClass = "pt-1";
@@ -311,7 +313,7 @@ export default function InlineEditor({
 
           <div>
             <label className={labelClass}>Name</label>
-            <input
+            <Input
               className={inputClass}
               placeholder="Your name"
               value={data.name}
@@ -320,7 +322,7 @@ export default function InlineEditor({
           </div>
           <div>
             <label className={labelClass}>Role / Tagline</label>
-            <input
+            <Input
               className={inputClass}
               placeholder="Product designer"
               value={data.role}
@@ -330,7 +332,7 @@ export default function InlineEditor({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className={labelClass}>Available for work</label>
-              <input
+              <Input
                 className={inputClass}
                 placeholder="Year, e.g. 2026"
                 value={data.availableYear}
@@ -339,7 +341,7 @@ export default function InlineEditor({
             </div>
             <div>
               <label className={labelClass}>Email</label>
-              <input
+              <Input
                 type="email"
                 className={inputClass}
                 placeholder="you@email.com"
@@ -432,7 +434,7 @@ export default function InlineEditor({
         <div className="space-y-3">
           <div>
             <label className={labelClass}>Heading</label>
-            <input
+            <Input
               className={inputClass}
               placeholder="A short introduction"
               value={data.aboutHeading}
@@ -441,7 +443,7 @@ export default function InlineEditor({
           </div>
           <div>
             <label className={labelClass}>Bio</label>
-            <textarea
+            <Textarea
               className={`${inputClass} resize-none`}
               rows={3}
               placeholder="Write a short introduction about yourself"
@@ -458,7 +460,7 @@ export default function InlineEditor({
         <div className="space-y-2">
           {data.services.map((service, index) => (
             <div key={index} className="flex items-center gap-2">
-              <input
+              <Input
                 className={`flex-1 ${inputClass}`}
                 placeholder="e.g. UX Design"
                 value={service}
@@ -491,7 +493,7 @@ export default function InlineEditor({
           {data.skills.map((skill, index) => (
             <div
               key={index}
-              className="flex items-center gap-1.5 rounded-md border border-border/60 bg-white px-2.5 py-1.5"
+              className="flex items-center gap-1.5 rounded-[0.5rem] border border-[rgb(219_218_222/0.9)] bg-white px-2.5 py-1.5 transition-[border-color] duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] hover:border-[rgb(158_158_167/0.7)] focus-within:border-muted-foreground"
             >
               <input
                 className="w-24 bg-transparent text-xs font-light text-foreground/75 outline-none placeholder:text-foreground/30"
@@ -614,7 +616,7 @@ export default function InlineEditor({
 
                       <div>
                         <label className={labelClass}>Title</label>
-                        <input
+                        <Input
                           className={inputClass}
                           placeholder="Project Name"
                           value={proj.title}
@@ -625,7 +627,7 @@ export default function InlineEditor({
                       </div>
                       <div>
                         <label className={labelClass}>Description</label>
-                        <textarea
+                        <Textarea
                           className={`${inputClass} resize-none`}
                           rows={2}
                           placeholder="What is this project about?"
@@ -638,7 +640,7 @@ export default function InlineEditor({
                       <div className="grid grid-cols-2 gap-3">
                         <div>
                           <label className={labelClass}>Focus</label>
-                          <input
+                          <Input
                             className={inputClass}
                             placeholder="Design, Dev"
                             value={proj.focus.join(", ")}
@@ -656,7 +658,7 @@ export default function InlineEditor({
                         </div>
                         <div>
                           <label className={labelClass}>Year</label>
-                          <input
+                          <Input
                             className={inputClass}
                             placeholder="2025"
                             value={proj.year}

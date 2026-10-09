@@ -3,13 +3,12 @@ import Image from "next/image";
 export default function BrandMark() {
   return (
     <Image
-      src="/images/brand/portory-logo.svg"
+      src="/images/brand/portory-wordmark.png"
       alt="Portory"
-      width={1536}
-      height={768}
-      className="h-8 w-[184px] max-w-full rounded-md object-cover object-center"
+      width={1064}
+      height={276}
+      className="h-8 w-auto max-w-full"
       priority
     />
   );
 }
-

@@ -268,13 +268,13 @@ export default function TemplateBuilderPage({
     const selectedId = pageState.selected;
 
     return (
-      <div className="min-h-screen bg-[#fafafa]">
+      <div className="min-h-screen bg-background">
         {/* Nav */}
         <motion.nav
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.05 }}
-          className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 sm:px-8 lg:px-10 py-5 bg-[#fafafa]/80 backdrop-blur-xl"
+          className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 sm:px-8 lg:px-10 py-5 bg-background/80 backdrop-blur-xl"
         >
           <Link
             href="/demo/minimal"
@@ -328,7 +328,7 @@ export default function TemplateBuilderPage({
                   <div className="flex items-center gap-3 min-w-0">
                     <div
                       className={`w-3 h-3 rounded-full shrink-0 ${
-                        selectedId === "bold" ? "bg-[#111]" : "bg-[#e8e8e6]"
+                        selectedId === "bold" ? "bg-foreground" : "bg-muted"
                       }`}
                     />
                     <p className="text-[11px] font-mono tracking-[0.1em] uppercase text-foreground/40 truncate">
@@ -382,7 +382,7 @@ export default function TemplateBuilderPage({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.35 }}
-        className="h-screen bg-[#f5f5f3] flex flex-col overflow-hidden"
+        className="h-screen bg-card flex flex-col overflow-hidden"
       >
         {/* Top bar */}
         <div className="shrink-0 bg-white/90 backdrop-blur-xl border-b border-border/40 px-5 sm:px-6 py-3.5 flex items-center justify-between gap-4">
@@ -427,7 +427,7 @@ export default function TemplateBuilderPage({
             <span className="hidden sm:flex items-center gap-2 text-[10px] font-mono tracking-[0.12em] uppercase text-foreground/25 bg-foreground/[0.03] border border-border/30 rounded-lg px-3 py-1.5">
               <span
                 className={`w-2 h-2 rounded-full ${
-                  isDark ? "bg-[#111]" : "bg-[#e8e8e6]"
+                  isDark ? "bg-foreground" : "bg-muted"
                 }`}
               />
               {activeTemplate.name}
@@ -523,7 +523,7 @@ export default function TemplateBuilderPage({
             initial={{ opacity: 0, x: -16 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className={`lg:w-[420px] xl:w-[460px] shrink-0 min-h-0 flex-1 lg:flex-none h-full overflow-y-auto overscroll-contain bg-[#fafafa] border-r border-border/30 ${
+            className={`lg:w-[420px] xl:w-[460px] shrink-0 min-h-0 flex-1 lg:flex-none h-full overflow-y-auto overscroll-contain bg-background border-r border-border/30 ${
               mobileView === "editor" ? "block" : "hidden lg:block"
             }`}
             data-lenis-prevent
@@ -553,7 +553,7 @@ export default function TemplateBuilderPage({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4, delay: 0.2 }}
-            className={`flex-1 min-w-0 min-h-0 h-full overflow-hidden bg-[#eeeee9] ${
+            className={`flex-1 min-w-0 min-h-0 h-full overflow-hidden bg-muted ${
               mobileView === "preview" ? "block" : "hidden lg:block"
             }`}
             data-lenis-prevent
@@ -563,7 +563,7 @@ export default function TemplateBuilderPage({
               <div
                 className={`
                   flex h-full min-h-0 flex-col overflow-hidden rounded-xl shadow-2xl shadow-black/8
-                  ${isDark ? "bg-[#1a1a1a]" : "bg-white"}
+                  ${isDark ? "bg-foreground" : "bg-white"}
                   border ${isDark ? "border-white/[0.06]" : "border-border/30"}
                 `}
               >
@@ -571,8 +571,8 @@ export default function TemplateBuilderPage({
                 <div
                   className={`flex items-center gap-2 px-4 py-2.5 border-b ${
                     isDark
-                      ? "border-white/[0.06] bg-[#111]"
-                      : "border-border/20 bg-[#fafafa]"
+                      ? "border-white/[0.06] bg-foreground"
+                      : "border-border/20 bg-background"
                   }`}
                 >
                   <div className="flex gap-1.5">
