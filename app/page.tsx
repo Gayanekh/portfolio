@@ -3,7 +3,7 @@ import PortoryLanding from "@/components/landing/PortoryLanding";
 export default function Page() {
   if (process.env.VERCEL_ENV === "production") {
     return (
-      <main className="flex min-h-screen items-center bg-[#fafafa] px-6 py-16 text-foreground sm:px-8 lg:px-10">
+      <main className="flex min-h-screen items-center bg-background px-6 py-16 text-foreground sm:px-8 lg:px-10">
         <div className="mx-auto w-full max-w-[1200px]">
           <p className="mb-12 text-[10px] font-mono uppercase tracking-[0.25em] text-foreground/45">
             Portory

@@ -20,8 +20,7 @@ export default function AuthForm({ mode, next, verified = false }: AuthFormProps
   const [lastName, setLastName] = useState("");
   const router = useRouter();
   const supabase = createClient();
-  const [activeMode, setActiveMode] = useState<AuthMode>(mode);
-  const isRegister = activeMode === "register";
+  const isRegister = mode === "register";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -121,18 +120,16 @@ export default function AuthForm({ mode, next, verified = false }: AuthFormProps
     router.refresh();
   }
 
+  // Carry a non-default destination over between the two auth routes.
+  const safeNext = getSafeNext(next);
+  const nextQuery = safeNext === getSafeNext(null) ? "" : `?${new URLSearchParams({ next: safeNext })}`;
+
   return (
     <LoginExperience
-      mode={activeMode}
+      mode={mode}
       firstName={firstName} lastName={lastName} confirmPassword={confirmPassword}
       onFirstNameChange={setFirstName} onLastNameChange={setLastName} onConfirmPasswordChange={setConfirmPassword}
-      onModeChange={() => {
-        if (isLoading) return;
-        setActiveMode(isRegister ? "login" : "register");
-        setError("");
-        setMessage("");
-        setShowPassword(false);
-      }}
+      loginHref={`/login${nextQuery}`} registerHref={`/register${nextQuery}`}
       email={email} password={password} error={error} message={message}
       isLoading={isLoading} showPassword={showPassword} verified={verified}
       onEmailChange={setEmail} onPasswordChange={setPassword}

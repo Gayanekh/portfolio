@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
 import { createProfile } from "@/lib/profile";
 
@@ -147,7 +148,7 @@ export default function VerifyEmailForm({ email, next }: VerifyEmailFormProps) {
           >
             Verification code
           </label>
-          <input
+          <Input
             id="verification-code"
             type="text"
             inputMode="numeric"
@@ -160,7 +161,7 @@ export default function VerifyEmailForm({ email, next }: VerifyEmailFormProps) {
             onChange={(event) =>
               setCode(event.target.value.replace(/\D/g, "").slice(0, 6))
             }
-            className="w-full rounded-md border border-border/70 bg-white px-3.5 py-3 text-center font-mono text-lg tracking-[0.35em] text-foreground outline-none transition focus:border-foreground/40 focus:ring-1 focus:ring-foreground/10"
+            className="w-full px-3.5 py-3 text-center font-mono text-lg tracking-[0.35em] text-foreground"
           />
         </div>
 

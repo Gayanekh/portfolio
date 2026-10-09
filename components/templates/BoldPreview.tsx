@@ -10,10 +10,10 @@ export default function BoldPreview({ data }: BoldPreviewProps) {
   const hasWork = data.projects.length > 0;
 
   return (
-    <div className="min-h-full bg-[#111] text-white">
+    <div className="min-h-full bg-foreground text-white">
       {data.navigation.enabled && (
         <nav
-          className="sticky top-0 z-20 grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-4 border-b border-white/10 bg-[#111]/95 px-6 text-[9px] font-sans font-medium uppercase tracking-[0.1em] text-white/60 backdrop-blur-sm sm:px-10 lg:px-14"
+          className="sticky top-0 z-20 grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-4 border-b border-white/10 bg-foreground/95 px-6 text-[9px] font-sans font-medium uppercase tracking-[0.1em] text-white/60 backdrop-blur-sm sm:px-10 lg:px-14"
           aria-label="Portfolio navigation"
         >
           <span className="truncate text-white/80">
@@ -52,7 +52,7 @@ export default function BoldPreview({ data }: BoldPreviewProps) {
               <summary className="cursor-pointer list-none rounded px-2 py-1 text-[9px] tracking-[0.1em] hover:bg-white/5">
                 Menu
               </summary>
-              <div className="absolute right-0 top-9 z-30 min-w-32 space-y-2 rounded-md border border-white/10 bg-[#111] p-3 shadow-lg shadow-black/20">
+              <div className="absolute right-0 top-9 z-30 min-w-32 space-y-2 rounded-md border border-white/10 bg-foreground p-3 shadow-lg shadow-black/20">
                 {data.navigation.links.work && hasWork && (
                   <a href="#work" className="block hover:text-white">
                     Work

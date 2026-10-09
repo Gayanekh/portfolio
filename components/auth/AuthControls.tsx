@@ -185,13 +185,13 @@ export default function AuthControls() {
     <div className="flex items-center gap-4">
       <Link
         href="/login"
-        className="text-xs text-foreground/55 transition-colors hover:text-foreground"
+        className="text-base  transition-colors hover:text-foreground font-medium uppercase"
       >
-        Sign In
+       Log in 
       </Link>
       <Link
         href="/templates"
-        className="rounded-md bg-foreground px-4 py-2 text-xs text-primary-foreground transition-opacity hover:opacity-80"
+        className="rounded-md bg-foreground px-4 py-2  text-primary-foreground transition-opacity hover:opacity-80"
       >
         Get Started
       </Link>

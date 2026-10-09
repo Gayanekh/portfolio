@@ -19,6 +19,9 @@ const LenisProvider = ({ children }: LenisProviderProps) => {
     const lenis = new Lenis({
       smoothWheel: true,
       syncTouch: true,
+      // Lenis handles in-page #hash links itself, so they scroll smoothly
+      // instead of competing with the browser's native anchor jump.
+      anchors: true,
     });
 
     let animationFrameId = 0;

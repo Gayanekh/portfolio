@@ -17,9 +17,5 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
   if (user) redirect(next);
 
-  return (
-    <main className="login-page text-foreground">
-      <AuthForm mode="login" next={next} verified={params.verified === "1"} />
-    </main>
-  );
+  return <AuthForm mode="login" next={next} verified={params.verified === "1"} />;
 }

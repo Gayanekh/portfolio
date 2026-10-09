@@ -1,111 +1,131 @@
-import Link from "next/link";
+"use client";
 
-const images = [
-  "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1000&q=80",
-  "https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1000&q=80",
-  "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1000&q=80",
-];
+import { useEffect, useState, type PointerEvent } from "react";
+import { AnimatePresence, motion, useMotionValue, useReducedMotionConfig, useSpring, useTransform } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+import { Reveal } from "@/components/landing/Reveal";
+import { LandingSection, SectionHeader } from "@/components/landing/Section";
+import { Art, TEMPLATE_IMAGE } from "@/components/landing/sample-portfolios";
+import { ease, focusRing, text } from "@/components/landing/landing-ui";
 
-function LightPreview({ side = "left" }: { side?: "left" | "right" }) {
+// Mock template thumbnails (free Unsplash photos) until the real templates exist.
+const photo = (id: string) => `https://images.unsplash.com/${id}?auto=format&fit=crop&q=75&w=700`;
+const TILES = [
+  "photo-1467232004584-a241de8bcf5d",
+  "photo-1642132652860-471b4228023e",
+  "photo-1634084462412-b54873c0a56d",
+  "photo-1648134859177-66e35b61e106",
+  null, // the centre tile, which cycles through the templates
+  "photo-1530435460869-d13625c69bbf",
+  "photo-1646193186138-148d07f84b13",
+  "photo-1649442746245-f51f4b76963f",
+  "photo-1627896181038-a0cf83c86008",
+].map((id) => id && photo(id));
+const CENTRE = Object.values(TEMPLATE_IMAGE);
+const CYCLE_MS = 2600;
+
+// The template wall from the reference: a dark card filled with a grid of
+// template thumbnails that fades into the dark at its edges. The centre one
+// keeps changing, the card leans towards the pointer, and the call to action
+// sits at the bottom.
+function TemplateWall() {
+  const reduced = useReducedMotionConfig();
+  const [shown, setShown] = useState(0);
+  const px = useMotionValue(0);
+  const py = useMotionValue(0);
+  const rotateY = useSpring(useTransform(px, [-0.5, 0.5], [-6, 6]), { stiffness: 150, damping: 20 });
+  const rotateX = useSpring(useTransform(py, [-0.5, 0.5], [5, -5]), { stiffness: 150, damping: 20 });
+
+  useEffect(() => {
+    if (reduced) return;
+    const timer = setInterval(() => setShown((i) => (i + 1) % CENTRE.length), CYCLE_MS);
+    return () => clearInterval(timer);
+  }, [reduced]);
+
+  const lean = (event: PointerEvent<HTMLAnchorElement>) => {
+    if (reduced || event.pointerType !== "mouse") return;
+    const box = event.currentTarget.getBoundingClientRect();
+    px.set((event.clientX - box.left) / box.width - 0.5);
+    py.set((event.clientY - box.top) / box.height - 0.5);
+  };
+  const rest = () => {
+    px.set(0);
+    py.set(0);
+  };
+
   return (
-    <div className="bg-white px-3 py-3 text-foreground">
-      <div className="mb-4 flex items-start justify-between gap-2">
-        <div>
-          <p className="text-[8px] font-medium">
-            {side === "left" ? "Hi, I'm" : "Olivia Carter"}
-          </p>
-          <p className="text-[8px] font-medium">
-            {side === "left" ? "Sarah Lee" : "Photographer"}
-          </p>
-          <p className="mt-1 text-[5px] text-foreground/45">
-            Selected work and ideas
-          </p>
+    <div className="[perspective:1200px]">
+      <motion.a
+        href="#templates"
+        onPointerMove={lean}
+        onPointerLeave={rest}
+        style={{ rotateX, rotateY }}
+        className={`${focusRing} group relative block h-[25rem] overflow-hidden rounded-3xl bg-foreground no-underline md:h-auto md:aspect-[8/7]`}
+      >
+        {/* The grid runs past the card's sides and bottom, so the outer tiles are cut off. */}
+        <div aria-hidden="true" className="absolute -inset-x-[14%] -top-[6%] grid h-full grid-cols-3 grid-rows-3 gap-3 md:gap-4">
+          {TILES.map((src, i) =>
+            src ? (
+              // eslint-disable-next-line @next/next/no-img-element -- remote mock photo
+              <img key={i} src={src} alt="" loading="lazy" decoding="async" className="h-full w-full rounded-md object-cover opacity-60" />
+            ) : (
+              <div key={i} className="relative overflow-hidden rounded-md">
+                <AnimatePresence initial={false}>
+                  <motion.img
+                    key={shown}
+                    src={CENTRE[shown]}
+                    alt=""
+                    decoding="async"
+                    initial={{ opacity: 0, scale: 1.06 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.9, ease }}
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                </AnimatePresence>
+              </div>
+            ),
+          )}
         </div>
-        <span className="h-7 w-7 rounded-full bg-foreground/10" />
-      </div>
-      <p className="mb-1 text-[5px] font-mono uppercase tracking-wider text-foreground/45">
-        Selected work
-      </p>
-      <div className="grid grid-cols-3 gap-1">
-        {images.map((image) => (
-          <img
-            key={image}
-            src={image}
-            alt="Portfolio project preview"
-            className="aspect-[4/3] w-full object-cover grayscale-[20%]"
-          />
-        ))}
-      </div>
+        {/* Fade the edges and the bottom into the dark. */}
+        <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_42%,transparent_30%,rgb(0_0_0/0.55)_80%)]" />
+        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-foreground from-45% to-transparent" />
+        <span className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-2 whitespace-nowrap p-5 text-center text-lg font-semibold tracking-[-0.01em] text-white md:text-base lg:text-xl xl:p-7 xl:text-2xl">
+          Browse website templates
+          <ArrowRight aria-hidden="true" strokeWidth={2} className="size-5 transition-transform duration-300 group-hover:translate-x-1 xl:size-6" />
+        </span>
+      </motion.a>
     </div>
   );
 }
 
-function DarkPreview() {
-  return (
-    <div className="bg-[#111] px-4 py-4 text-white">
-      <p className="text-[5px] font-mono uppercase tracking-[0.2em] text-white/40">
-        Portfolio
-      </p>
-      <p className="mt-5 text-[15px] font-light leading-none">Danilo Silva</p>
-      <p className="mt-1 text-[7px] text-white/45">Developer</p>
-      <div className="mt-5 grid grid-cols-2 gap-1.5">
-        {images.slice(0, 2).map((image) => (
-          <img
-            key={image}
-            src={image}
-            alt="Portfolio project preview"
-            className="aspect-[4/3] w-full object-cover opacity-80"
-          />
-        ))}
-      </div>
-      <p className="mt-3 text-[5px] text-white/35">Selected projects</p>
-    </div>
-  );
-}
-
+// Contact section, laid out like the reference: one light card with a tag,
+// a large heading, a short paragraph and a small sign-off at the bottom on
+// the left, and the template wall on the right. Keeps the #contact anchor.
 export default function FinalCTA() {
   return (
-    <section className="px-6 py-16 sm:px-8 lg:px-10 lg:py-20">
-      <div className="mx-auto grid max-w-[1200px] overflow-hidden rounded-xl border border-border/60 bg-[#f1f1ee] lg:min-h-[330px] lg:grid-cols-[0.55fr_1fr]">
-        <div className="relative z-20 flex flex-col justify-center px-7 py-10 sm:px-10 lg:px-12 lg:py-11">
-          <h2 className="text-3xl font-normal leading-[1.08] tracking-tight text-foreground sm:text-4xl">
-            Your work deserves
-            <br />a place of its own.
-          </h2>
-          <p className="mt-4 max-w-xs text-xs leading-relaxed text-foreground/50 sm:text-sm">
-            Join Portory and create a portfolio you&apos;ll be proud to share.
-          </p>
-          <Link
-            href="/templates"
-            className="mt-6 inline-flex w-fit items-center gap-3 rounded-md bg-foreground px-4 py-2.5 text-[11px] text-primary-foreground transition-opacity hover:opacity-80"
-          >
-            Build Your Portfolio <span aria-hidden="true">-&gt;</span>
-          </Link>
+    <LandingSection id="contact" label="Get started">
+      <SectionHeader
+        label="Get started"
+        title="Let's Build Yours"
+        intro="Your work deserves a place of its own. Pick a template and have a page ready to share."
+      />
+      <Reveal>
+        <div className="grid grid-cols-1 gap-8 rounded-[2rem] bg-white/55 p-5 shadow-[0_1px_2px_rgb(0_0_0/0.03)] ring-1 ring-foreground/5 md:grid-cols-2 md:gap-10 md:p-8 xl:p-10">
+          <div className="flex flex-col justify-between gap-10">
+            <div className="flex flex-col items-start gap-4 xl:gap-5">
+              <span className="rounded-full bg-white px-3 py-1.5 text-sm text-foreground shadow-[0_1px_2px_rgb(0_0_0/0.05)] ring-1 ring-foreground/5">Professional templates</span>
+              <h3 className="m-0 text-balance text-[length:clamp(2rem,8vw,2.75rem)] font-semibold leading-[1.1] tracking-[-0.025em] md:text-[length:clamp(2rem,3.6vw,3.5rem)]">
+                A Simple &amp; Professional Portfolio
+              </h3>
+              <p className={`${text.lgXl} m-0 max-w-[32rem] leading-snug text-foreground/75`}>
+                Start from a considered template, see every change in a live preview, and publish a page that works on every screen. One simple link is all you need to share it with your next opportunity.
+              </p>
+            </div>
+          </div>
+          <TemplateWall />
         </div>
-
-        <div className="relative flex min-h-[310px] flex-col items-center justify-center gap-3 overflow-hidden px-4 py-8 sm:min-h-[350px] sm:px-8 lg:block lg:min-h-[330px] lg:overflow-visible lg:px-2">
-          <div className="relative aspect-[16/10] w-full max-w-[340px] overflow-hidden rounded-lg border border-border/70 bg-white shadow-lg shadow-black/5 lg:absolute lg:left-0 lg:top-[30px] lg:w-[250px] lg:max-w-none xl:w-[300px]">
-            <div className="h-5 border-b border-border/50 bg-[#fafafa] px-2.5 py-1.5">
-              <span className="block h-1.5 w-1.5 rounded-full bg-foreground/15" />
-            </div>
-            <LightPreview />
-          </div>
-
-          <div className="relative z-10 aspect-[16/10] w-full max-w-[370px] overflow-hidden rounded-lg border border-white/10 bg-[#111] shadow-xl shadow-black/15 lg:absolute lg:left-[180px] lg:top-[10px] lg:w-[280px] lg:max-w-none xl:left-[220px] xl:w-[330px]">
-            <div className="h-5 border-b border-white/10 bg-[#0a0a0a] px-2.5 py-1.5">
-              <span className="block h-1.5 w-1.5 rounded-full bg-white/20" />
-            </div>
-            <DarkPreview />
-          </div>
-
-          <div className="relative aspect-[16/10] w-full max-w-[340px] overflow-hidden rounded-lg border border-border/70 bg-white shadow-lg shadow-black/5 lg:absolute lg:left-[400px] lg:top-[30px] lg:w-[250px] lg:max-w-none xl:left-[470px] xl:w-[300px]">
-            <div className="h-5 border-b border-border/50 bg-[#fafafa] px-2.5 py-1.5">
-              <span className="block h-1.5 w-1.5 rounded-full bg-foreground/15" />
-            </div>
-            <LightPreview side="right" />
-          </div>
-        </div>
-      </div>
-    </section>
+      </Reveal>
+    </LandingSection>
   );
 }
