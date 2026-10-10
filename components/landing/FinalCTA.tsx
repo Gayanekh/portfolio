@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState, type PointerEvent } from "react";
 import { AnimatePresence, motion, useMotionValue, useReducedMotionConfig, useSpring, useTransform } from "framer-motion";
 import { ArrowRight } from "lucide-react";
@@ -7,6 +8,8 @@ import { Reveal } from "@/components/landing/Reveal";
 import { LandingSection, SectionHeader } from "@/components/landing/Section";
 import { Art, TEMPLATE_IMAGE } from "@/components/landing/sample-portfolios";
 import { ease, focusRing, text } from "@/components/landing/landing-ui";
+
+const MotionLink = motion.create(Link);
 
 // Mock template thumbnails (free Unsplash photos) until the real templates exist.
 const photo = (id: string) => `https://images.unsplash.com/${id}?auto=format&fit=crop&q=75&w=700`;
@@ -55,8 +58,8 @@ function TemplateWall() {
 
   return (
     <div className="[perspective:1200px]">
-      <motion.a
-        href="#templates"
+      <MotionLink
+        href="/templates/gallery"
         onPointerMove={lean}
         onPointerLeave={rest}
         style={{ rotateX, rotateY }}
@@ -94,7 +97,7 @@ function TemplateWall() {
           Browse website templates
           <ArrowRight aria-hidden="true" strokeWidth={2} className="size-5 transition-transform duration-300 group-hover:translate-x-1 xl:size-6" />
         </span>
-      </motion.a>
+      </MotionLink>
     </div>
   );
 }
