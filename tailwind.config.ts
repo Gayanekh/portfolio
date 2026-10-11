@@ -53,6 +53,10 @@ const config: Config = {
           DEFAULT: token("card"),
           foreground: token("card-foreground"),
         },
+        popover: {
+          DEFAULT: token("popover"),
+          foreground: token("popover-foreground"),
+        },
         destructive: token("destructive"),
         success: {
           DEFAULT: token("success"),
