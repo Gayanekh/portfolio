@@ -1,5 +1,6 @@
 import type { ComponentType } from "react";
 import MinimalPreview from "@/components/templates/MinimalPreview";
+import ProductTemplate from "@/components/template-detail/examples/ProductTemplate";
 import { demoPortfolioData } from "@/components/templates/demo-data";
 import { GALLERY_TEMPLATES } from "@/components/gallery/gallery-templates";
 
@@ -36,6 +37,16 @@ const LIVE_TEMPLATES: TemplateDetail[] = [
     useHref: "/templates?template=minimal&edit=1",
     demoHref: "/demo/minimal",
     Preview: MinimalSample,
+  },
+  // TEST TEMPLATE — delete with examples/ProductTemplate.tsx after testing.
+  {
+    id: "product",
+    name: "Product",
+    description:
+      "A single product page with a large serif title, price, quantity and add-to-cart, and an ingredients section. Pick a palette and a font pack below.",
+    bestFor: "Makers and small shops",
+    useHref: "/templates/editor/product",
+    Preview: ProductTemplate,
   },
 ];
 

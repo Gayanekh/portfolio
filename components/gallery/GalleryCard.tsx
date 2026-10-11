@@ -25,7 +25,7 @@ export default function GalleryCard({ template, index }: { template: GalleryTemp
       className="list-none"
     >
       <MotionLink
-        href={templateDetailHref(template.id)}
+        href={template.href ?? templateDetailHref(template.id)}
         aria-label={`View the ${template.name} template, for ${template.bestFor.toLowerCase()}`}
         initial="rest"
         animate="rest"

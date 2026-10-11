@@ -13,6 +13,8 @@ export interface GalleryTemplate {
   image?: string;
   // A real template from the template registry (components/template-detail).
   live?: boolean;
+  // Where the card leads, if not the template's detail page.
+  href?: string;
 }
 
 const photo = (id: string) => `https://images.unsplash.com/${id}?auto=format&fit=crop&q=80&w=1100`;
@@ -26,6 +28,8 @@ export const GALLERY_STYLES: { id: GalleryStyle | "all"; label: string }[] = [
 
 export const GALLERY_TEMPLATES: GalleryTemplate[] = [
   { id: "minimal", name: "Minimal", style: "case", bestFor: "Designers and creatives", live: true },
+  // TEST TEMPLATE — delete after testing (see components/template-detail/examples/ProductTemplate.tsx).
+  { id: "product", name: "Product", style: "image", bestFor: "Makers and small shops", live: true, href: "/templates/editor/product" },
   { id: "atelier", name: "Atelier", style: "image", bestFor: "Designers and makers", image: photo("photo-1487014679447-9f8336841d58") },
   { id: "ledger", name: "Ledger", style: "text", bestFor: "Teachers and consultants", image: photo("photo-1502945015378-0e284ca1a5be") },
   { id: "gallery", name: "Gallery", style: "image", bestFor: "Photographers and artists", image: photo("photo-1592839961515-64c68091f712") },
