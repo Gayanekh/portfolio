@@ -15,40 +15,35 @@ import {
   Play,
   Redo2,
   Smartphone,
-  Store,
+  Type,
   Undo2,
   X,
 } from "lucide-react";
-import { getTemplateDetail } from "@/components/template-detail/template-registry";
 import { ease, focusRing, primaryButton } from "@/components/landing/landing-ui";
 import { createSlug } from "@/lib/portfolios";
 import SelectCard from "@/components/template-editor/SelectCard";
-import ProductTemplate, {
-  PRODUCT_CONTENT,
-  PRODUCT_SECTIONS,
-  type ProductContent,
-  type ProductSectionId,
-  type ProductTextKey,
-} from "@/components/template-detail/examples/ProductTemplate";
-import { findFontPack, findPalette, themeFontVariables } from "@/components/template-detail/theme-options";
+import TemplateRenderer from "@/components/site-templates/core/TemplateRenderer";
+import { mergeContent, readSiteTitle } from "@/components/site-templates/core/content";
+import type { EditHooks, TemplateContent, TemplateDefinition } from "@/components/site-templates/core/types";
+import { getSiteTemplate } from "@/components/site-templates/registry";
+import { themeFontVariables } from "@/components/template-detail/theme-options";
+import ContentPanel from "@/components/template-editor/ContentPanel";
 import EditableSection, { type SectionAction } from "@/components/template-editor/EditableSection";
 import EditableText from "@/components/template-editor/EditableText";
-import ProductPanel from "@/components/template-editor/ProductPanel";
 import StylesPanel from "@/components/template-editor/StylesPanel";
 import { useEditHistory } from "@/components/template-editor/useEditHistory";
 
 type Mode = "view" | "edit" | "preview";
 type Device = "desktop" | "mobile";
-// What the canvas shows: the home page, or one of its sections.
-type Focus = ProductSectionId | "all";
+// What the canvas shows: the home page ("all"), or one of its sections.
+type Focus = string;
 interface EditorDoc {
-  content: ProductContent;
+  content: TemplateContent;
   palette: string;
   font: string;
 }
 
-const STORAGE_KEY = "portory-product-template";
-const DEFAULT_DOC: EditorDoc = { content: PRODUCT_CONTENT, palette: "original", font: "original" };
+const defaultDoc = (template: TemplateDefinition): EditorDoc => ({ content: mergeContent(template, null), palette: "original", font: "original" });
 const smooth = [0.22, 1, 0.36, 1] as const;
 const slide = "transition-[width,padding,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]";
 
@@ -59,28 +54,31 @@ const rise = (delay: number) => ({
   transition: { duration: 0.7, ease, delay },
 });
 
-// The sections list in the sidebar and the top bar.
-// The home page first, then its sections.
+// The sections list in the sidebar and the top bar: the home page first,
+// then the template's sections.
 type SectionOption = { id: Focus; label: string; menu?: string };
 const HOME_PAGE: SectionOption = { id: "all", label: "Home page" };
-const SECTION_OPTIONS: SectionOption[] = [HOME_PAGE, ...PRODUCT_SECTIONS];
-const sectionLabel = (id: Focus) => SECTION_OPTIONS.find((option) => option.id === id)!.label;
 
-// This example has no account behind it, so Save keeps the page in this browser.
-const readSaved = (): EditorDoc | null => {
+// Site templates have no account storage yet, so Save keeps the page in this
+// browser, one entry per template.
+const storageKey = (template: TemplateDefinition) => `portory-site-${template.id}`;
+const readSaved = (template: TemplateDefinition): EditorDoc => {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
+    const raw = localStorage.getItem(storageKey(template));
+    if (!raw) return defaultDoc(template);
     const saved = JSON.parse(raw);
-    // Text added to the template since the page was saved starts from its default.
-    return { ...DEFAULT_DOC, ...saved, content: { ...PRODUCT_CONTENT, ...saved.content } };
+    return {
+      palette: typeof saved?.palette === "string" ? saved.palette : "original",
+      font: typeof saved?.font === "string" ? saved.font : "original",
+      content: mergeContent(template, saved?.content),
+    };
   } catch {
-    return null;
+    return defaultDoc(template);
   }
 };
-const writeSaved = (doc: EditorDoc) => {
+const writeSaved = (key: string, doc: EditorDoc) => {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(doc));
+    localStorage.setItem(key, JSON.stringify(doc));
     return true;
   } catch {
     // Storage unavailable (private mode): the page still works for this visit.
@@ -88,20 +86,20 @@ const writeSaved = (doc: EditorDoc) => {
   }
 };
 
-// Publish, like Save, stays in this browser until templates such as this one
-// are stored with the account (the portfolios API takes Minimal and Bold only).
-// It keeps a copy of the page as published, to tell whether it has changed since.
-const PUBLISHED_KEY = `${STORAGE_KEY}-published`;
-const readPublished = (): string | null => {
+// Publish, like Save, stays in this browser until site templates are stored
+// with the account (the portfolios API takes Minimal and Bold only). It keeps
+// a copy of the page as published, to tell whether it has changed since.
+const publishedKey = (key: string) => `${key}-published`;
+const readPublished = (key: string): string | null => {
   try {
-    return localStorage.getItem(PUBLISHED_KEY);
+    return localStorage.getItem(publishedKey(key));
   } catch {
     return null;
   }
 };
-const writePublished = (doc: EditorDoc) => {
+const writePublished = (key: string, doc: EditorDoc) => {
   try {
-    localStorage.setItem(PUBLISHED_KEY, JSON.stringify(doc));
+    localStorage.setItem(publishedKey(key), JSON.stringify(doc));
     return true;
   } catch {
     return false;
@@ -122,44 +120,52 @@ function Tip({ label, children }: { label: string; children: ReactNode }) {
 
 const iconButton = "grid size-8 place-items-center rounded-md text-neutral-800 transition-colors hover:bg-neutral-100 disabled:cursor-default disabled:text-neutral-300 disabled:hover:bg-transparent";
 
-// The page editor from the reference, for the Product example template:
+// The page editor from the reference, for any site template (see
+// components/site-templates):
 // - View: the template's sidebar on the left and the page in a canvas card, with
 //   Edit, the page title, desktop/mobile view, Site Styles and Preview.
 // - Edit: the sidebar slides away and the canvas fills the screen. Hover a
 //   section to outline it and open its menu, click any text to type into it.
 //   Save, Exit (asks before discarding changes), Undo and Redo.
 // - Preview: the page alone, full screen, with a close button.
-export default function TemplateBuilderPageEditor({ backHref }: { backHref: string }) {
+export default function TemplateBuilderPageEditor({ backHref, templateId }: { backHref: string; templateId: string }) {
   // The saved page lives in this browser, so the editor starts on the client.
   const onClient = useSyncExternalStore(noSubscribe, () => true, () => false);
-  if (!onClient) return <div data-full-screen className="h-screen bg-white" />;
-  return <Editor backHref={backHref} initial={readSaved() ?? DEFAULT_DOC} />;
+  const template = getSiteTemplate(templateId);
+  if (!onClient || !template) return <div data-full-screen className="h-screen bg-white" />;
+  return <Editor key={template.id} backHref={backHref} template={template} initial={readSaved(template)} />;
 }
 
 const noSubscribe = () => () => {};
 
-function Editor({ backHref, initial }: { backHref: string; initial: EditorDoc }) {
+function Editor({ backHref, template, initial }: { backHref: string; template: TemplateDefinition; initial: EditorDoc }) {
+  const key = storageKey(template);
   const history = useEditHistory<EditorDoc>(initial);
   const doc = history.value;
   const [saved, setSaved] = useState<EditorDoc>(initial);
   const [mode, setMode] = useState<Mode>("view");
   const [device, setDevice] = useState<Device>("desktop");
   const [stylesOpen, setStylesOpen] = useState(false);
-  const [productOpen, setProductOpen] = useState(false);
-  const [selected, setSelected] = useState<ProductTextKey | null>(null);
+  // The section whose content panel is open.
+  const [contentSection, setContentSection] = useState<string | null>(null);
+  // The text being edited, as "section.field".
+  const [selected, setSelected] = useState<string | null>(null);
   const [confirmExit, setConfirmExit] = useState(false);
   const [focus, setFocus] = useState<Focus>("all");
   const [pickerOpen, setPickerOpen] = useState(false);
   const pageRef = useRef<HTMLDivElement>(null);
-  const [publishedDoc, setPublishedDoc] = useState<string | null>(readPublished);
+  const [publishedDoc, setPublishedDoc] = useState<string | null>(() => readPublished(key));
   const [feedback, setFeedback] = useState("");
   const [copied, setCopied] = useState(false);
   const dirty = JSON.stringify(doc) !== JSON.stringify(saved);
   // Published, and nothing has changed since.
   const published = !dirty && publishedDoc === JSON.stringify(doc);
   const editing = mode === "edit";
-  const template = getTemplateDetail("product")!;
-  const publicPath = `/p/${createSlug(doc.content.siteTitle)}`;
+  const siteTitle = readSiteTitle(template, doc.content);
+  const publicPath = `/p/${createSlug(siteTitle)}`;
+  const sectionOptions: SectionOption[] = [HOME_PAGE, ...template.sections.map(({ id, label, menu }) => ({ id, label, menu }))];
+  const sectionLabel = (id: Focus) => sectionOptions.find((option) => option.id === id)?.label ?? HOME_PAGE.label;
+  const contentDefinition = template.sections.find((section) => section.id === contentSection);
   const statusText = feedback || (dirty ? "Unsaved changes" : published ? "Published" : publishedDoc ? "Saved, not published" : "Saved");
 
   // A newly chosen section starts at its top.
@@ -182,36 +188,36 @@ function Editor({ backHref, initial }: { backHref: string; initial: EditorDoc })
       if (mode === "preview") setMode("view");
       else if (pickerOpen) setPickerOpen(false);
       else if (confirmExit) setConfirmExit(false);
-      else if (productOpen) setProductOpen(false);
+      else if (contentSection) setContentSection(null);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [mode, pickerOpen, confirmExit, productOpen]);
+  }, [mode, pickerOpen, confirmExit, contentSection]);
 
-  const setContent = (key: ProductTextKey, value: string) =>
-    history.update((d) => ({ ...d, content: { ...d.content, [key]: value } }));
+  const setContent = (section: string, field: string, value: string) =>
+    history.update((d) => ({ ...d, content: { ...d.content, [section]: { ...d.content[section], [field]: value } } }));
 
   // Outside edit mode a style change is kept straight away.
-  const setStyle = (key: "palette" | "font", id: string) => {
-    const next = { ...doc, [key]: id };
+  const setStyle = (style: "palette" | "font", id: string) => {
+    const next = { ...doc, [style]: id };
     history.update(next);
     history.commit();
     if (!editing) {
-      writeSaved(next);
+      writeSaved(key, next);
       setSaved(next);
     }
   };
 
   const save = () => {
     history.commit();
-    setFeedback(writeSaved(doc) ? "" : "Unable to save in this browser.");
+    setFeedback(writeSaved(key, doc) ? "" : "Unable to save in this browser.");
     setSaved(doc);
   };
 
   // Publishing saves the page too, as in TemplateBuilderPage.
   const publish = () => {
     history.commit();
-    if (!writeSaved(doc) || !writePublished(doc)) {
+    if (!writeSaved(key, doc) || !writePublished(key, doc)) {
       setFeedback("Unable to publish in this browser.");
       return;
     }
@@ -232,7 +238,7 @@ function Editor({ backHref, initial }: { backHref: string; initial: EditorDoc })
   const leaveEdit = () => {
     setMode("view");
     setSelected(null);
-    setProductOpen(false);
+    setContentSection(null);
     setStylesOpen(false);
     setConfirmExit(false);
   };
@@ -253,46 +259,47 @@ function Editor({ backHref, initial }: { backHref: string; initial: EditorDoc })
     leaveEdit();
   };
 
-  const renderText = (key: ProductTextKey, value: string) =>
-    editing ? (
-      <EditableText
-        value={value}
-        selected={selected === key}
-        onSelect={() => setSelected(key)}
-        onChange={(next) => setContent(key, next)}
-        onCommit={history.commit}
-      />
-    ) : (
-      value
-    );
-
-  const renderSection = (id: ProductSectionId, children: ReactNode) => {
-    if (!editing) return children;
-    // "Edit section" opens Site Styles, so it is there only on the whole page.
-    const actions: SectionAction[] = [
-      ...(id === "product" ? [{ label: "Edit product", Icon: Store, onClick: () => setProductOpen(true) }] : []),
-      ...(focus === "all" ? [{ label: "Edit section", Icon: Pencil, onClick: () => setStylesOpen(true) }] : []),
-    ];
-    return <EditableSection actions={actions}>{children}</EditableSection>;
+  // How the template's text and sections become editable.
+  const edit: EditHooks = {
+    renderText: (section, field, value) => {
+      const id = `${section}.${field}`;
+      return (
+        <EditableText
+          value={value}
+          selected={selected === id}
+          onSelect={() => setSelected(id)}
+          onChange={(next) => setContent(section, field, next)}
+          onCommit={history.commit}
+        />
+      );
+    },
+    renderSection: (section, children) => {
+      const definition = template.sections.find((item) => item.id === section);
+      // "Edit section" opens Site Styles, so it is there only on the whole page.
+      const actions: SectionAction[] = [
+        ...(definition?.fields?.length ? [{ label: "Edit content", Icon: Type, onClick: () => setContentSection(section) }] : []),
+        ...(focus === "all" ? [{ label: "Edit section", Icon: Pencil, onClick: () => setStylesOpen(true) }] : []),
+      ];
+      return <EditableSection actions={actions}>{children}</EditableSection>;
+    },
   };
 
   // On the canvas the page shows the chosen section, and a menu link there
   // switches to its section; on the whole page it scrolls to it. The
   // preview always shows the whole page, as visitors see it.
-  const page = (forceMobile: boolean, editable: boolean, onCanvas: boolean) => {
+  const page = (editable: boolean, onCanvas: boolean) => {
     const single = onCanvas && focus !== "all" ? focus : undefined;
     return (
-      <div className={`${themeFontVariables} ${findPalette(doc.palette).className} ${findFontPack(doc.font).className} min-h-full bg-card font-sans text-foreground`}>
-        <ProductTemplate
-          content={doc.content}
-          mobile={forceMobile}
-          renderText={editable ? renderText : undefined}
-          renderSection={editable ? renderSection : undefined}
-          only={single}
-          onNavigate={single ? chooseSection : undefined}
-          activeSection={single}
-        />
-      </div>
+      <TemplateRenderer
+        template={template}
+        content={doc.content}
+        palette={doc.palette}
+        font={doc.font}
+        edit={editable ? edit : undefined}
+        only={single}
+        onNavigate={single ? chooseSection : undefined}
+        activeSection={single}
+      />
     );
   };
 
@@ -408,16 +415,8 @@ function Editor({ backHref, initial }: { backHref: string; initial: EditorDoc })
                 are in Site Styles, on the right of the canvas top bar. */}
             <motion.div {...rise(0.08)} className="flex flex-col gap-3">
               <span id="section-label" className="text-sm font-semibold text-foreground">Section</span>
-              <SelectCard value={focus} options={SECTION_OPTIONS} onChange={chooseSection} labelledBy="section-label" />
+              <SelectCard value={focus} options={sectionOptions} onChange={chooseSection} labelledBy="section-label" />
             </motion.div>
-
-            {template.demoHref && (
-              <motion.div {...rise(0.24)} className="text-center">
-                <Link href={template.demoHref} className={`${focusRing} rounded text-xs font-semibold uppercase tracking-[0.08em] text-foreground no-underline underline-offset-4 hover:underline`}>
-                  View demo site
-                </Link>
-              </motion.div>
-            )}
           </div>
         </aside>
       </div>
@@ -509,7 +508,7 @@ function Editor({ backHref, initial }: { backHref: string; initial: EditorDoc })
                     <ChevronDown className="h-3 w-3 text-neutral-500" />
                   </motion.span>
                 </span>
-                <span className="max-w-[40vw] truncate text-[10px] text-neutral-500">{doc.content.title || "Untitled"}</span>
+                <span className="max-w-[40vw] truncate text-[10px] text-neutral-500">{siteTitle || "Untitled"}</span>
               </button>
 
               <AnimatePresence>
@@ -524,7 +523,7 @@ function Editor({ backHref, initial }: { backHref: string; initial: EditorDoc })
                       transition={{ duration: 0.2, ease: smooth }}
                       className="absolute left-1/2 top-full z-50 m-0 mt-2 w-52 list-none rounded-md bg-white p-1 shadow-[0_8px_30px_rgb(0_0_0/0.18)] ring-1 ring-black/5"
                     >
-                      {SECTION_OPTIONS.map(({ id, label, menu }) => (
+                      {sectionOptions.map(({ id, label, menu }) => (
                         <li key={id} role="none">
                           <button
                             type="button"
@@ -611,18 +610,21 @@ function Editor({ backHref, initial }: { backHref: string; initial: EditorDoc })
               transition={{ duration: 0.45, ease: smooth }}
               className={`mx-auto min-h-full bg-white ${slide} ${device === "mobile" ? "my-6 w-[390px] max-w-full overflow-hidden rounded-2xl shadow-[0_10px_40px_-12px_rgb(0_0_0/0.3)] ring-1 ring-black/5" : "w-full"}`}
             >
-              {page(device === "mobile", editing, true)}
+              {page(editing, true)}
             </motion.div>
           </div>
         </motion.div>
 
         <AnimatePresence>
-          {productOpen && editing && (
-            <ProductPanel
-              content={doc.content}
-              onChange={setContent}
+          {contentDefinition?.fields && editing && (
+            <ContentPanel
+              key={contentDefinition.id}
+              title={contentDefinition.label}
+              fields={contentDefinition.fields}
+              content={doc.content[contentDefinition.id] ?? {}}
+              onChange={(field, value) => setContent(contentDefinition.id, field, value)}
               onCommit={history.commit}
-              onClose={() => setProductOpen(false)}
+              onClose={() => setContentSection(null)}
             />
           )}
         </AnimatePresence>
@@ -684,7 +686,7 @@ function Editor({ backHref, initial }: { backHref: string; initial: EditorDoc })
             className="fixed inset-0 z-[60] overflow-y-auto bg-white"
             data-lenis-prevent
           >
-            {page(false, false, false)}
+            {page(false, false)}
             <button
               type="button"
               onClick={() => setMode("view")}

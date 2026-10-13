@@ -33,7 +33,7 @@ export default function TemplateFrame({ id }: { id: string }) {
   if (!Preview) return null;
   return (
     <div className={`${themeFontVariables} ${findPalette(theme.palette).className} ${findFontPack(theme.font).className} min-h-screen bg-card font-sans text-foreground`}>
-      <Preview />
+      <Preview palette={theme.palette} font={theme.font} />
     </div>
   );
 }
