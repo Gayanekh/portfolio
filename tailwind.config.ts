@@ -1,5 +1,6 @@
 import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate";
+import containerQueries from "@tailwindcss/container-queries";
 
 // Theme colours live as CSS variables in app/globals.css. color-mix keeps
 // opacity modifiers such as text-foreground/70 working with any colour format.
@@ -26,6 +27,9 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-1)"],
+        // Site templates' headings: the template's own display font, or the
+        // chosen font pack's (see theme-options.ts).
+        display: ["var(--font-display, var(--font-1))"],
       },
       colors: {
         border: token("border"),
@@ -84,7 +88,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [tailwindcssAnimate],
+  plugins: [tailwindcssAnimate, containerQueries],
 };
 
 export default config;

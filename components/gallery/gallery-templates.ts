@@ -27,12 +27,18 @@ export const GALLERY_STYLES: { id: GalleryStyle | "all"; label: string }[] = [
 ];
 
 export const GALLERY_TEMPLATES: GalleryTemplate[] = [
+  // Site templates (components/site-templates) open their demo: the real
+  // template, with Use This Template to open it in the editor.
+  { id: "showcase", name: "Showcase", style: "image", bestFor: "Photographers, UI/UX and graphic designers", live: true, href: "/templates/demo/showcase" },
+  // IN PROGRESS — built step by step from a design reference.
+  { id: "persona", name: "Persona", style: "image", bestFor: "Brand and product designers", live: true, href: "/templates/demo/persona" },
+  // IN PROGRESS — built step by step from a design reference.
+  { id: "gallery", name: "Gallery", style: "image", bestFor: "Photographers and artists", live: true, href: "/templates/demo/gallery" },
   { id: "minimal", name: "Minimal", style: "case", bestFor: "Designers and creatives", live: true },
-  // TEST TEMPLATE — delete after testing (see components/template-detail/examples/ProductTemplate.tsx).
-  { id: "product", name: "Product", style: "image", bestFor: "Makers and small shops", live: true, href: "/templates/editor/product" },
+  // TEST TEMPLATE — delete after testing (see components/site-templates/product).
+  { id: "product", name: "Product", style: "image", bestFor: "Makers and small shops", live: true, href: "/templates/demo/product" },
   { id: "atelier", name: "Atelier", style: "image", bestFor: "Designers and makers", image: photo("photo-1487014679447-9f8336841d58") },
   { id: "ledger", name: "Ledger", style: "text", bestFor: "Teachers and consultants", image: photo("photo-1502945015378-0e284ca1a5be") },
-  { id: "gallery", name: "Gallery", style: "image", bestFor: "Photographers and artists", image: photo("photo-1592839961515-64c68091f712") },
   { id: "chapter", name: "Chapter", style: "case", bestFor: "Researchers and writers", image: photo("photo-1522199755839-a2bacb67c546") },
   { id: "studio", name: "Studio", style: "image", bestFor: "Architects and interior designers", image: photo("photo-1467232004584-a241de8bcf5d") },
   { id: "brief", name: "Brief", style: "case", bestFor: "Product and UX people", image: photo("photo-1642132652860-471b4228023e") },

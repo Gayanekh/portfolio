@@ -53,17 +53,18 @@ export interface FontPack {
   // Fonts for the "Heading / Paragraph text" sample on the option button.
   heading: string;
   body: string;
-  // Sets the template's main font (--font-1) and its small mono labels.
+  // Sets the template's main font (--font-1), its headings (--font-display;
+  // "Original" keeps the template's own) and its small mono labels.
   className: string;
 }
 
 export const FONT_PACKS: FontPack[] = [
   { id: "original", name: "Original", heading: "font-[family-name:var(--tf-inter-tight)] font-semibold", body: "font-[family-name:var(--tf-dm-mono)]", className: "" },
-  { id: "editorial", name: "Editorial", heading: "font-[family-name:var(--tf-fraunces)] font-medium", body: "font-[family-name:var(--tf-inter-tight)]", className: "[--font-1:var(--tf-fraunces)] [&_.font-mono]:font-[family-name:var(--tf-inter-tight)]" },
-  { id: "grotesk", name: "Grotesk", heading: "font-[family-name:var(--tf-space-grotesk)] font-semibold", body: "font-[family-name:var(--tf-space-mono)]", className: "[--font-1:var(--tf-space-grotesk)] [&_.font-mono]:font-[family-name:var(--tf-space-mono)]" },
-  { id: "classic", name: "Classic", heading: "font-[family-name:var(--tf-playfair)] font-semibold", body: "font-[family-name:var(--tf-dm-sans)]", className: "[--font-1:var(--tf-playfair)] [&_.font-mono]:font-[family-name:var(--tf-dm-sans)]" },
-  { id: "humanist", name: "Humanist", heading: "font-[family-name:var(--tf-dm-sans)] font-semibold", body: "font-[family-name:var(--tf-dm-mono)]", className: "[--font-1:var(--tf-dm-sans)]" },
-  { id: "technical", name: "Technical", heading: "font-[family-name:var(--tf-plex-sans)] font-semibold", body: "font-[family-name:var(--tf-plex-mono)]", className: "[--font-1:var(--tf-plex-sans)] [&_.font-mono]:font-[family-name:var(--tf-plex-mono)]" },
+  { id: "editorial", name: "Editorial", heading: "font-[family-name:var(--tf-fraunces)] font-medium", body: "font-[family-name:var(--tf-inter-tight)]", className: "[--font-display:var(--font-1)] [--font-1:var(--tf-fraunces)] [&_.font-mono]:font-[family-name:var(--tf-inter-tight)]" },
+  { id: "grotesk", name: "Grotesk", heading: "font-[family-name:var(--tf-space-grotesk)] font-semibold", body: "font-[family-name:var(--tf-space-mono)]", className: "[--font-display:var(--font-1)] [--font-1:var(--tf-space-grotesk)] [&_.font-mono]:font-[family-name:var(--tf-space-mono)]" },
+  { id: "classic", name: "Classic", heading: "font-[family-name:var(--tf-playfair)] font-semibold", body: "font-[family-name:var(--tf-dm-sans)]", className: "[--font-display:var(--font-1)] [--font-1:var(--tf-playfair)] [&_.font-mono]:font-[family-name:var(--tf-dm-sans)]" },
+  { id: "humanist", name: "Humanist", heading: "font-[family-name:var(--tf-dm-sans)] font-semibold", body: "font-[family-name:var(--tf-dm-mono)]", className: "[--font-display:var(--font-1)] [--font-1:var(--tf-dm-sans)]" },
+  { id: "technical", name: "Technical", heading: "font-[family-name:var(--tf-plex-sans)] font-semibold", body: "font-[family-name:var(--tf-plex-mono)]", className: "[--font-display:var(--font-1)] [--font-1:var(--tf-plex-sans)] [&_.font-mono]:font-[family-name:var(--tf-plex-mono)]" },
 ];
 
 export const findPalette = (id: string | null | undefined) => COLOR_PALETTES.find((p) => p.id === id) ?? COLOR_PALETTES[0];
