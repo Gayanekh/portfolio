@@ -34,6 +34,7 @@ export const GALLERY_TEMPLATES: GalleryTemplate[] = [
   { id: "persona", name: "Persona", style: "image", bestFor: "Brand and product designers", live: true, href: "/templates/demo/persona" },
   // IN PROGRESS — built step by step from a design reference.
   { id: "gallery", name: "Gallery", style: "image", bestFor: "Photographers and artists", live: true, href: "/templates/demo/gallery" },
+  { id: "deck", name: "Deck", style: "image", bestFor: "Product and brand designers, studios", live: true, href: "/templates/demo/deck" },
   { id: "minimal", name: "Minimal", style: "case", bestFor: "Designers and creatives", live: true },
   // TEST TEMPLATE — delete after testing (see components/site-templates/product).
   { id: "product", name: "Product", style: "image", bestFor: "Makers and small shops", live: true, href: "/templates/demo/product" },

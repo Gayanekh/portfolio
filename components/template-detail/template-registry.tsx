@@ -4,6 +4,7 @@ import TemplateRenderer from "@/components/site-templates/core/TemplateRenderer"
 import { productTemplate } from "@/components/site-templates/product";
 import { showcaseTemplate } from "@/components/site-templates/showcase";
 import { personaTemplate } from "@/components/site-templates/persona";
+import { deckTemplate } from "@/components/site-templates/deck";
 import { galleryTemplate } from "@/components/site-templates/gallery";
 import { siteTemplateDemoHref, siteTemplateEditorHref } from "@/components/site-templates/registry";
 import { demoPortfolioData } from "@/components/templates/demo-data";
@@ -55,6 +56,10 @@ function GallerySample({ palette, font }: PreviewProps) {
   return <TemplateRenderer template={galleryTemplate} palette={palette} font={font} />;
 }
 
+function DeckSample({ palette, font }: PreviewProps) {
+  return <TemplateRenderer template={deckTemplate} palette={palette} font={font} />;
+}
+
 const LIVE_TEMPLATES: TemplateDetail[] = [
   {
     id: showcaseTemplate.id,
@@ -82,6 +87,15 @@ const LIVE_TEMPLATES: TemplateDetail[] = [
     useHref: siteTemplateEditorHref(galleryTemplate.id),
     demoHref: siteTemplateDemoHref(galleryTemplate.id),
     Preview: GallerySample,
+  },
+  {
+    id: deckTemplate.id,
+    name: deckTemplate.name,
+    description: deckTemplate.description,
+    bestFor: "Product and brand designers, studios",
+    useHref: siteTemplateEditorHref(deckTemplate.id),
+    demoHref: siteTemplateDemoHref(deckTemplate.id),
+    Preview: DeckSample,
   },
   {
     id: "minimal",
