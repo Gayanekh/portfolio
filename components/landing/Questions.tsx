@@ -4,8 +4,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus } from "lucide-react";
 import { Reveal } from "@/components/landing/Reveal";
-import { CtaLink, LandingSection, SectionDivider, SectionFooter, SectionHeader } from "@/components/landing/Section";
-import { ease, focusRing } from "@/components/landing/landing-ui";
+import { displayTitle, ease, focusRing, kicker, section } from "@/components/landing/landing-ui";
 
 const FAQ: [string, string][] = [
   ["Can I edit my portfolio after publishing?", "Yes, as often as you like. Edits stay in your draft until you choose Publish changes, so visitors never see half-finished work. You can also unpublish at any time and publish again later."],
@@ -15,80 +14,79 @@ const FAQ: [string, string][] = [
   ["Who is Portory for?", "Anyone who wants to show their work: teachers, photographers, consultants, nurses, engineers, students, career changers, and people who simply want a good page about what they do."],
 ];
 
-// One row in the style of the reference: hairline dividers, the question on
-// the left, "+" on the right ("−" while open). Opening it expands the row and
-// brings the answer up into the right half.
-function Item({ id, question, answer, open, onToggle }: { id: string; question: string; answer: string; open: boolean; onToggle: () => void }) {
-  return (
-    <div className="border-t border-foreground/10 last:border-b">
-      <h3 className="m-0">
-        <button
-          type="button"
-          aria-expanded={open}
-          aria-controls={`${id}-answer`}
-          onClick={onToggle}
-          className={`${focusRing} flex w-full cursor-pointer items-center justify-between gap-6 py-4 text-left md:py-5`}
-        >
-          <span className="text-[length:clamp(1.25rem,2.1vw,1.75rem)] font-normal leading-tight tracking-[-0.03em]">{question}</span>
-          <span aria-hidden="true" className="grid size-3 shrink-0 place-items-center">
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.span
-                key={open ? "minus" : "plus"}
-                initial={{ opacity: 0, rotate: -90 }}
-                animate={{ opacity: 1, rotate: 0 }}
-                exit={{ opacity: 0, rotate: 90 }}
-                transition={{ duration: 0.2, ease }}
-                className="block"
-              >
-                {open ? <Minus strokeWidth={1.5} className="size-3" /> : <Plus strokeWidth={1.5} className="size-3" />}
-              </motion.span>
-            </AnimatePresence>
-          </span>
-        </button>
-      </h3>
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.div
-            id={`${id}-answer`}
-            initial={{ height: 0 }}
-            animate={{ height: "auto" }}
-            exit={{ height: 0 }}
-            transition={{ duration: 0.5, ease }}
-            className="overflow-hidden"
-          >
-            <div className="grid grid-cols-1 pb-6 md:grid-cols-2 md:gap-10 md:pb-7">
-              <motion.p
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 6 }}
-                transition={{ duration: 0.45, ease, delay: 0.08 }}
-                className="m-0 select-text border-t border-foreground/10 pt-3 text-[0.8125rem] font-medium leading-relaxed text-foreground/70 md:col-start-2"
-              >
-                {answer}
-              </motion.p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-// The FAQ: every question in one list of accordion rows in the style of the
-// reference, and a "more questions" footer row with a call to action.
+// Questions in an accordion, from the landing-redesign branch: the title on
+// the left, the questions on the right, one open at a time; "+" swaps to "−"
+// while open and the answer rises into place. Stacked below lg.
 export default function Questions() {
-  // One question open at a time.
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [open, setOpen] = useState<number | null>(null);
+
   return (
-    <LandingSection sectionId="faq" label="FAQ section">
-      <Reveal>
-        <div className="flex flex-col">
+    <section id="faq" aria-label="Frequently asked questions" className={`${section} bg-neutral-50 md:py-32`}>
+      <div className="mx-auto grid w-content-width grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] lg:gap-16">
+        <Reveal className="flex max-w-[52rem] flex-col gap-5">
+          <p className={kicker}>FAQ</p>
+          <h2 className={displayTitle}>Questions, answered</h2>
+        </Reveal>
+        <div>
           {FAQ.map(([question, answer], i) => {
-            const id = `faq-${i + 1}`;
-            return <Item key={question} id={id} question={question} answer={answer} open={openId === id} onToggle={() => setOpenId(openId === id ? null : id)} />;
+            const isOpen = open === i;
+            return (
+              <div key={question} className="border-t border-black/10 last:border-b">
+                <h3 className="m-0">
+                  <button
+                    type="button"
+                    id={`faq-${i}`}
+                    aria-expanded={isOpen}
+                    aria-controls={`faq-${i}-answer`}
+                    onClick={() => setOpen(isOpen ? null : i)}
+                    className={`${focusRing} flex w-full cursor-pointer items-center justify-between gap-6 py-6 text-left`}
+                  >
+                    <span className="text-[length:clamp(1.15rem,1.8vw,1.5rem)] font-medium leading-snug tracking-[-0.02em] text-black">{question}</span>
+                    <span aria-hidden="true" className="grid size-6 shrink-0 place-items-center">
+                      <AnimatePresence mode="wait" initial={false}>
+                        <motion.span
+                          key={isOpen ? "minus" : "plus"}
+                          initial={{ opacity: 0, rotate: -90 }}
+                          animate={{ opacity: 1, rotate: 0 }}
+                          exit={{ opacity: 0, rotate: 90 }}
+                          transition={{ duration: 0.2, ease }}
+                          className="block"
+                        >
+                          {isOpen ? <Minus className="size-6" /> : <Plus className="size-6" />}
+                        </motion.span>
+                      </AnimatePresence>
+                    </span>
+                  </button>
+                </h3>
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      id={`faq-${i}-answer`}
+                      role="region"
+                      aria-labelledby={`faq-${i}`}
+                      initial={{ height: 0 }}
+                      animate={{ height: "auto" }}
+                      exit={{ height: 0 }}
+                      transition={{ duration: 0.5, ease }}
+                      className="overflow-hidden"
+                    >
+                      <motion.p
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 6 }}
+                        transition={{ duration: 0.45, ease, delay: 0.08 }}
+                        className="m-0 max-w-[40rem] select-text pb-7 text-base leading-relaxed text-neutral-600 md:text-lg"
+                      >
+                        {answer}
+                      </motion.p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            );
           })}
         </div>
-      </Reveal>    
-    </LandingSection>
+      </div>
+    </section>
   );
 }

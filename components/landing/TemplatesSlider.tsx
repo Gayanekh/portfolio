@@ -17,12 +17,12 @@ import {
 } from "framer-motion";
 import { ArrowUpRight, ExternalLink, Pause, Play } from "lucide-react";
 import { useLanding } from "@/components/landing/LandingProvider";
-import { Reveal, SplitWords } from "@/components/landing/Reveal";
+import { Reveal } from "@/components/landing/Reveal";
 import ScaledPreview from "@/components/landing/ScaledPreview";
 import { CtaLink } from "@/components/landing/Section";
 import { PEOPLE, STYLE_LABEL, TEMPLATES, type TemplateId } from "@/components/landing/sample-portfolios";
 import { templates as appTemplates } from "@/components/templates/template-data";
-import { ease, focusRing, glassPill, secondaryOnCard, sectionIntro, sectionTitle, text } from "@/components/landing/landing-ui";
+import { displayTitle, ease, focusRing, glassPill, kicker, lead, secondaryOnCard, text } from "@/components/landing/landing-ui";
 
 // One headline per template; everything else comes from the template data.
 const HEADLINE: Record<TemplateId, string> = {
@@ -404,11 +404,16 @@ export default function TemplatesSlider() {
           {size.w > 0 && poses.map((pose, i) => <FanCard key={TEMPLATES[i].id} index={i} pose={pose} flight={flight} position={position} />)}
         </div>
 
-        <div className="w-content-width mx-auto flex flex-col items-center gap-2">
-          <Reveal className="mb-1 w-fit rounded-full border border-foreground/10 bg-background px-3 py-1 text-xs font-medium"><p className="m-0">Templates</p></Reveal>
-          <SplitWords as="h2" text="Templates for every kind of work" className={sectionTitle} />
-          <SplitWords as="p" text="Four layouts, each shown with an example person. Select a card to open the templates." className={sectionIntro} />
-          <Reveal className="mt-4 md:mt-5">
+        {/* The same opening as the other sections: label and title on the left, intro on the right. */}
+        <div className="w-content-width mx-auto flex flex-col gap-8 md:gap-10">
+          <Reveal className="grid grid-cols-1 items-end gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-16">
+            <div className="flex flex-col gap-5">
+              <p className={kicker}>Templates</p>
+              <h2 className={displayTitle}>Templates for every kind of work</h2>
+            </div>
+            <p className={lead}>Four layouts, each shown with an example person. Select a card to open the templates.</p>
+          </Reveal>
+          <Reveal>
             <div role="tablist" aria-label="Template" className="relative inline-flex max-w-full flex-wrap justify-center gap-1 rounded-full bg-foreground/[0.04] p-1">
               {TEMPLATES.map((template, i) => {
                 const active = i === index;
@@ -544,7 +549,7 @@ export default function TemplatesSlider() {
             <div className="mt-6 flex items-center justify-center gap-4 pr-4">
               <div aria-hidden="true" className="flex items-center gap-1.5 ml-auto">
                 {TEMPLATES.map((template, i) => (
-                  <span key={template.id} className={`h-1.5 rounded-full transition-all duration-500 ${i === index ? "w-6 bg-foreground" : "w-1.5 bg-foreground/25"}`} />
+                  <span key={template.id} className={`h-1.5 rounded-full transition-all duration-500 ${i === index ? "w-6 bg-primary" : "w-1.5 bg-foreground/25"}`} />
                 ))}
               </div>
               <button
