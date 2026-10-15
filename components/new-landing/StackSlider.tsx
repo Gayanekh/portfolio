@@ -55,10 +55,10 @@ function Card({ item, index, count, position, priority }: { item: StackItem; ind
 }
 
 // A 1:1 stage of stacked cards with a vertical dot rail on its right, driven by
-// `position` (0 … count - 1, from the page's scroll). Each step, the next
-// card rises from the bottom of the stage and covers the current one, which
-// shrinks to 70% from its top edge and fades; going back plays it in
-// reverse. Everything stays inside the stage. A dot scrolls to its card.
+// `position` (0 … count - 1, animated by the hero's autoplay). Each step, the
+// next card rises from the bottom of the stage and covers the current one,
+// which shrinks to 70% from its top edge and fades; going back plays it in
+// reverse. Everything stays inside the stage. A dot shows its card.
 export default function StackSlider({
   items,
   position,

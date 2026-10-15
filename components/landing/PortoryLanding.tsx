@@ -1,9 +1,12 @@
+import ClaimAddress from "@/components/landing/ClaimAddress";
+import Features from "@/components/landing/Features";
 import FinalCTA from "@/components/landing/FinalCTA";
-import HowItWorks from "@/components/landing/HowItWorks";
 import LandingFooter from "@/components/landing/LandingFooter";
 import LandingHeader from "@/components/landing/LandingHeader";
 import LandingProvider from "@/components/landing/LandingProvider";
 import Questions from "@/components/landing/Questions";
+import Steps from "@/components/landing/Steps";
+import Styler from "@/components/landing/Styler";
 import TemplatesSlider from "@/components/landing/TemplatesSlider";
 import HeroTemplates from "@/components/new-landing/HeroTemplates";
 import StartAtTop from "@/components/new-landing/StartAtTop";
@@ -20,7 +23,10 @@ export default function PortoryLanding() {
         <main>
           <HeroTemplates />
           <TemplatesSlider />
-          <HowItWorks />
+          <Features />
+          <Styler />
+          <ClaimAddress />
+          <Steps />
           <Questions />
           <FinalCTA />
         </main>

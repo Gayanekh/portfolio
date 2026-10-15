@@ -82,7 +82,7 @@ export default function HowItWorks() {
     <LandingSection id="how-it-works" label="How it works">
       <SectionHeader
         label="How it works"
-        title="Everything you need to present your work"
+        title="From blank page to published link in three simple steps"
         intro="From choosing a template to sharing your link — Portory keeps every step simple."
       />
       <Reveal>

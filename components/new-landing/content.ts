@@ -15,9 +15,7 @@ export const HERO = {
   title: "Your work has a story.",
   accent: "Show it with Portory.",
   text: "Choose a template, add your details and work samples, and publish your portfolio at your own portory.net address. Keep editing whenever you like, even after it's live.",
-  primary: { href: "/templates", label: "Get started" } satisfies LinkItem,
-  secondary: { href: "#templates", label: "See the templates" } satisfies LinkItem,
-};
+  primary: { href: "/templates", label: "Get started" } satisfies LinkItem,};
 
 /* ---------- Templates ---------- */
 
