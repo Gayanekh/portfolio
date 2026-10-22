@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "framer-motion";
-import { ArrowLeft, ArrowUp } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowLeft } from "lucide-react";
 import AuthControls from "@/components/auth/AuthControls";
-import BrandMark from "@/components/auth/BrandMark";
+import BackToTop from "@/components/BackToTop";
+import Logo from "@/components/brand/Logo";
 import GalleryCard from "@/components/gallery/GalleryCard";
 import { GALLERY_STYLES, GALLERY_TEMPLATES, type GalleryStyle } from "@/components/gallery/gallery-templates";
 import { ease, focusRing } from "@/components/landing/landing-ui";
@@ -22,17 +23,14 @@ const rise = (delay: number) => ({
 // same tab; a back-to-top button appears once you've scrolled.
 export default function TemplateGallery() {
   const [style, setStyle] = useState<GalleryStyle | "all">("all");
-  const [showTop, setShowTop] = useState(false);
-  const { scrollY } = useScroll();
-  useMotionValueEvent(scrollY, "change", (y) => setShowTop(y > 600));
 
   const shown = style === "all" ? GALLERY_TEMPLATES : GALLERY_TEMPLATES.filter((t) => t.style === style);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="mx-auto flex w-content-width items-center justify-between gap-4 py-5">
-        <Link href="/" aria-label="Portory home" className={`${focusRing} flex items-center rounded-lg [&_img]:h-6`}>
-          <BrandMark />
+        <Link href="/" aria-label="Portory home" className={`${focusRing} flex items-center rounded`}>
+          <Logo className="h-9 w-auto" />
         </Link>
         <div className="flex items-center gap-2 [&_a]:no-underline">
           <AuthControls />
@@ -41,7 +39,7 @@ export default function TemplateGallery() {
 
       <main className="mx-auto w-content-width pb-24 pt-10 md:pt-16">
         <motion.div {...rise(0)}>
-          <Link href="/" className={`${focusRing} group mb-8 inline-flex items-center gap-1.5 rounded-full text-sm text-foreground/60 no-underline transition-colors hover:text-foreground`}>
+          <Link href="/" className={`${focusRing} group mb-8 inline-flex items-center gap-1.5 rounded text-sm text-foreground/60 no-underline transition-colors hover:text-foreground`}>
             <ArrowLeft className="size-4 transition-transform duration-300 group-hover:-translate-x-0.5" />
             Back to home
           </Link>
@@ -67,7 +65,7 @@ export default function TemplateGallery() {
             </motion.span>{" "}
             {shown.length === 1 ? "Result" : "Results"}
           </p>
-          <div role="group" aria-label="Filter by style" className="flex flex-wrap gap-1 rounded-full bg-foreground/5 p-1">
+          <div role="group" aria-label="Filter by style" className="flex flex-wrap gap-1 rounded bg-foreground/5 p-1">
             {GALLERY_STYLES.map((option) => {
               const active = option.id === style;
               return (
@@ -76,9 +74,9 @@ export default function TemplateGallery() {
                   type="button"
                   aria-pressed={active}
                   onClick={() => setStyle(option.id)}
-                  className={`${focusRing} relative cursor-pointer rounded-full px-3.5 py-1.5 text-sm transition-colors ${active ? "text-background" : "text-foreground/65 hover:text-foreground"}`}
+                  className={`${focusRing} relative cursor-pointer rounded px-3.5 py-1.5 text-sm transition-colors ${active ? "text-background" : "text-foreground/65 hover:text-foreground"}`}
                 >
-                  {active && <motion.span layoutId="gallery-filter" transition={{ duration: 0.4, ease }} className="absolute inset-0 rounded-full bg-foreground" />}
+                  {active && <motion.span layoutId="gallery-filter" transition={{ duration: 0.4, ease }} className="absolute inset-0 rounded bg-foreground" />}
                   <span className="relative">{option.label}</span>
                 </button>
               );
@@ -95,22 +93,7 @@ export default function TemplateGallery() {
         </motion.ul>
       </main>
 
-      <AnimatePresence>
-        {showTop && (
-          <motion.button
-            type="button"
-            aria-label="Back to top"
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 16 }}
-            transition={{ duration: 0.3, ease }}
-            className={`${focusRing} fixed bottom-6 right-6 z-50 grid size-11 cursor-pointer place-items-center rounded-full bg-foreground text-background shadow-[0_8px_24px_-8px_rgb(0_0_0/0.4)]`}
-          >
-            <ArrowUp className="size-5" />
-          </motion.button>
-        )}
-      </AnimatePresence>
+      <BackToTop />
     </div>
   );
 }

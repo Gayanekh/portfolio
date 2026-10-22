@@ -54,11 +54,62 @@ export const STACK = TEMPLATES.map((template) => {
   return { ...template, image: photo ?? template.image, photo: Boolean(photo) };
 });
 
+// The page reads as one sentence after the hero: each step's title is the
+// next one ("Pick a layout. Make it say what you do. ..."), and its tag says
+// where in the story it is. Step 01 is the templates slider; 02 to 04 are
+// the story (Story.tsx), told on one template that stays on screen.
 export const TEMPLATES_INTRO = {
-  tag: "Templates",
-  title: "Templates for every kind of work",
-  text: "Each one is a real, editable site. Pick one, make it yours and publish.",
+  tag: "01 · Choose",
+  title: "Pick a layout.",
+  text: "Templates for every kind of work. Each one is a real, editable site: pick one, make it yours and publish.",
   link: "View template",
   // Autoplay: how long each template stays before the next.
   autoplayMs: 4500,
+};
+
+/* ---------- Story: How it works and Design (chapters 02 to 04) ---------- */
+
+// How it works (Choose, add your work, publish) with Design (make it yours)
+// placed between its last two steps, told on one real template that stays on
+// screen. Choosing is chapter 01, the templates slider. The ids keep the
+// header's "How it works" anchor working.
+export const STORY = {
+  label: "How it works",
+  template: "persona",
+  // The progress row over the preview.
+  progress: [
+    { href: "#templates", short: "Choose" },
+    { href: "#how-it-works", short: "Add your work" },
+    { href: "#make-it-yours", short: "Style" },
+    { href: "#publish", short: "Publish" },
+  ] satisfies { href: string; short: string }[],
+  write: {
+    id: "how-it-works",
+    tag: "02 · Add your work",
+    title: "Make it say what you do.",
+    text: "Fill in your details and work samples one section at a time. The live preview shows exactly how your page will look.",
+    // The editor's sections, as they look partway through.
+    fields: [
+      { label: "Name and headline", value: "Done" },
+      { label: "About you", value: "Done" },
+      { label: "Projects", value: "2 added" },
+    ],
+    status: "Editing your draft · only you can see it",
+  },
+  style: {
+    id: "make-it-yours",
+    tag: "03 · Style",
+    title: "Make it look like you.",
+    text: "Pick a colour palette and a font pairing, and the whole template changes with you. Try it on a real template.",
+    shuffle: "Shuffle",
+  },
+  publish: {
+    id: "publish",
+    tag: "04 · Publish",
+    title: "Put it online.",
+    text: "Get a portory.net address to send to anyone. Edit any time and publish your changes when they're ready.",
+    address: "portory.net/lena-marlow",
+    live: "Published",
+    start: { href: "/templates", label: "Get started" } satisfies LinkItem,
+  },
 };

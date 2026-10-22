@@ -15,7 +15,7 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import { ArrowUpRight, ExternalLink, Pause, Play } from "lucide-react";
+import { ArrowRight, ArrowUpRight, ExternalLink, Pause, Play } from "lucide-react";
 import { useLanding } from "@/components/landing/LandingProvider";
 import { Reveal } from "@/components/landing/Reveal";
 import ScaledPreview from "@/components/landing/ScaledPreview";
@@ -173,6 +173,8 @@ export default function TemplatesSlider() {
   const [hovered, setHovered] = useState(false);
   const [side, setSide] = useState<"prev" | "next" | null>(null);
   const [label, setLabel] = useState<"prev" | "next">("next");
+  // The tab under the pointer: the tab pill moves to it.
+  const [hoveredTab, setHoveredTab] = useState<number | null>(null);
   const showHint = hovered && side !== null;
   const [step, setStep] = useState(0);
   const [size, setSize] = useState({ w: 0, h: 0 });
@@ -387,6 +389,9 @@ export default function TemplatesSlider() {
     return () => window.clearTimeout(timer);
   }, [playing, ready, landed, inView, step, index, moveTo]);
 
+  // Autoplay is counting down to the next card (the bar under the slider fills with it).
+  const running = playing && ready && landed && inView && !!step;
+
   const onTabKey = (event: React.KeyboardEvent, current: number) => {
     const target = event.key === "ArrowRight" ? current + 1 : event.key === "ArrowLeft" ? current - 1 : event.key === "Home" ? 0 : event.key === "End" ? COUNT - 1 : null;
     if (target === null) return;
@@ -414,9 +419,12 @@ export default function TemplatesSlider() {
             <p className={lead}>Four layouts, each shown with an example person. Select a card to open the templates.</p>
           </Reveal>
           <Reveal>
-            <div role="tablist" aria-label="Template" className="relative inline-flex max-w-full flex-wrap justify-center gap-1 rounded-full bg-foreground/[0.04] p-1">
+            {/* Plain tabs; a light grey pill marks the chosen one and slides to
+                the one hovered, then back when the pointer leaves */}
+            <div role="tablist" aria-label="Template" onMouseLeave={() => setHoveredTab(null)} className="relative inline-flex max-w-full flex-wrap gap-1">
               {TEMPLATES.map((template, i) => {
                 const active = i === index;
+                const lit = (hoveredTab ?? index) === i;
                 return (
                   <button
                     key={template.id}
@@ -428,9 +436,10 @@ export default function TemplatesSlider() {
                     tabIndex={active ? 0 : -1}
                     onClick={() => select(i)}
                     onKeyDown={(event) => onTabKey(event, i)}
-                    className={`${focusRing} relative cursor-pointer rounded-full px-4 py-2 text-sm font-medium transition-colors duration-300 ${active ? "text-foreground" : "text-foreground/60 hover:text-foreground"}`}
+                    onMouseEnter={() => setHoveredTab(i)}
+                    className={`${focusRing} relative cursor-pointer rounded-full px-4 py-2.5 text-sm font-medium text-foreground`}
                   >
-                    {active && <motion.span layoutId="tpl-tab-pill" aria-hidden="true" transition={{ duration: 0.4, ease }} className="absolute inset-0 rounded-full bg-white shadow-[0_1px_3px_rgb(0_0_0/0.1)]" />}
+                    {lit && <motion.span layoutId="tpl-tab-pill" aria-hidden="true" transition={{ type: "spring", stiffness: 420, damping: 36 }} className="absolute inset-0 rounded-full bg-foreground/[0.08]" />}
                     <span className="relative">{template.name}</span>
                   </button>
                 );
@@ -546,17 +555,44 @@ export default function TemplatesSlider() {
           </div>
 
           <motion.div style={{ opacity: shell }}>
-            <div className="mt-6 flex items-center justify-center gap-4 pr-4">
-              <div aria-hidden="true" className="flex items-center gap-1.5 ml-auto">
+            {/* All the templates; where the slider is (the chosen one's bar fills
+                over the autoplay interval, full while paused); pause and play */}
+            <div className="w-content-width mx-auto mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+              <Link
+                href="/templates"
+                className={`${focusRing} group inline-flex h-11 items-center gap-2 justify-self-start rounded bg-foreground pl-5 pr-4 text-sm font-medium text-white no-underline transition-colors hover:bg-foreground/85`}
+              >
+                See all templates
+                <ArrowRight aria-hidden="true" className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+              </Link>
+              <div aria-hidden="true" className="flex items-center gap-1.5">
                 {TEMPLATES.map((template, i) => (
-                  <span key={template.id} className={`h-1.5 rounded-full transition-all duration-500 ${i === index ? "w-6 bg-primary" : "w-1.5 bg-foreground/25"}`} />
+                  <motion.span
+                    key={template.id}
+                    initial={false}
+                    animate={{ width: i === index ? 40 : 6 }}
+                    transition={{ type: "spring", stiffness: 260, damping: 32 }}
+                    className="relative h-1.5 overflow-hidden rounded-full bg-foreground/15"
+                  >
+                    {/* A full-length bar sliding in from the left (so its rounded
+                        ends never stretch), in step with the autoplay timer */}
+                    {i === index && (
+                      <motion.span
+                        key={`${index}-${running ? "run" : "hold"}`}
+                        initial={{ x: running ? "-100%" : "0%" }}
+                        animate={{ x: "0%" }}
+                        transition={running ? { duration: AUTOPLAY_MS / 1000, ease: "linear" } : { duration: 0.4, ease }}
+                        className="absolute inset-0 rounded-full bg-foreground will-change-transform"
+                      />
+                    )}
+                  </motion.span>
                 ))}
               </div>
               <button
                 type="button"
                 aria-label={playing ? "Pause autoplay" : "Start autoplay"}
                 onClick={() => setChosen(!playing)}
-                className={`${focusRing} ml-auto grid size-10 cursor-pointer place-items-center rounded-full border border-foreground/10 bg-white text-foreground transition-colors hover:border-foreground/20`}
+                className={`${focusRing} grid size-11 cursor-pointer place-items-center justify-self-end rounded border border-foreground/10 bg-white text-foreground transition-colors hover:border-foreground/25 hover:bg-foreground/[0.03]`}
               >
                 {playing ? <Pause aria-hidden="true" className="size-4" /> : <Play aria-hidden="true" className="size-4" />}
               </button>

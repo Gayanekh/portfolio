@@ -26,7 +26,7 @@ export default function TemplateDemo({ id }: { id: string }) {
       >
         <Link
           href="/templates/gallery"
-          className={`${focusRing} group flex h-10 items-center gap-1.5 rounded-full bg-white/85 px-4 text-xs font-semibold uppercase tracking-[0.08em] text-neutral-900 no-underline shadow-[0_2px_12px_rgb(0_0_0/0.12)] ring-1 ring-black/5 backdrop-blur-md`}
+          className={`${focusRing} group flex h-10 items-center gap-1.5 rounded bg-white/85 px-4 text-xs font-semibold uppercase tracking-[0.08em] text-neutral-900 no-underline shadow-[0_2px_12px_rgb(0_0_0/0.12)] ring-1 ring-black/5 backdrop-blur-md`}
         >
           <ArrowLeft className="size-4 transition-transform duration-300 group-hover:-translate-x-0.5" />
           Templates
@@ -41,7 +41,7 @@ export default function TemplateDemo({ id }: { id: string }) {
       >
         <Link
           href={siteTemplateEditorHref(template.id)}
-          className={`${focusRing} ${primaryButton} group flex h-12 items-center gap-2 rounded-full px-6 text-xs font-semibold uppercase tracking-[0.08em] no-underline`}
+          className={`${focusRing} ${primaryButton} group flex h-12 items-center gap-2 rounded px-6 text-xs font-semibold uppercase tracking-[0.08em] no-underline`}
         >
           Use This Template
           <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" />

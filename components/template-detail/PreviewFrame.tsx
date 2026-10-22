@@ -14,8 +14,26 @@ const DESKTOP_WIDTH = 1280;
 // The template in a browser window. A live template runs in its own frame,
 // laid out at full desktop width and scaled down to fit (or at phone width on
 // mobile); a placeholder shows its image. Palette and font changes are sent to
-// the frame and fade the preview in, as in the reference.
-export default function PreviewFrame({ template, device, palette, font }: { template: TemplateDetail; device: Device; palette: string; font: string }) {
+// the frame and the preview settles in (a soft fade out of a slight blur).
+// `fill` lets the desktop window take its column's full width; `address`
+// replaces the one in the browser bar and `height` the window's height.
+export default function PreviewFrame({
+  template,
+  device,
+  palette,
+  font,
+  fill = false,
+  address,
+  height = "h-[min(76vh,46rem)]",
+}: {
+  template: TemplateDetail;
+  device: Device;
+  palette: string;
+  font: string;
+  fill?: boolean;
+  address?: string;
+  height?: string;
+}) {
   const frameRef = useRef<HTMLIFrameElement>(null);
   const [bodyRef, animate] = useAnimate<HTMLDivElement>();
   // The frame reloads when the device changes, so "loaded" belongs to a device.
@@ -70,7 +88,7 @@ export default function PreviewFrame({ template, device, palette, font }: { temp
       firstTheme.current = false;
       return;
     }
-    animate(bodyRef.current, { opacity: [0.2, 1] }, { duration: 0.6, ease });
+    animate(bodyRef.current, { opacity: [0.55, 1], filter: ["blur(6px)", "blur(0px)"], scale: [0.99, 1] }, { duration: 0.7, ease });
   }, [palette, font, animate, bodyRef]);
 
 
@@ -78,14 +96,16 @@ export default function PreviewFrame({ template, device, palette, font }: { temp
     <motion.div
       layout
       transition={{ duration: 0.6, ease }}
-      className={`flex h-[min(76vh,46rem)] flex-col overflow-hidden rounded-xl bg-white shadow-[0_2px_6px_rgb(0_0_0/0.05),0_30px_60px_-30px_rgb(0_0_0/0.3)] ring-1 ring-foreground/10 ${device === "desktop" ? "w-full max-w-[64rem]" : "w-[390px] max-w-full"}`}
+      className={`flex ${height} flex-col overflow-hidden rounded-2xl bg-white shadow-[0_1px_2px_rgb(0_0_0/0.04),0_24px_60px_-28px_rgb(0_0_0/0.35)] ring-1 ring-black/[0.06] ${device === "desktop" ? (fill ? "w-full" : "w-full max-w-[64rem]") : "w-[390px] max-w-full"}`}
     >
-      <motion.div layout="position" aria-hidden="true" className="flex h-7 shrink-0 items-center gap-1.5 border-b border-foreground/5 px-3">
-        <span className="size-2 rounded-full bg-foreground/15" />
-        <span className="size-2 rounded-full bg-foreground/15" />
-        <span className="size-2 rounded-full bg-foreground/15" />
+      {/* A soft browser bar: three dots and the page's address */}
+      <motion.div layout="position" aria-hidden="true" className="relative flex h-9 shrink-0 items-center gap-1.5 bg-gradient-to-b from-white to-neutral-50 px-3.5 shadow-[inset_0_-1px_0_rgb(0_0_0/0.05)]">
+        <span className="size-2.5 rounded-full bg-black/[0.08]" />
+        <span className="size-2.5 rounded-full bg-black/[0.08]" />
+        <span className="size-2.5 rounded-full bg-black/[0.08]" />
+        <span className="absolute left-1/2 hidden -translate-x-1/2 rounded-md bg-black/[0.04] px-3 py-1 text-[11px] text-black/40 sm:block">{address ?? `portory.net/${template.id}`}</span>
       </motion.div>
-      <div ref={bodyRef} className="relative min-h-0 flex-1 overflow-hidden bg-foreground/5">
+      <div ref={bodyRef} className="relative min-h-0 flex-1 overflow-hidden bg-foreground/5 will-change-[opacity,filter,transform]">
         {template.Preview ? (
           <>
             <motion.iframe

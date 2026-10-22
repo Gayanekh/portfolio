@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { animate, motion, motionValue, useMotionValue, useReducedMotion, type MotionValue } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import { FieldPicture } from "../core/blocks";
 import { useField, useSectionId, useTemplate } from "../core/context";
 import { glideTo, scrollParent, viewOf } from "../core/scroll";
 import DeckSlider from "./DeckSlider";
@@ -90,15 +91,13 @@ function PillButton({ field, hrefField, onClick, solid = false, children }: { fi
 
 // One travelling image. The slider's cards carry the links, so it is decorative.
 function DeckImage({ field, pose, index, top }: { field: string; pose: Pose; index: number; top: boolean }) {
-  const src = useField(field).value;
   return (
     <motion.div
       aria-hidden="true"
       style={{ x: pose.x, y: pose.y, width: pose.w, height: pose.h, opacity: pose.opacity, zIndex: top ? 99 : index + 1 }}
       className="absolute left-0 top-0 overflow-hidden rounded-2xl bg-card shadow-[0_2px_6px_rgb(0_0_0/0.06),0_30px_60px_-28px_rgb(0_0_0/0.4)] ring-1 ring-foreground/10 will-change-transform"
     >
-      {/* eslint-disable-next-line @next/next/no-img-element -- user images from any host */}
-      {src && <img src={src} alt="" fetchPriority={index === 0 ? "high" : "auto"} className="absolute inset-0 block h-full w-full object-cover" />}
+      <FieldPicture field={field} priority={index === 0} className="absolute inset-0 block h-full w-full object-cover" />
     </motion.div>
   );
 }

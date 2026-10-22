@@ -168,7 +168,7 @@ export default function VerifyEmailForm({ email, next }: VerifyEmailFormProps) {
         <button
           type="submit"
           disabled={!email || code.length !== 6 || isVerifying}
-          className="w-full rounded-md bg-foreground px-4 py-3 text-sm text-primary-foreground transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded bg-foreground px-4 py-3 text-sm text-primary-foreground transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isVerifying ? "Verifying..." : "Verify"}
         </button>

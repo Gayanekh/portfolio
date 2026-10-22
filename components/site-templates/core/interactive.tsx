@@ -2,7 +2,8 @@
 
 import { Children, useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { AnimatePresence, motion, useAnimationFrame, useMotionValue, useReducedMotion, useSpring, useTransform, type MotionValue } from "framer-motion";
-import { useField, useTemplate } from "./context";
+import { FieldPicture } from "./blocks";
+import { useField, useMediaMeta, useTemplate } from "./context";
 import { scrollParent, viewOf } from "./scroll";
 
 // Interactive blocks, for pages that respond to the visitor: text that lights
@@ -293,8 +294,8 @@ const SPANS = ["@xl:col-span-5", "@xl:col-span-7", "@xl:col-span-7", "@xl:col-sp
 
 function Service({ card, index }: { card: ServiceCard; index: number }) {
   const name = useField(card.name);
+  const imageHidden = useMediaMeta(card.image)?.hidden;
   const text = useField(card.text).node;
-  const src = useField(card.image).value;
   const still = useReducedMotion();
   const ended = !name.value || /[.!?]$/.test(name.value);
   return (
@@ -305,21 +306,19 @@ function Service({ card, index }: { card: ServiceCard; index: number }) {
       transition={{ duration: 0.9, ease, delay: (index % 2) * 0.12 }}
       className={`group/card flex flex-col gap-5 bg-foreground/[0.04] p-3 @xl:p-4 ${SPANS[index % SPANS.length]}`}
     >
+      {/* The card's image box, gone with its image when that is deleted */}
+      {!imageHidden && (
       <div className="relative h-[clamp(14rem,24cqw,24rem)] overflow-hidden bg-foreground/[0.06]">
-        {src && (
-          // eslint-disable-next-line @next/next/no-img-element -- user images from any host
-          <img
-            src={src}
-            alt={name.value}
-            loading="lazy"
-            decoding="async"
-            className="block h-full w-full object-cover contrast-[1.05] grayscale transition-[filter,transform] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/card:scale-[1.04] group-hover/card:grayscale-0"
-          />
-        )}
+        <FieldPicture
+          field={card.image}
+          alt={name.value}
+          className="block h-full w-full object-cover contrast-[1.05] grayscale transition-[filter,transform] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/card:scale-[1.04] group-hover/card:grayscale-0"
+        />
         <span className="absolute left-3 top-3 bg-card px-2 py-1 text-[11px] font-medium tabular-nums tracking-[0.08em]">
           {String(index + 1).padStart(2, "0")}
         </span>
       </div>
+      )}
       <div className="flex flex-col gap-3 px-1 pb-2 @xl:px-2">
         <div className="flex items-center justify-between gap-4">
           <h3 className="m-0 font-display text-[length:clamp(1.4rem,2cqw,2.1rem)] font-bold uppercase leading-none tracking-[-0.03em]">

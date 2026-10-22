@@ -18,7 +18,7 @@ const HOME = COUNT;
 const wrap = (value: number) => ((value % COUNT) + COUNT) % COUNT;
 const lower = (value: string) => value.charAt(0).toLowerCase() + value.slice(1);
 
-const roundButton = `${focusRing} grid size-10 cursor-pointer place-items-center rounded-full border border-foreground/10 bg-white text-foreground transition-colors hover:border-foreground/20`;
+const roundButton = `${focusRing} grid size-10 cursor-pointer place-items-center rounded border border-foreground/10 bg-white text-foreground transition-colors hover:border-foreground/20`;
 
 // One slide, as on the current landing page: a light card with the template's
 // details on the left (number, name, description, link, who it is for) and its
@@ -246,7 +246,7 @@ export default function TemplateSlider({
 
   return (
     <>
-      <div role="tablist" aria-label="Template" className="relative mx-auto mt-4 flex w-fit max-w-full flex-wrap justify-center gap-1 rounded-full bg-foreground/[0.04] p-1 md:mt-5">
+      <div role="tablist" aria-label="Template" className="relative mx-auto mt-4 flex w-fit max-w-full flex-wrap justify-center gap-1 rounded bg-foreground/[0.04] p-1 md:mt-5">
         {TEMPLATES.map((template, i) => {
           const active = i === index;
           return (
@@ -260,9 +260,9 @@ export default function TemplateSlider({
               tabIndex={active ? 0 : -1}
               onClick={() => select(i)}
               onKeyDown={(event) => onTabKey(event, i)}
-              className={`${focusRing} relative cursor-pointer rounded-full px-4 py-2 text-sm font-medium transition-colors duration-300 ${active ? "text-foreground" : "text-foreground/60 hover:text-foreground"}`}
+              className={`${focusRing} relative cursor-pointer rounded px-4 py-2 text-sm font-medium transition-colors duration-300 ${active ? "text-foreground" : "text-foreground/60 hover:text-foreground"}`}
             >
-              {active && <motion.span layoutId="new-landing-tab" aria-hidden="true" transition={{ duration: 0.4, ease }} className="absolute inset-0 rounded-full bg-white shadow-[0_1px_3px_rgb(0_0_0/0.1)]" />}
+              {active && <motion.span layoutId="new-landing-tab" aria-hidden="true" transition={{ duration: 0.4, ease }} className="absolute inset-0 rounded bg-white shadow-[0_1px_3px_rgb(0_0_0/0.1)]" />}
               <span className="relative">{template.name}</span>
             </button>
           );

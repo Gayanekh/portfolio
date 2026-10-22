@@ -3,67 +3,65 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import { Art } from "@/components/landing/sample-portfolios";
 import { ease, focusRing } from "@/components/landing/landing-ui";
 
 const HERO_CTA = "hero-cta";
-const NAV_CARD = '[data-nav-card="true"]';
 
-// Beside the compact nav card (to its left) on wide screens; centred at the bottom of
-// the screen when there is no room there.
-const SIDE = "right-[calc(50%+min(min(85vw,clamp(40rem,72.5vw,100rem))*0.92,48rem)/2+10px)] top-[22px] xl:top-[25px] 2xl:top-[29px]";
-const BOTTOM = "inset-x-4 bottom-4 flex justify-center";
+// The same frosted card as the compact nav bar (LandingHeader), so the two
+// read as one set.
+export const frostedCard = "rounded-2xl bg-white/75 shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_12px_32px_-12px_rgb(0_0_0/0.22)] backdrop-blur-xl backdrop-saturate-150";
 
-// The hero's "Create Your Portfolio" again, shown only once the original has
-// scrolled up out of view. Same destination as the hero button. Rendered
-// outside the nav because the nav's transform would break fixed positioning.
-export default function FloatingCta() {
-  const [show, setShow] = useState(false);
-  const [side, setSide] = useState(false);
-
+// Whether the hero's "Create Your Portfolio" has scrolled up out of view.
+export function useHeroCtaGone() {
+  const [gone, setGone] = useState(false);
   useEffect(() => {
     const target = document.getElementById(HERO_CTA);
     if (!target) return;
-    // Side placement needs a wide screen and room left of the nav card for
-    // the button at the current text size.
-    const fitsBeside = () => {
-      const card = document.querySelector<HTMLElement>(NAV_CARD);
-      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-      return window.matchMedia("(min-width: 1024px)").matches && !!card && card.getBoundingClientRect().left - 10 >= 15 * rem;
-    };
-    const observer = new IntersectionObserver(([entry]) => {
-      setSide(fitsBeside());
-      setShow(!entry.isIntersecting && entry.boundingClientRect.top < 0);
-    });
+    const observer = new IntersectionObserver(([entry]) => setGone(!entry.isIntersecting && entry.boundingClientRect.top < 0));
     observer.observe(target);
-    const onResize = () => setSide(fitsBeside());
-    window.addEventListener("resize", onResize);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", onResize);
-    };
+    return () => observer.disconnect();
   }, []);
+  return gone;
+}
 
-  const hidden = side ? { opacity: 0, x: 24, scale: 0.94 } : { opacity: 0, y: 24, scale: 0.94 };
+// The hero's "Create Your Portfolio" again, as a frosted card: a sample
+// portfolio, the words and an arrow that nudges on hover. Same destination
+// as the hero button.
+export function CreateButton({ className = "" }: { className?: string }) {
+  return (
+    <Link
+      href="/templates"
+      className={`${focusRing} ${frostedCard} group pointer-events-auto flex items-center gap-3 whitespace-nowrap py-2 pl-2 pr-4 text-sm font-semibold text-foreground no-underline transition-colors duration-200 hover:bg-white/90 ${className}`}
+    >
+      <span aria-hidden="true" className="block size-9 shrink-0 overflow-hidden rounded-lg ring-1 ring-black/[0.06]">
+        <Art name="river" />
+      </span>
+      Create your portfolio
+      <ArrowRight aria-hidden="true" className="size-4 text-foreground/60 transition-[transform,color] duration-300 group-hover:translate-x-0.5 group-hover:text-foreground" />
+    </Link>
+  );
+}
+
+// Below xl, where there is no room beside the compact nav bar, the button
+// floats centred at the bottom of the screen once the hero's has scrolled
+// away. (From xl it sits beside the bar, in LandingHeader.) Rendered outside
+// the nav because the nav's transform would break fixed positioning.
+export default function FloatingCta() {
+  const gone = useHeroCtaGone();
 
   return (
     <AnimatePresence>
-      {show && (
+      {gone && (
         <motion.div
-          key={side ? "side" : "bottom"}
-          initial={hidden}
-          animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
-          exit={hidden}
+          initial={{ opacity: 0, y: 24, scale: 0.94 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 24, scale: 0.94 }}
           transition={{ duration: 0.45, ease }}
-          className={`pointer-events-none fixed z-[1000] ${side ? SIDE : BOTTOM}`}
+          className="pointer-events-none fixed inset-x-4 bottom-4 z-[1000] flex justify-center xl:hidden"
         >
-          <Link
-            href="/templates"
-            className={`${focusRing} pointer-events-auto inline-flex min-h-12 max-w-full items-center gap-2.5 rounded-full bg-foreground py-1.5 pl-1.5 pr-[18px] text-sm font-semibold text-white no-underline shadow-[0_8px_24px_-8px_rgb(0_0_0/0.45)] transition-transform duration-200 active:scale-[0.97] motion-reduce:transition-none`}
-          >
-            <span aria-hidden="true" className="block size-9 shrink-0 overflow-hidden rounded-full border-2 border-white/85 bg-foreground/80"><Art name="river" /></span>
-            <span className="min-w-0">Create Your Portfolio</span>
-          </Link>
+          <CreateButton className="h-14" />
         </motion.div>
       )}
     </AnimatePresence>

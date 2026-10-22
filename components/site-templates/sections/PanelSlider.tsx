@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Menu } from "../core/blocks";
+import { FieldPicture, Menu } from "../core/blocks";
 import { useField, useSectionId } from "../core/context";
 
 // A poster-like opening screen with a slider of series, in panels:
@@ -65,10 +65,7 @@ function FieldValue({ field }: { field: string }) {
 
 // A slide's picture, filling the image panel.
 function Picture({ field, label }: { field: string; label: string }) {
-  const src = useField(field).value;
-  if (!src) return null;
-  // eslint-disable-next-line @next/next/no-img-element -- user images from any host
-  return <img src={src} alt={label} decoding="async" className="absolute inset-0 block h-full w-full object-cover" />;
+  return <FieldPicture field={field} alt={label} priority className="absolute inset-0 block h-full w-full object-cover" />;
 }
 
 // The current slide's text: it leaves quickly, and the next comes in after

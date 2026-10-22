@@ -31,7 +31,7 @@ export default function ContentPanel({
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 8, scale: 0.98 }}
       transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-      className="absolute right-4 top-16 z-40 w-[300px] rounded-lg bg-white font-sans shadow-[0_8px_30px_rgb(0_0_0/0.18)] ring-1 ring-black/5"
+      className="absolute right-4 top-16 z-40 w-[300px] rounded-lg bg-white font-ui shadow-[0_8px_30px_rgb(0_0_0/0.18)] ring-1 ring-black/5"
     >
       <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-2.5">
         <span className="border-b-2 border-neutral-900 pb-1 text-xs font-semibold text-neutral-900">{title}</span>

@@ -220,7 +220,7 @@ export default function Features() {
                   type="button"
                   tabIndex={-1}
                   onClick={() => show(k)}
-                  className={`w-1.5 cursor-pointer rounded-full border-0 p-0 transition-[height,background-color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                  className={`w-1.5 cursor-pointer rounded border-0 p-0 transition-[height,background-color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                     k === index ? "h-[22px] bg-primary" : "h-1.5 bg-foreground/35 hover:bg-foreground/60"
                   }`}
                 />

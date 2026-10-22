@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type MouseEvent, type PointerEvent } from "react";
 import { animate, motion, useInView, useMotionValue, useMotionValueEvent, useReducedMotion, useSpring, useTransform, type MotionValue } from "framer-motion";
 import { ArrowUpRight, Pause, Play } from "lucide-react";
+import { FieldPicture } from "../core/blocks";
 import { useField, useSectionId } from "../core/context";
 
 // The project slider of the Deck template, after the Portory landing page's
@@ -31,10 +32,7 @@ function FieldValue({ field }: { field: string }) {
 
 // A project's image, filling its box.
 function Picture({ field, label }: { field: string; label?: string }) {
-  const src = useField(field).value;
-  if (!src) return null;
-  // eslint-disable-next-line @next/next/no-img-element -- user images from any host
-  return <img src={src} alt={label ?? ""} decoding="async" loading="lazy" className="absolute inset-0 block h-full w-full object-cover" />;
+  return <FieldPicture field={field} alt={label ?? ""} className="absolute inset-0 block h-full w-full object-cover" />;
 }
 
 // A project's tab, named after its title.

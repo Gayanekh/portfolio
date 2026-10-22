@@ -10,7 +10,7 @@ export default function BoldPreview({ data }: BoldPreviewProps) {
   const hasWork = data.projects.length > 0;
 
   return (
-    <div className="min-h-full bg-foreground text-white">
+    <div data-template-font className="min-h-full bg-foreground font-sans text-white">
       {data.navigation.enabled && (
         <nav
           className="sticky top-0 z-20 grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-4 border-b border-white/10 bg-foreground/95 px-6 text-[9px] font-sans font-medium uppercase tracking-[0.1em] text-white/60 backdrop-blur-sm sm:px-10 lg:px-14"

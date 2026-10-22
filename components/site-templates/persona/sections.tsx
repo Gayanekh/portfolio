@@ -62,7 +62,7 @@ export function About() {
                   <PosterTitle size="section" field="title" />
                 </Reveal>
                 <Reveal delay={0.15}>
-                  <Portrait>
+                  <Portrait field="photo">
                     <Media field="photo" ratio="portrait" tone="mono" label="Lena Marlow" />
                   </Portrait>
                 </Reveal>

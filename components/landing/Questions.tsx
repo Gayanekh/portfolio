@@ -17,11 +17,12 @@ const FAQ: [string, string][] = [
 // Questions in an accordion, from the landing-redesign branch: the title on
 // the left, the questions on the right, one open at a time; "+" swaps to "−"
 // while open and the answer rises into place. Stacked below lg.
-export default function Questions() {
+// `className` sets the band's background (light grey by default).
+export default function Questions({ className = "bg-neutral-50" }: { className?: string }) {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section id="faq" aria-label="Frequently asked questions" className={`${section} bg-neutral-50 md:py-32`}>
+    <section id="faq" aria-label="Frequently asked questions" className={`${section} ${className} md:py-32`}>
       <div className="mx-auto grid w-content-width grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] lg:gap-16">
         <Reveal className="flex max-w-[52rem] flex-col gap-5">
           <p className={kicker}>FAQ</p>

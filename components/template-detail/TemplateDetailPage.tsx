@@ -49,7 +49,7 @@ export default function TemplateDetailPage({ id }: { id: string }) {
                 aria-label={label}
                 aria-pressed={device === id}
                 onClick={() => setDevice(id)}
-                className={`${focusRing} grid size-8 cursor-pointer place-items-center rounded-md transition-colors ${device === id ? "text-foreground" : "text-foreground/35 hover:text-foreground/70"}`}
+                className={`${focusRing} grid size-8 cursor-pointer place-items-center rounded transition-colors ${device === id ? "text-foreground" : "text-foreground/35 hover:text-foreground/70"}`}
               >
                 <Icon className="size-4" />
               </button>
@@ -69,7 +69,7 @@ export default function TemplateDetailPage({ id }: { id: string }) {
             <p className="m-0 text-sm leading-relaxed text-foreground/60">{template.description}</p>
             <Link
               href={template.useHref}
-              className={`${focusRing} ${primaryButton} group mt-2 flex h-12 items-center justify-center gap-2 rounded-lg text-xs font-semibold uppercase tracking-[0.08em] no-underline`}
+              className={`${focusRing} ${primaryButton} group mt-2 flex h-12 items-center justify-center gap-2 rounded text-xs font-semibold uppercase tracking-[0.08em] no-underline`}
             >
               Start with this design
               <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" />

@@ -30,19 +30,21 @@ export interface ColorPalette {
   name: string;
   // Four swatches shown on the option button, light to dark.
   swatches: [string, string, string, string];
+  // Its muted text colour, as a fifth swatch (between the accent and the text).
+  muted: string;
   // Redefines the template's colour tokens. Empty keeps the template's own.
   className: string;
 }
 
 export const COLOR_PALETTES: ColorPalette[] = [
-  { id: "original", name: "Original", swatches: ["bg-[#fafafa]", "bg-[#e5e5e5]", "bg-[#ff4500]", "bg-[#1a1a1a]"], className: "" },
-  { id: "linen", name: "Linen", swatches: ["bg-[#f3efe7]", "bg-[#2f3b2a]", "bg-[#a4532c]", "bg-[#1e2a1f]"], className: "[--card:#f3efe7] [--foreground:#1e2a1f] [--border:#dcd5c8] [--muted-foreground:#6f6a5e] [--primary:#a4532c]" },
-  { id: "sun", name: "Sun", swatches: ["bg-[#ffffff]", "bg-[#f5b800]", "bg-[#3a3a3a]", "bg-[#111111]"], className: "[--card:#ffffff] [--foreground:#111111] [--border:#e6e6e6] [--muted-foreground:#6b6b6b] [--primary:#f5b800]" },
-  { id: "rose", name: "Rose", swatches: ["bg-[#f6f1f0]", "bg-[#a8484b]", "bg-[#7d8a77]", "bg-[#2b2b2b]"], className: "[--card:#f6f1f0] [--foreground:#2b2b2b] [--border:#e6dcda] [--muted-foreground:#7a6f6d] [--primary:#a8484b]" },
-  { id: "sand", name: "Sand", swatches: ["bg-[#f4eee8]", "bg-[#d9c8b8]", "bg-[#8c7b67]", "bg-[#1c1c1c]"], className: "[--card:#f4eee8] [--foreground:#1c1c1c] [--border:#e2d8cd] [--muted-foreground:#7b7266] [--primary:#8c7b67]" },
-  { id: "ink", name: "Ink", swatches: ["bg-[#f2f2f2]", "bg-[#2b2b2b]", "bg-[#ff5a1f]", "bg-[#141414]"], className: "[--card:#141414] [--foreground:#f2f2f2] [--border:#2b2b2b] [--muted-foreground:#a3a3a3] [--primary:#ff5a1f]" },
-  { id: "ocean", name: "Ocean", swatches: ["bg-[#f5f7fb]", "bg-[#9db8e8]", "bg-[#2f6fdb]", "bg-[#0f172a]"], className: "[--card:#f5f7fb] [--foreground:#0f172a] [--border:#dfe5ef] [--muted-foreground:#64748b] [--primary:#2f6fdb]" },
-  { id: "lime", name: "Lime", swatches: ["bg-[#fbfbe9]", "bg-[#dfe48a]", "bg-[#9aa52e]", "bg-[#2a3311]"], className: "[--card:#fbfbe9] [--foreground:#2a3311] [--border:#e7e8c4] [--muted-foreground:#6b7046] [--primary:#9aa52e]" },
+  { id: "original", name: "Original", swatches: ["bg-[#fafafa]", "bg-[#e5e5e5]", "bg-[#ff4500]", "bg-[#1a1a1a]"], muted: "bg-[#737373]", className: "" },
+  { id: "linen", name: "Linen", swatches: ["bg-[#f3efe7]", "bg-[#2f3b2a]", "bg-[#a4532c]", "bg-[#1e2a1f]"], muted: "bg-[#6f6a5e]", className: "[--card:#f3efe7] [--foreground:#1e2a1f] [--border:#dcd5c8] [--muted-foreground:#6f6a5e] [--primary:#a4532c]" },
+  { id: "sun", name: "Sun", swatches: ["bg-[#ffffff]", "bg-[#f5b800]", "bg-[#3a3a3a]", "bg-[#111111]"], muted: "bg-[#6b6b6b]", className: "[--card:#ffffff] [--foreground:#111111] [--border:#e6e6e6] [--muted-foreground:#6b6b6b] [--primary:#f5b800]" },
+  { id: "rose", name: "Rose", swatches: ["bg-[#f6f1f0]", "bg-[#a8484b]", "bg-[#7d8a77]", "bg-[#2b2b2b]"], muted: "bg-[#7a6f6d]", className: "[--card:#f6f1f0] [--foreground:#2b2b2b] [--border:#e6dcda] [--muted-foreground:#7a6f6d] [--primary:#a8484b]" },
+  { id: "sand", name: "Sand", swatches: ["bg-[#f4eee8]", "bg-[#d9c8b8]", "bg-[#8c7b67]", "bg-[#1c1c1c]"], muted: "bg-[#7b7266]", className: "[--card:#f4eee8] [--foreground:#1c1c1c] [--border:#e2d8cd] [--muted-foreground:#7b7266] [--primary:#8c7b67]" },
+  { id: "ink", name: "Ink", swatches: ["bg-[#f2f2f2]", "bg-[#2b2b2b]", "bg-[#ff5a1f]", "bg-[#141414]"], muted: "bg-[#a3a3a3]", className: "[--card:#141414] [--foreground:#f2f2f2] [--border:#2b2b2b] [--muted-foreground:#a3a3a3] [--primary:#ff5a1f]" },
+  { id: "ocean", name: "Ocean", swatches: ["bg-[#f5f7fb]", "bg-[#9db8e8]", "bg-[#2f6fdb]", "bg-[#0f172a]"], muted: "bg-[#64748b]", className: "[--card:#f5f7fb] [--foreground:#0f172a] [--border:#dfe5ef] [--muted-foreground:#64748b] [--primary:#2f6fdb]" },
+  { id: "lime", name: "Lime", swatches: ["bg-[#fbfbe9]", "bg-[#dfe48a]", "bg-[#9aa52e]", "bg-[#2a3311]"], muted: "bg-[#6b7046]", className: "[--card:#fbfbe9] [--foreground:#2a3311] [--border:#e7e8c4] [--muted-foreground:#6b7046] [--primary:#9aa52e]" },
 ];
 
 /* ---------- Font packs ---------- */

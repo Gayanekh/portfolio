@@ -86,7 +86,7 @@ export function SectionFooter({
   );
 }
 
-export const ctaClass = `${focusRing} ${primaryButton} group flex h-10 items-center justify-center rounded-2xl px-6 text-sm no-underline`;
+export const ctaClass = `${focusRing} ${primaryButton} group flex h-10 items-center justify-center rounded px-6 text-sm no-underline`;
 
 export function CtaLink({ href, label, className = "" }: { href: string; label: string; className?: string }) {
   return (
