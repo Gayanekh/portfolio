@@ -1,3 +1,4 @@
+import BackToTop from "@/components/BackToTop";
 import ClaimAddress from "@/components/landing/ClaimAddress";
 import Features from "@/components/landing/Features";
 import FinalCTA from "@/components/landing/FinalCTA";
@@ -25,12 +26,13 @@ export default function PortoryLanding() {
           <TemplatesSlider />
           <Features />
           <Styler />
-          <ClaimAddress />
           <Steps />
-          <Questions />
+          <Questions className="bg-transparent" />
+          <ClaimAddress />
           <FinalCTA />
         </main>
         <LandingFooter />
+        <BackToTop />
       </div>
     </LandingProvider>
   );

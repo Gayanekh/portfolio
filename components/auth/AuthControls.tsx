@@ -1,93 +1,60 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import type { User } from "@supabase/supabase-js";
-import { createClient } from "@/lib/supabase/client";
-import { getInitials } from "@/lib/auth-routing";
+import { useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowRight, ChevronDown, LogOut } from "lucide-react";
+import { useAccount, type Account } from "@/components/auth/useAccount";
 
-type Profile = {
-  first_name: string;
-  last_name: string;
-  avatar_url: string | null;
-};
+const smooth = [0.22, 1, 0.36, 1] as const;
 
-export default function AuthControls() {
-  const router = useRouter();
+// "Get started": dark, square, its arrow nudging on hover.
+const startButton =
+  "group inline-flex h-10 items-center gap-1.5 rounded bg-foreground pl-4 pr-3.5 text-sm font-medium text-white transition-colors hover:bg-foreground/85";
+const startArrow = <ArrowRight aria-hidden="true" className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" />;
+
+// The account's photo, or its initials on a dark disc.
+function Avatar({ account, size }: { account: Account; size: "sm" | "lg" }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={`grid shrink-0 place-items-center overflow-hidden rounded-full bg-foreground font-semibold text-white ring-2 ring-white ${
+        size === "sm" ? "size-7 text-[10px]" : "size-11 text-sm"
+      }`}
+    >
+      {account.avatarUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element -- the account's avatar from storage
+        <img src={account.avatarUrl} alt="" className="h-full w-full object-cover" />
+      ) : (
+        account.initials
+      )}
+    </span>
+  );
+}
+
+// Signed out: Log in and Get started. Signed in: the account (its avatar and
+// first name, opening a menu with who is signed in and Log out on hover,
+// click or Arrow Down) and Get started. `start={false}` leaves Get started out
+// (where another button already leads to the templates); `avatarOnly` shows
+// the account as its avatar alone (in tight spots, like the compact nav bar).
+export default function AuthControls({ start = true, avatarOnly = false }: { start?: boolean; avatarOnly?: boolean }) {
   const accountTriggerRef = useRef<HTMLButtonElement>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [supabase] = useState(() => createClient());
+  const [leaving, setLeaving] = useState(false);
+  const { account, signOut: endSession } = useAccount();
 
-  useEffect(() => {
-    const loadProfile = async (userId: string) => {
-      const { data: nextProfile } = await supabase
-        .from("profiles")
-        .select("first_name, last_name, avatar_url")
-        .eq("id", userId)
-        .maybeSingle();
-      setProfile(nextProfile);
-    };
-
-    const loadUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      setUser(data.user);
-      if (!data.user) {
-        setProfile(null);
-        return;
-      }
-      await loadProfile(data.user.id);
-    };
-
-    loadUser();
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
-        if (session?.user) {
-          loadProfile(session.user.id);
-        } else {
-          setProfile(null);
-          setIsMenuOpen(false);
-        }
-      },
-    );
-
-    return () => listener.subscription.unsubscribe();
-  }, [supabase]);
-
-  if (user) {
-    const metadataFirstName = String(user.user_metadata?.first_name || "").trim();
-    const metadataLastName = String(user.user_metadata?.last_name || "").trim();
-    const firstName = profile?.first_name?.trim() || metadataFirstName;
-    const lastName = profile?.last_name?.trim() || metadataLastName;
-    const email = user.email || "";
-    const emailName = email.split("@")[0] || "Account";
-    const fullName =
-      [firstName, lastName].filter(Boolean).join(" ") || emailName;
-    const emailParts = emailName.split(/[^a-zA-Z0-9]+/).filter(Boolean);
-    const initials = firstName || lastName
-      ? getInitials(firstName, lastName)
-      : emailParts.length > 1
-        ? `${emailParts[0][0]}${emailParts[1][0]}`.toUpperCase()
-        : emailName.slice(0, 2).toUpperCase();
+  if (account) {
+    const { fullName, email } = account;
+    const firstName = fullName.split(" ")[0] || fullName;
 
     const signOut = async () => {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error("Unable to sign out", { code: error.code });
-        return;
-      }
-      setUser(null);
-      setProfile(null);
-      setIsMenuOpen(false);
-      router.replace("/");
-      router.refresh();
+      setLeaving(true);
+      if (await endSession()) setIsMenuOpen(false);
+      setLeaving(false);
     };
 
     return (
-      <div className="hidden items-center gap-3 sm:flex">
+      <div className="flex items-center gap-2">
         <div
           className="relative"
           onMouseEnter={() => setIsMenuOpen(true)}
@@ -101,10 +68,7 @@ export default function AuthControls() {
             if (event.key === "Escape") {
               setIsMenuOpen(false);
               accountTriggerRef.current?.focus();
-            } else if (
-              event.key === "ArrowDown" &&
-              event.target === accountTriggerRef.current
-            ) {
+            } else if (event.key === "ArrowDown" && event.target === accountTriggerRef.current) {
               event.preventDefault();
               setIsMenuOpen(true);
             }
@@ -117,84 +81,77 @@ export default function AuthControls() {
             aria-haspopup="menu"
             aria-expanded={isMenuOpen}
             onClick={() => setIsMenuOpen((open) => !open)}
-            className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-border/70 bg-foreground/[0.08] text-[10px] font-mono text-foreground/70 outline-none transition-colors hover:border-foreground/30 focus-visible:ring-2 focus-visible:ring-foreground/20"
+            className={`flex h-10 cursor-pointer items-center gap-2 rounded outline-none ${avatarOnly ? "px-1.5" : "pl-1.5 pr-2.5"} transition-colors focus-visible:ring-2 focus-visible:ring-foreground/20 ${
+              isMenuOpen ? "bg-foreground/[0.06]" : "hover:bg-foreground/[0.05]"
+            }`}
           >
-            {profile?.avatar_url ? (
-              <img
-                src={profile.avatar_url}
-                alt=""
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              initials
+            <Avatar account={account} size="sm" />
+            {!avatarOnly && (
+              <>
+                <span className="max-w-[8rem] truncate text-sm font-medium text-foreground">{firstName}</span>
+                <ChevronDown aria-hidden="true" className={`size-4 text-foreground/45 transition-transform duration-300 ${isMenuOpen ? "rotate-180" : ""}`} />
+              </>
             )}
           </button>
 
-          {isMenuOpen && (
-            <div className="absolute right-0 top-full z-50 w-64 pt-2">
-              <div
-                role="menu"
-                aria-label="Account menu"
-                className="rounded-lg border border-border/60 bg-white p-4 shadow-xl shadow-black/10"
+          <AnimatePresence>
+            {isMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                transition={{ duration: 0.2, ease: smooth }}
+                className="absolute right-0 top-full z-50 w-72 origin-top-right pt-2"
               >
-                <div className="flex items-start gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border/70 bg-foreground/[0.08] text-[10px] font-mono text-foreground/70">
-                    {profile?.avatar_url ? (
-                      <img
-                        src={profile.avatar_url}
-                        alt=""
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      initials
-                    )}
+                <div role="menu" aria-label="Account menu" className="overflow-hidden rounded-xl bg-white p-1.5 shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_16px_40px_-12px_rgb(0_0_0/0.25)]">
+                  {/* Who is signed in */}
+                  <div className="flex items-center gap-3 rounded-lg bg-foreground/[0.03] p-3">
+                    <Avatar account={account} size="lg" />
+                    <div className="min-w-0 leading-tight">
+                      <p className="m-0 truncate text-sm font-semibold text-foreground">{fullName}</p>
+                      {email && <p className="m-0 mt-1 truncate text-xs text-foreground/50">{email}</p>}
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <p className="truncate text-sm text-foreground">{fullName}</p>
-                    {email && (
-                      <p className="mt-0.5 truncate text-xs text-foreground/45">
-                        {email}
-                      </p>
-                    )}
-                  </div>
+
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={signOut}
+                    disabled={leaving}
+                    className="mt-1.5 flex w-full cursor-pointer items-center gap-2.5 rounded px-3 py-2.5 text-left text-sm font-medium text-foreground/75 transition-colors hover:bg-red-50 hover:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20 disabled:cursor-default disabled:opacity-50"
+                  >
+                    <LogOut aria-hidden="true" className="size-4" />
+                    {leaving ? "Logging out..." : "Log out"}
+                  </button>
                 </div>
-                <div className="my-4 border-t border-border/60" />
-                <button
-                  type="button"
-                  role="menuitem"
-                  onClick={signOut}
-                  className="w-full rounded px-2 py-1.5 text-left text-xs text-foreground/60 transition-colors hover:bg-foreground/[0.04] hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20"
-                >
-                  Sign out
-                </button>
-              </div>
-            </div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-        <Link
-          href="/templates"
-          className="rounded-md bg-foreground px-4 py-2 text-xs text-primary-foreground transition-opacity hover:opacity-80"
-        >
-          Get Started
-        </Link>
+        {start && (
+          <Link href="/templates" className={startButton}>
+            Get started
+            {startArrow}
+          </Link>
+        )}
       </div>
     );
   }
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-1.5">
       <Link
         href="/login"
-        className="text-base  transition-colors hover:text-foreground font-medium uppercase"
+        className="inline-flex h-10 items-center rounded px-3.5 text-sm font-medium text-foreground/70 transition-colors hover:bg-foreground/[0.05] hover:text-foreground"
       >
-       Log in 
+        Log in
       </Link>
-      <Link
-        href="/templates"
-        className="rounded-md bg-foreground px-4 py-2  text-primary-foreground transition-opacity hover:opacity-80"
-      >
-        Get Started
-      </Link>
+      {start && (
+        <Link href="/templates" className={startButton}>
+          Get started
+          {startArrow}
+        </Link>
+      )}
     </div>
   );
 }

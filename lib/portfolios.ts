@@ -1,5 +1,7 @@
 import type { PortfolioData } from "@/context/PortfolioContext";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { mergeContent, readSiteTitle } from "@/components/site-templates/core/content";
+import { getSiteTemplate } from "@/components/site-templates/registry";
 
 export type PortfolioRecord = {
   id: string;
@@ -58,6 +60,50 @@ function hasValidProjectImages(projects: unknown[]) {
     const image = (project as { image?: unknown }).image;
     return image === undefined || isImageValue(image);
   });
+}
+
+// A site template's page as the editor saves it: the text by section and
+// field, and the chosen palette and font pack.
+export interface SitePortfolioData {
+  // The page's name in the editor, apart from its site title.
+  name?: string;
+  content: Record<string, Record<string, string>>;
+  palette: string;
+  font: string;
+  // The page's arrangement in the editor (see components/site-templates/core/layout).
+  layout?: unknown;
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+export function isSitePortfolioData(value: unknown): value is SitePortfolioData {
+  if (!isRecord(value) || !isRecord(value.content)) return false;
+  return (
+    (value.name === undefined || typeof value.name === "string") &&
+    typeof value.palette === "string" &&
+    typeof value.font === "string" &&
+    Object.values(value.content).every(
+      (section) => isRecord(section) && Object.values(section).every((field) => typeof field === "string"),
+    )
+  );
+}
+
+// The templates the template builder edits (PortfolioData); every other
+// template id is a site template (SitePortfolioData).
+export const BUILDER_TEMPLATE_IDS = ["minimal", "bold"];
+
+// Checks a save or publish request. Returns the name its address starts
+// from (a site template's page name, else its site title), or null when the
+// template or the data is not valid.
+export function readPortfolioName(templateId: unknown, portfolioData: unknown): string | null {
+  if (typeof templateId !== "string") return null;
+  if (BUILDER_TEMPLATE_IDS.includes(templateId)) {
+    return isPortfolioData(portfolioData) ? portfolioData.name : null;
+  }
+  const template = getSiteTemplate(templateId);
+  if (!template || !isSitePortfolioData(portfolioData)) return null;
+  return portfolioData.name?.trim() || readSiteTitle(template,mergeContent(template, portfolioData.content));
 }
 
 export function isPortfolioData(value: unknown): value is PortfolioData {

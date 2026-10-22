@@ -3,7 +3,9 @@
 import { useMemo, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { findFontPack, findPalette, themeFontVariables } from "@/components/template-detail/theme-options";
+import { SectionFrame } from "./Arranged";
 import { defaultContent } from "./content";
+import { definitionOf, sectionOrder, type PageLayout } from "./layout";
 import { SectionScope, TemplateProvider } from "./context";
 import StackItem from "./StackItem";
 import { glideTo } from "./scroll";
@@ -17,6 +19,8 @@ export interface TemplateRendererProps {
   font?: string;
   // The editor's hooks; without them the page is read-only.
   edit?: EditHooks;
+  // Sections reordered and copied, blocks moved and added (see ./layout).
+  layout?: PageLayout;
   // Show only this section (working section by section).
   only?: string;
   // A menu link was followed. Without it the page scrolls to the section.
@@ -31,7 +35,7 @@ const Passthrough = ({ children }: { children: ReactNode }) => <>{children}</>;
 // layer and the chosen palette and font pack on the inner one, so the choice
 // wins and "Original" falls back to the template's. Layouts respond to the
 // page's own width (container queries), so the editor's phone view is real.
-export default function TemplateRenderer({ template, content, palette, font, edit, only, onNavigate, activeSection }: TemplateRendererProps) {
+export default function TemplateRenderer({ template, content, palette, font, edit, layout, only, onNavigate, activeSection }: TemplateRendererProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [followed, setFollowed] = useState(() => template.sections.find((section) => section.menu)?.id);
   const text = useMemo(() => content ?? defaultContent(template), [content, template]);
@@ -44,17 +48,34 @@ export default function TemplateRenderer({ template, content, palette, font, edi
     if (target) glideTo(target);
   };
 
-  const sections = template.sections.filter((section) => !only || section.id === only);
+  // The sections in the page's order, copies included, each with its instance id.
+  const sections = sectionOrder(template, layout)
+    .filter((instance) => !only || instance === only)
+    .flatMap((instance) => {
+      const definition = definitionOf(template, instance);
+      return definition ? [{ ...definition, id: instance }] : [];
+    });
 
   return (
-    <div className={cn(themeFontVariables, template.theme, "min-h-full")}>
+    <div data-template-font className={cn(themeFontVariables, template.theme, "min-h-full")}>
       <div ref={rootRef} data-site-template className={cn(findPalette(palette).className, findFontPack(font).className, "@container relative min-h-full bg-card font-sans text-foreground")}>
-        <TemplateProvider value={{ template, content: text, edit, current: activeSection ?? followed, navigate }}>
+        <TemplateProvider value={{ template, content: text, edit, layout, current: activeSection ?? followed, navigate }}>
           <Provider>
             {sections.map(({ id, Component, stack }, index) => {
               const section = (
                 <SectionScope key={id} id={id}>
-                  {edit ? edit.renderSection(id, <Component />) : <Component />}
+                  {edit ? (
+                    edit.renderSection(
+                      id,
+                      <SectionFrame instance={id}>
+                        <Component />
+                      </SectionFrame>,
+                    )
+                  ) : (
+                    <SectionFrame instance={id}>
+                      <Component />
+                    </SectionFrame>
+                  )}
                 </SectionScope>
               );
               if (template.scroll !== "stack" || stack === false || sections.length === 1) return section;

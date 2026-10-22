@@ -89,7 +89,7 @@ export default function LoginExperience({ email, password, error, isLoading, sho
             <label htmlFor="password" className={labelClass}>Password</label>
             <div className="relative">
               <Input id="password" name="password" type={showPassword ? "text" : "password"} required minLength={6} autoComplete={isRegister ? "new-password" : "current-password"} placeholder={isRegister ? "Create a password" : "Enter password"} value={password} onChange={(event) => onPasswordChange(event.target.value)} className={`${inputClass} pr-[70px]`} aria-describedby={isRegister ? ["password-hint", describedBy].filter(Boolean).join(" ") : describedBy} />
-              <button type="button" aria-pressed={showPassword} onClick={onTogglePassword} className={`${focusRing} absolute right-1.5 top-1/2 -translate-y-1/2 rounded-lg p-2 text-[13.5px] font-semibold text-foreground`}>
+              <button type="button" aria-pressed={showPassword} onClick={onTogglePassword} className={`${focusRing} absolute right-1.5 top-1/2 -translate-y-1/2 rounded p-2 text-[13.5px] font-semibold text-foreground`}>
                 {showPassword ? "Hide" : "Show"}
               </button>
             </div>

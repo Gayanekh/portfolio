@@ -32,7 +32,7 @@ export default function OptionGrid<T extends { id: string; name: string }>({
               aria-pressed={active}
               aria-label={option.name}
               onClick={() => onSelect(option.id)}
-              className={`${focusRing} group relative flex h-14 cursor-pointer items-center rounded-md bg-foreground/[0.04] px-2.5 text-left transition-colors hover:bg-foreground/[0.07]`}
+              className={`${focusRing} group relative flex h-14 cursor-pointer items-center rounded bg-foreground/[0.04] px-2.5 text-left transition-colors hover:bg-foreground/[0.07]`}
             >
               {active && (
                 <motion.span

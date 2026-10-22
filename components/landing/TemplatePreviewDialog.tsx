@@ -8,9 +8,9 @@ import ScaledPreview from "@/components/landing/ScaledPreview";
 import { PEOPLE, TEMPLATES, templateName, type PersonKey, type TemplateId } from "@/components/landing/sample-portfolios";
 import { ease, focusRing, primaryButton } from "@/components/landing/landing-ui";
 
-const primaryLink = `${focusRing} ${primaryButton} inline-flex h-10 items-center rounded-2xl px-[18px] text-sm font-semibold no-underline`;
+const primaryLink = `${focusRing} ${primaryButton} inline-flex h-10 items-center rounded px-[18px] text-sm font-semibold no-underline`;
 
-const chip = `${focusRing} min-h-9 rounded-full border px-3.5 text-[13.5px] font-medium transition-[background-color,color,border-color] duration-200`;
+const chip = `${focusRing} min-h-9 rounded border px-3.5 text-[13.5px] font-medium transition-[background-color,color,border-color] duration-200`;
 const chipOn = "border-foreground bg-foreground text-white";
 const chipOff = "border-border bg-white text-foreground hover:border-foreground/15";
 
@@ -55,7 +55,7 @@ export default function TemplatePreviewDialog({
         >
           <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-[18px]">
             <h2 id="preview-title" className="m-0 text-2xl font-[650] tracking-[-0.04em]">{templateName(template)} template</h2>
-            <button type="button" onClick={onClose} aria-label="Close preview" className={`${focusRing} grid h-9 w-9 place-items-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground`}>
+            <button type="button" onClick={onClose} aria-label="Close preview" className={`${focusRing} grid h-9 w-9 place-items-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground`}>
               <X aria-hidden="true" className="h-[18px] w-[18px]" />
             </button>
           </div>
@@ -81,7 +81,7 @@ export default function TemplatePreviewDialog({
                 <span className="min-w-[7.5em] text-[13.5px] font-medium text-muted-foreground">Device</span>
                 <div className="inline-flex gap-0.5 rounded-full bg-muted p-1">
                   {(["desktop", "mobile"] as const).map((d) => (
-                    <button key={d} type="button" aria-pressed={d === device} onClick={() => setDevice(d)} className={`${focusRing} min-h-9 rounded-full px-4 text-sm font-medium capitalize transition-colors ${d === device ? "bg-foreground text-white" : "text-muted-foreground hover:text-foreground"}`}>{d}</button>
+                    <button key={d} type="button" aria-pressed={d === device} onClick={() => setDevice(d)} className={`${focusRing} min-h-9 rounded px-4 text-sm font-medium capitalize transition-colors ${d === device ? "bg-foreground text-white" : "text-muted-foreground hover:text-foreground"}`}>{d}</button>
                   ))}
                 </div>
               </div>
@@ -91,7 +91,7 @@ export default function TemplatePreviewDialog({
             </div>
           </div>
           <div className="flex flex-wrap justify-end gap-2.5 border-t border-border px-5 py-3.5">
-            <button type="button" onClick={onClose} className={`${focusRing} inline-flex h-10 items-center rounded-full border border-border bg-white px-[18px] text-sm font-semibold transition-colors hover:border-foreground/15`}>Close</button>
+            <button type="button" onClick={onClose} className={`${focusRing} inline-flex h-10 items-center rounded border border-border bg-white px-[18px] text-sm font-semibold transition-colors hover:border-foreground/15`}>Close</button>
             <Link href="/templates" className={primaryLink}>Use {templateName(template)}</Link>
           </div>
         </motion.div>

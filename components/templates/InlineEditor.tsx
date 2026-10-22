@@ -470,7 +470,7 @@ export default function InlineEditor({
                 onClick={() => removeService(index)}
                 type="button"
                 aria-label={`Remove service ${index + 1}`}
-                className="p-2 rounded-lg text-foreground/40 hover:text-red-500 hover:bg-red-500/10 transition-all"
+                className="p-2 rounded text-foreground/40 hover:text-red-500 hover:bg-red-500/10 transition-all"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>

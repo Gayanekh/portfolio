@@ -56,7 +56,7 @@ export default function PagesPanel({
         type="button"
         aria-current={page === current ? "page" : undefined}
         onClick={() => setNotice(page === current ? null : page)}
-        className={`flex w-full items-center gap-2.5 rounded-md px-1.5 py-1.5 text-left text-[13px] transition-colors ${
+        className={`flex w-full items-center gap-2.5 rounded px-1.5 py-1.5 text-left text-[13px] transition-colors ${
           page === current ? "bg-neutral-100 font-medium text-neutral-900" : "text-neutral-700 hover:bg-neutral-50"
         }`}
       >

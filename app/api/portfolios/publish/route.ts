@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createSlug, getUniqueSlug, isPortfolioData } from "@/lib/portfolios";
+import { createSlug, getUniqueSlug, readPortfolioName } from "@/lib/portfolios";
 
 export async function POST(request: Request) {
   try {
@@ -20,10 +20,9 @@ export async function POST(request: Request) {
     const templateId = body?.templateId;
     const portfolioData = body?.portfolioData;
 
-    if (
-      !(["minimal", "bold"] as string[]).includes(templateId) ||
-      !isPortfolioData(portfolioData)
-    ) {
+    // Minimal and Bold take PortfolioData; site templates their editor's page.
+    const name = readPortfolioName(templateId, portfolioData);
+    if (name === null) {
       return NextResponse.json(
         { error: "Portfolio data is invalid." },
         { status: 400 },
@@ -40,7 +39,7 @@ export async function POST(request: Request) {
 
     const slug =
       existing?.slug ||
-      (await getUniqueSlug(supabase, createSlug(portfolioData.name)));
+      (await getUniqueSlug(supabase, createSlug(name)));
     const now = new Date().toISOString();
     const { data: record, error } = await supabase
       .from("portfolios")

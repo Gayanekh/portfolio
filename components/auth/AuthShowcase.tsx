@@ -15,7 +15,7 @@ const SLIDE_MS = 6000;
 const ease = [0.22, 1, 0.36, 1] as const;
 const previewData = { ...demoPortfolioData, showScrollProgress: false };
 const glassButton =
-  "grid place-items-center rounded-full border text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+  "grid place-items-center rounded border text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
 
 export default function AuthShowcase() {
   const reducedMotion = useReducedMotion();
@@ -98,7 +98,7 @@ export default function AuthShowcase() {
         <Link
           href="/"
           aria-label="Back to home"
-          className="group/back absolute left-2 top-2 z-[3] grid h-[60px] w-[60px] place-items-center rounded-full border border-foreground/15 bg-white text-foreground transition-[border-color,transform] duration-200 hover:border-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground active:scale-[.94]"
+          className="group/back absolute left-2 top-2 z-[3] grid h-[60px] w-[60px] place-items-center rounded border border-foreground/15 bg-white text-foreground transition-[border-color,transform] duration-200 hover:border-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground active:scale-[.94]"
         >
           <ArrowLeft aria-hidden="true" className="h-5 w-5 transition-transform duration-300 group-hover/back:-translate-x-[3px]" />
         </Link>

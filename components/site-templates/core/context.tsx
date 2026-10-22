@@ -1,13 +1,19 @@
 "use client";
 
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, createElement, useContext, type ReactNode } from "react";
+import { Moved } from "./Arranged";
 import { readField } from "./content";
+import RichText from "./RichText";
+import { isRich, plainText } from "./rich-format";
+import type { PageLayout } from "./layout";
 import type { EditHooks, TemplateContent, TemplateDefinition } from "./types";
 
 interface TemplateState {
   template: TemplateDefinition;
   content: TemplateContent;
   edit?: EditHooks;
+  // Sections reordered and copied, blocks moved and added (see ./layout).
+  layout?: PageLayout;
   // The menu item to underline.
   current?: string;
   // Follow a menu link to a section.
@@ -36,11 +42,29 @@ export function useSectionId() {
   return id;
 }
 
-// A field of the current section: its text, and what to render for it (an
-// editable box while editing, the text otherwise).
+// Where a block of the current section was moved on the grid, if it was.
+export function useMoved(field: string) {
+  const { layout } = useTemplate();
+  const section = useSectionId();
+  return layout?.moved?.[`${section}.${field}`];
+}
+
+// An image field's settings from the image panel (focal point, link,
+// description, file name), if it has any.
+export function useMediaMeta(field: string) {
+  const { layout } = useTemplate();
+  const section = useSectionId();
+  return layout?.media?.[`${section}.${field}`];
+}
+
+// A field of the current section: its words (without formatting, for
+// labels, links and titles), and what to render for it (an editable box while
+// editing, the formatted text otherwise), in its moved place.
 export function useField(field: string) {
   const { content, edit } = useTemplate();
   const section = useSectionId();
-  const value = readField(content, section, field);
-  return { value, editing: Boolean(edit), node: edit ? edit.renderText(section, field, value) : value };
+  const spot = useMoved(field);
+  const raw = readField(content, section, field);
+  const inner = edit ? edit.renderText(section, field, raw) : isRich(raw) ? createElement(RichText, { value: raw, inline: true }) : raw;
+  return { value: plainText(raw), editing: Boolean(edit), node: spot ? createElement(Moved, { spot }, inner) : inner };
 }

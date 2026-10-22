@@ -3,7 +3,10 @@
 import { useRef, type ButtonHTMLAttributes, type MouseEvent, type ReactNode } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { motion, useInView, useReducedMotion } from "framer-motion";
-import { useField, useSectionId, useTemplate } from "./context";
+import { Moved } from "./Arranged";
+import { useField, useMediaMeta, useMoved, useSectionId, useTemplate } from "./context";
+import { safeHref } from "./rich-format";
+import type { MediaMeta } from "./layout";
 
 // The building blocks of every site template. All styling lives here, as
 // variants: a template picks options and never writes its own classes, so
@@ -78,8 +81,10 @@ export function Section({
   children,
   ...variants
 }: { as?: "section" | "header" | "footer"; children: ReactNode } & VariantProps<typeof section>) {
+  // Its id is also its anchor, so a link to "#about" reaches it.
+  const id = useSectionId();
   return (
-    <Tag data-section={useSectionId()} className={section(variants)}>
+    <Tag id={id} data-section={id} className={section(variants)}>
       <div className={contentWidth({ spacing: variants.spacing })}>{children}</div>
     </Tag>
   );
@@ -733,19 +738,79 @@ const imageFocus = cva("block h-full w-full object-cover transition-transform du
   defaultVariants: { focus: "center" },
 });
 
+// The picture of an image field: selectable, movable and replaceable while
+// editing (with no picture yet, an empty box to add one), in its moved place.
+// An image's focal point (from the image panel) as its position in its box.
+// It is the author's data, so it is set on the element.
+const focalStyle = (meta?: MediaMeta) => (meta?.focal ? { objectPosition: `${meta.focal.x}% ${meta.focal.y}%` } : undefined);
+
 function FieldImage({ field, label, focus }: { field: string; label?: string } & VariantProps<typeof imageFocus>) {
   const src = useField(field).value;
-  if (!src) return null;
-  return (
+  const spot = useMoved(field);
+  const meta = useMediaMeta(field);
+  const { edit } = useTemplate();
+  const section = useSectionId();
+  // Deleted from the toolbar: not drawn at all.
+  if (meta?.hidden) return null;
+  const picture = src ? (
     // eslint-disable-next-line @next/next/no-img-element -- user images from any host
     <img
       src={src}
-      alt={label ?? ""}
+      alt={meta?.alt || label || ""}
       loading="lazy"
       decoding="async"
+      style={focalStyle(meta)}
       className={imageFocus({ focus })}
     />
+  ) : null;
+  // Its link from the image panel, for visitors (while editing it would leave the editor).
+  const href = !edit ? safeHref(meta?.href) : undefined;
+  const image = picture && href ? (
+    <a href={href} className="block h-full w-full">
+      {picture}
+    </a>
+  ) : (
+    picture
   );
+  if (!image && !edit?.renderMedia) return null;
+  const shown = edit?.renderMedia ? edit.renderMedia(section, field, image) : image;
+  return spot ? <Moved spot={spot}>{shown}</Moved> : shown;
+}
+
+// The picture of an image field in a box the template lays out itself (a
+// slider's slide, a deck card, a project card): drawn as given, and while
+// editing selectable and replaceable in place, with an empty box to add one.
+export function FieldPicture({
+  field,
+  alt = "",
+  className,
+  priority = false,
+}: {
+  field: string;
+  alt?: string;
+  className: string;
+  priority?: boolean;
+}) {
+  const src = useField(field).value;
+  const meta = useMediaMeta(field);
+  const { edit } = useTemplate();
+  const section = useSectionId();
+  // Deleted from the toolbar: not drawn at all.
+  if (meta?.hidden) return null;
+  const image = src ? (
+    // eslint-disable-next-line @next/next/no-img-element -- user images from any host
+    <img
+      src={src}
+      alt={meta?.alt || alt}
+      decoding="async"
+      loading={priority ? "eager" : "lazy"}
+      fetchPriority={priority ? "high" : "auto"}
+      style={focalStyle(meta)}
+      className={className}
+    />
+  ) : null;
+  if (!edit?.renderMedia) return image;
+  return edit.renderMedia(section, field, image, { fixed: true });
 }
 
 // An image box: the image whose address is the section's `field`, or
@@ -759,6 +824,9 @@ export function Media({
   focus,
   ...variants
 }: { field?: string; children?: ReactNode; label?: string } & VariantProps<typeof media> & VariantProps<typeof imageFocus>) {
+  // An image deleted with the toolbar takes its box with it.
+  const hidden = useMediaMeta(field ?? "")?.hidden;
+  if (field && hidden) return null;
   return (
     <div role={label && !field ? "img" : undefined} aria-label={field ? undefined : label} aria-hidden={label ? undefined : true} className={media(variants)}>
       {field ? <FieldImage field={field} label={label} focus={focus} /> : children}
@@ -767,8 +835,10 @@ export function Media({
 }
 
 // A portrait's frame, as the PosterHero's: not too wide, with a small black
-// square at its lower corner.
-export function Portrait({ children }: { children: ReactNode }) {
+// square at its lower corner. Gone with its image (`field`) when that is deleted.
+export function Portrait({ field, children }: { field?: string; children: ReactNode }) {
+  const hidden = useMediaMeta(field ?? "")?.hidden;
+  if (field && hidden) return null;
   return (
     <div className="relative w-full max-w-[22rem]">
       {children}

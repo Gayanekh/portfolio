@@ -14,6 +14,7 @@ import BoldPreview from "@/components/templates/BoldPreview";
 import { templates } from "@/components/templates/template-data";
 import { createClient } from "@/lib/supabase/client";
 import { templateEditorNext } from "@/lib/auth-routing";
+import { loadPortfolio, RequestError, sendPortfolio } from "@/lib/portfolio-client";
 
 /* ─── initial portfolio data ─── */
 
@@ -56,58 +57,6 @@ const initialData: PortfolioData = {
 type PageState =
   | { step: "select"; selected: string | null }
   | { step: "customize"; templateId: string };
-
-/* ─── save/publish responses ─── */
-
-// Carries a message that is safe to show to the user.
-class RequestError extends Error {}
-
-// Reads the body as text first, so a non-JSON response (such as a 413 page)
-// cannot throw while handling an error.
-async function readResponse(response: Response) {
-  const text = await response.text();
-  try {
-    return JSON.parse(text) as Record<string, unknown>;
-  } catch {
-    return null;
-  }
-}
-
-function failureMessage(
-  action: "save" | "publish",
-  status: number,
-  body: Record<string, unknown> | null,
-) {
-  if (status === 413) {
-    return `Unable to ${action}: the portfolio is too large (HTTP 413).`;
-  }
-  if (status === 401) {
-    return `Your session has expired. Sign in again to ${action}.`;
-  }
-  const serverError = typeof body?.error === "string" ? body.error : null;
-  return `${serverError ?? `Unable to ${action}.`} (HTTP ${status})`;
-}
-
-async function sendPortfolio(
-  action: "save" | "publish",
-  templateId: string,
-  portfolioData: PortfolioData,
-) {
-  const response = await fetch(`/api/portfolios/${action}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ templateId, portfolioData }),
-  });
-  const body = await readResponse(response);
-  if (!response.ok) {
-    throw new RequestError(failureMessage(action, response.status, body));
-  }
-  const portfolio = body?.portfolio as { slug?: unknown } | undefined;
-  if (typeof portfolio?.slug !== "string") {
-    throw new RequestError(`Unable to ${action}: unexpected server response.`);
-  }
-  return { slug: portfolio.slug };
-}
 
 /* ═══════════════════════════════════════════════
    TEMPLATE PAGE
@@ -175,17 +124,19 @@ export default function TemplateBuilderPage({
       });
     }
 
-    fetch("/api/portfolios")
-      .then(async (response) => {
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const result = await response.json();
-        return result.portfolio ?? null;
-      })
+    loadPortfolio()
       .then((portfolio) => {
         setLoadState("loaded");
         // No row yet: a new user starts from the default data.
         if (!portfolio) return;
-        setData(portfolio.portfolio_data);
+        // A portfolio made in the site template editor has a different shape:
+        // start from the default data here, keeping its address. Saving here
+        // replaces it, as switching template does.
+        if (!templates.some((item) => item.id === portfolio.template_id)) {
+          setPortfolioSlug(portfolio.slug);
+          return;
+        }
+        setData(portfolio.portfolio_data as PortfolioData);
         setSavedData(JSON.stringify(portfolio.portfolio_data));
         setSavedTemplateId(portfolio.template_id);
         setPortfolioSlug(portfolio.slug);
@@ -340,7 +291,7 @@ export default function TemplateBuilderPage({
                   </div>
                   <button
                     onClick={() => continueToEditor(selectedId)}
-                    className="group shrink-0 inline-flex items-center gap-2.5 bg-foreground text-primary-foreground text-[11px] font-mono tracking-[0.1em] uppercase px-6 py-3 rounded-xl hover:bg-foreground/90 transition-all duration-300"
+                    className="group shrink-0 inline-flex items-center gap-2.5 bg-foreground text-primary-foreground text-[11px] font-mono tracking-[0.1em] uppercase px-6 py-3 rounded hover:bg-foreground/90 transition-all duration-300"
                   >
                     Continue
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform duration-300" />
@@ -436,7 +387,7 @@ export default function TemplateBuilderPage({
                   onClick={() => setEditorOpen(false)}
                   aria-label="Hide editor"
                   title="Hide editor"
-                  className="grid size-8 place-items-center rounded-md text-foreground/45 transition-colors duration-200 hover:bg-foreground/[0.05] hover:text-foreground"
+                  className="grid size-8 place-items-center rounded text-foreground/45 transition-colors duration-200 hover:bg-foreground/[0.05] hover:text-foreground"
                 >
                   <PanelLeftClose className="h-4 w-4" />
                 </button>
@@ -479,7 +430,7 @@ export default function TemplateBuilderPage({
                 <button
                   onClick={backToTemplates}
                   aria-label="Back to templates"
-                  className="grid size-8 place-items-center rounded-md text-foreground/50 transition-colors hover:text-foreground lg:hidden"
+                  className="grid size-8 place-items-center rounded text-foreground/50 transition-colors hover:text-foreground lg:hidden"
                 >
                   <ArrowLeft className="h-4 w-4" />
                 </button>
@@ -520,7 +471,7 @@ export default function TemplateBuilderPage({
                       exit={{ opacity: 0, scale: 0.85, x: -6 }}
                       transition={{ duration: 0.3, ease: smooth }}
                       whileTap={{ scale: 0.96 }}
-                      className="hidden items-center gap-1.5 rounded-md bg-foreground px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-foreground/85 lg:flex"
+                      className="hidden items-center gap-1.5 rounded bg-foreground px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-foreground/85 lg:flex"
                     >
                       <Pen className="h-3 w-3" />
                       Edit
@@ -561,7 +512,7 @@ export default function TemplateBuilderPage({
                   type="button"
                   onClick={savePortfolio}
                   disabled={!isDirty || saveState === "saving" || !canPersist}
-                  className="rounded-md border border-border/70 px-3 py-1.5 text-[10px] font-mono uppercase tracking-[0.1em] text-foreground transition disabled:cursor-not-allowed disabled:opacity-35"
+                  className="rounded border border-border/70 px-3 py-1.5 text-[10px] font-mono uppercase tracking-[0.1em] text-foreground transition disabled:cursor-not-allowed disabled:opacity-35"
                 >
                   {saveState === "saving" ? "Saving..." : "Save"}
                 </button>
@@ -569,7 +520,7 @@ export default function TemplateBuilderPage({
                   type="button"
                   onClick={publishPortfolio}
                   disabled={publishState === "publishing" || !canPersist}
-                  className="rounded-md bg-foreground px-3 py-1.5 text-[10px] font-mono uppercase tracking-[0.1em] text-primary-foreground transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded bg-foreground px-3 py-1.5 text-[10px] font-mono uppercase tracking-[0.1em] text-primary-foreground transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {publishState === "publishing"
                     ? "Publishing..."
@@ -592,7 +543,7 @@ export default function TemplateBuilderPage({
                 <button
                   type="button"
                   onClick={() => window.location.reload()}
-                  className="rounded-md border border-red-300 px-3 py-1 font-mono uppercase tracking-[0.1em] hover:bg-red-100"
+                  className="rounded border border-red-300 px-3 py-1 font-mono uppercase tracking-[0.1em] hover:bg-red-100"
                 >
                   Reload
                 </button>

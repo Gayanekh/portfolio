@@ -226,7 +226,7 @@ export default function TemplatesSlider({ start = 0, arrival }: { start?: number
           <SplitWords as="h2" text={TEMPLATES_INTRO.title} className={sectionTitle} />
           <SplitWords as="p" text={TEMPLATES_INTRO.text} className={sectionIntro} />
           <Reveal className="mt-4 md:mt-5">
-            <div role="tablist" aria-label="Template" className="relative inline-flex max-w-full flex-wrap justify-center gap-1 rounded-full bg-foreground/[0.04] p-1">
+            <div role="tablist" aria-label="Template" className="relative inline-flex max-w-full flex-wrap justify-center gap-1 rounded bg-foreground/[0.04] p-1">
               {TEMPLATES.map((template, i) => {
                 const active = i === index;
                 return (
@@ -240,9 +240,9 @@ export default function TemplatesSlider({ start = 0, arrival }: { start?: number
                     tabIndex={active ? 0 : -1}
                     onClick={() => select(i)}
                     onKeyDown={(event) => onTabKey(event, i)}
-                    className={`${focusRing} relative cursor-pointer rounded-full px-4 py-2 text-sm font-medium transition-colors duration-300 ${active ? "text-foreground" : "text-foreground/60 hover:text-foreground"}`}
+                    className={`${focusRing} relative cursor-pointer rounded px-4 py-2 text-sm font-medium transition-colors duration-300 ${active ? "text-foreground" : "text-foreground/60 hover:text-foreground"}`}
                   >
-                    {active && <motion.span layoutId="tpl-tab-pill" aria-hidden="true" transition={{ duration: 0.4, ease }} className="absolute inset-0 rounded-full bg-white shadow-[0_1px_3px_rgb(0_0_0/0.1)]" />}
+                    {active && <motion.span layoutId="tpl-tab-pill" aria-hidden="true" transition={{ duration: 0.4, ease }} className="absolute inset-0 rounded bg-white shadow-[0_1px_3px_rgb(0_0_0/0.1)]" />}
                     <span className="relative">{template.name}</span>
                   </button>
                 );
@@ -358,7 +358,7 @@ export default function TemplatesSlider({ start = 0, arrival }: { start?: number
               type="button"
               aria-label={playing ? "Pause autoplay" : "Start autoplay"}
               onClick={() => setChosen(!playing)}
-              className={`${focusRing} ml-auto grid size-10 cursor-pointer place-items-center rounded-full border border-foreground/10 bg-white text-foreground transition-colors hover:border-foreground/20`}
+              className={`${focusRing} ml-auto grid size-10 cursor-pointer place-items-center rounded border border-foreground/10 bg-white text-foreground transition-colors hover:border-foreground/20`}
             >
               {playing ? <Pause aria-hidden="true" className="size-4" /> : <Play aria-hidden="true" className="size-4" />}
             </button>

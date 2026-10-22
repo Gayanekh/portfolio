@@ -16,7 +16,7 @@ export default function MinimalPreview({
   const hasWork = data.projects.length > 0;
 
   return (
-    <div className="min-h-full bg-card px-6 sm:px-10 lg:px-14 py-10">
+    <div data-template-font className="min-h-full bg-card px-6 font-sans sm:px-10 lg:px-14 py-10">
       {data.navigation.enabled && (
         <nav
           className="sticky top-0 z-20 mb-10 grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-4 border-b border-border/40 bg-card/95 px-2 text-[9px] font-sans font-medium uppercase tracking-[0.1em] text-foreground/70 backdrop-blur-sm"

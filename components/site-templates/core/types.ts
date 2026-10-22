@@ -55,6 +55,12 @@ export interface TemplateDefinition {
 export interface EditHooks {
   renderText: (section: string, field: string, value: string) => ReactNode;
   renderSection: (section: string, children: ReactNode) => ReactNode;
+  // An image field's picture, made selectable, movable and replaceable.
+  // `fixed`: an image that keeps its place in the template's layout (a
+  // slider's or a card's), so it can be replaced but not moved or resized.
+  renderMedia?: (section: string, field: string, image: ReactNode, options?: { fixed?: boolean }) => ReactNode;
+  // A block added with "Add block" (see ./layout), made editable.
+  renderAdded?: (section: string, block: import("./layout").AddedBlock) => ReactNode;
 }
 
 // Typing helper for template files.

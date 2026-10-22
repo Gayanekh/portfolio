@@ -26,7 +26,11 @@ const config: Config = {
         "content-width": "min(85vw, clamp(40rem, 72.5vw, 100rem))",
       },
       fontFamily: {
+        // Portfolio templates' text: Inter Tight, or the chosen font pack's.
         sans: ["var(--font-1)"],
+        // The site's own text and UI (Inter), and its headings (Inter Tight).
+        ui: ["var(--font-ui)"],
+        heading: ["var(--font-heading)"],
         // Site templates' headings: the template's own display font, or the
         // chosen font pack's (see theme-options.ts).
         display: ["var(--font-display, var(--font-1))"],

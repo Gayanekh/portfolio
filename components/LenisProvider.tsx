@@ -20,8 +20,10 @@ const LenisProvider = ({ children }: LenisProviderProps) => {
       smoothWheel: true,
       syncTouch: true,
       // Lenis handles in-page #hash links itself, so they scroll smoothly
-      // instead of competing with the browser's native anchor jump.
-      anchors: true,
+      // instead of competing with the browser's native anchor jump. It stops
+      // 6rem short of the target (the sections' scroll-mt-24), so a section
+      // lands below the floating header rather than under it.
+      anchors: { offset: -96 },
     });
 
     let animationFrameId = 0;

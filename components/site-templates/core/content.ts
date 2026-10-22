@@ -1,3 +1,4 @@
+import { plainText } from "./rich-format";
 import type { SectionContent, TemplateContent, TemplateDefinition } from "./types";
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -25,4 +26,4 @@ export const mergeContent = (template: TemplateDefinition, saved: unknown): Temp
 export const readField = (content: TemplateContent, section: string, field: string) => content[section]?.[field] ?? "";
 
 export const readSiteTitle = (template: TemplateDefinition, content: TemplateContent) =>
-  readField(content, template.siteTitle.section, template.siteTitle.field);
+  plainText(readField(content, template.siteTitle.section, template.siteTitle.field));

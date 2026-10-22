@@ -28,7 +28,7 @@ const REWIND = { duration: 1.4, ease };
 const WHEEL_QUIET_MS = 250;
 const WHEEL_REPEAT_MS = 900;
 
-const heroButton = `${focusRing} group inline-flex h-12 items-center gap-2 rounded-full px-6 text-[0.95rem] font-medium no-underline transition-colors`;
+const heroButton = `${focusRing} group inline-flex h-12 items-center gap-2 rounded px-6 text-[0.95rem] font-medium no-underline transition-colors`;
 
 export default function HeroTemplates() {
   const reduced = useReducedMotionConfig();
@@ -98,7 +98,7 @@ export default function HeroTemplates() {
     // The top padding keeps the content clear of the floating header.
     <section ref={sectionRef} aria-label="Introduction" className="flex min-h-svh items-center pb-10 pt-[7.5rem] md:pt-28">
       {/* Side by side: the text on the left, the card stack on the right (stacked on phones). */}
-      <div className="mx-auto grid w-content-width grid-cols-1 items-center gap-10 md:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] md:gap-10 lg:gap-12">
+      <div className="mx-auto grid w-content-width grid-cols-1 items-center gap-10 px-3 md:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] md:gap-10 lg:gap-12 xl:px-4 2xl:px-5">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -125,7 +125,7 @@ export default function HeroTemplates() {
           onMouseLeave={() => setPaused(false)}
           onFocus={() => setPaused(true)}
           onBlur={(event) => !event.currentTarget.contains(event.relatedTarget) && setPaused(false)}
-          className="flex justify-center"
+          className="flex justify-center md:justify-end"
         >
           <StackSlider items={STACK} position={position} active={active} onSelect={setActive} />
         </div>
