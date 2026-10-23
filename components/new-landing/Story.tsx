@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Check, Link2, Lock, Shuffle } from "lucide-react";
+import { Check, Link2, Lock, MoveRight, Shuffle } from "lucide-react";
 import { Reveal } from "@/components/landing/Reveal";
 import PreviewFrame from "@/components/template-detail/PreviewFrame";
 import { getTemplateDetail } from "@/components/template-detail/template-registry";
@@ -260,7 +260,7 @@ export default function Story() {
               </p>
               <Link href={STORY.publish.start.href} className={`${solidButton} group h-12 w-fit`}>
                 {STORY.publish.start.label}
-                <ArrowRight aria-hidden="true" className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+                <MoveRight aria-hidden="true" className="size-5 transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
             </div>
           </Chapter>

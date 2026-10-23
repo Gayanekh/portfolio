@@ -15,12 +15,12 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import { ArrowRight, ArrowUpRight, ExternalLink, Pause, Play } from "lucide-react";
+import { ExternalLink, MoveRight, Pause, Play } from "lucide-react";
 import { useLanding } from "@/components/landing/LandingProvider";
 import { Reveal } from "@/components/landing/Reveal";
 import ScaledPreview from "@/components/landing/ScaledPreview";
 import { CtaLink } from "@/components/landing/Section";
-import { PEOPLE, STYLE_LABEL, TEMPLATES, type TemplateId } from "@/components/landing/sample-portfolios";
+import { STYLE_LABEL, TEMPLATES, type TemplateId } from "@/components/landing/sample-portfolios";
 import { templates as appTemplates } from "@/components/templates/template-data";
 import { displayTitle, ease, focusRing, glassPill, kicker, lead, secondaryOnCard, text } from "@/components/landing/landing-ui";
 
@@ -40,8 +40,6 @@ const COUNT = TEMPLATES.length;
 const SLIDES = Array.from({ length: COUNT * 3 }, (_, k) => k);
 const HOME = COUNT;
 const AUTOPLAY_MS = 4500;
-const lower = (value: string) => value.charAt(0).toLowerCase() + value.slice(1);
-const initials = (name: string) => name.split(" ").map((part) => part[0]).join("").slice(0, 2);
 const clamp = (value: number) => Math.min(1, Math.max(0, value));
 const wrap = (value: number) => ((value % COUNT) + COUNT) % COUNT;
 
@@ -133,9 +131,9 @@ function PreviewPane({
     <motion.div
       ref={paneRef}
       style={flies ? { opacity } : undefined}
-      className="relative h-full min-h-80 overflow-hidden rounded-2xl bg-white md:aspect-square md:max-w-full"
+      className="relative h-full min-h-[34rem] w-full overflow-hidden rounded-xl bg-white md:min-h-[32rem] lg:min-h-0"
     >
-      <ScaledPreview template={template.id} person={template.sample} base={1100} className="absolute inset-0 h-full w-full min-h-0 rounded-2xl" />
+      <ScaledPreview template={template.id} person={template.sample} base={1100} className="absolute inset-0 h-full w-full min-h-0 rounded-xl" />
       <AnimatePresence>
         {!ready && (
           <motion.span
@@ -466,7 +464,6 @@ export default function TemplatesSlider() {
               <motion.div style={{ x }} aria-live={playing ? "off" : "polite"} className="flex">
                 {SLIDES.map((slide) => {
                   const template = TEMPLATES[slide % COUNT];
-                  const person = PEOPLE[template.sample];
                   // Only the middle copy is exposed to assistive technology.
                   const copy = Math.floor(slide / COUNT) !== 1;
                   return (
@@ -476,32 +473,42 @@ export default function TemplatesSlider() {
                       aria-roledescription="slide"
                       aria-label={`${slide % COUNT + 1} of ${COUNT}`}
                       aria-hidden={copy || undefined}
-                      className="relative mb-10 mr-5 w-full flex-none select-none md:w-[80%] lg:aspect-[1280/700] lg:w-[min(1280px,calc(100vw-9rem))]"
+                      className="group/card relative mb-10 mr-5 w-full flex-none select-none md:w-[80%] lg:aspect-[1280/700] lg:w-[min(1280px,calc(100vw-9rem))]"
                     >
                       <motion.div
                         style={{ opacity: shell }}
-                        className="grid h-full grid-cols-1 gap-4 rounded-[2rem]  p-3 card  md:grid-cols-2 md:gap-8 md:p-4"
+                        className="card relative h-full rounded-[1.25rem] p-3 shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_18px_40px_-28px_rgb(0_0_0/0.35)] md:p-4"
                       >
-                        <div className="flex min-w-0 flex-col justify-between gap-8 p-3 md:p-6">
-                          <div className="flex flex-col items-start gap-4">
+                        <PreviewPane slide={slide} flight={flight} position={position} ready={ready} paneRef={(element) => { paneRefs.current[slide] = element; }} />
+
+                        {/* The template's panel over the image: its style, headline and
+                            link always; on hover or focus it grows to show who it suits
+                            and what to bring (always open where there is no hover). */}
+                        <div className="pointer-events-none absolute inset-x-6 bottom-6 z-[5] max-w-[28rem] rounded-xl bg-white/80 p-5 shadow-[0_0_0_1px_rgb(0_0_0/0.05),0_16px_40px_-20px_rgb(0_0_0/0.35)] backdrop-blur-xl backdrop-saturate-150 md:bottom-8 md:left-8 md:right-auto md:p-6">
+                          <div className="flex flex-col items-start gap-3">
                             <span className="rounded-full border border-foreground/10 bg-background px-3 py-1 text-xs font-medium">{STYLE_LABEL[template.style]}</span>
-                            <h3 className="m-0 text-balance text-[length:clamp(1.6rem,7vw,2.25rem)] font-medium leading-[1.05] tracking-[-0.03em] md:text-[length:clamp(1.75rem,3vw,2.75rem)]">{HEADLINE[template.id]}</h3>
-                            <p className={`${text.base} m-0 text-balance leading-snug text-foreground/75`}>
-                              {template.name} is good for {lower(template.bestFor)}. It works best with {template.needs.map(lower).join(", ")}.
-                            </p>
-                            <span aria-hidden="true" className="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold">
-                              Open templates <ArrowUpRight className="size-4" />
+                            <h3 className="m-0 text-[1.0625rem] font-medium leading-snug tracking-[-0.02em] sm:text-xl md:text-[1.375rem]">{HEADLINE[template.id]}</h3>
+                            <span aria-hidden="true" className="inline-flex items-center gap-2 text-sm font-semibold">
+                              Use {template.name} <MoveRight className="size-5 transition-transform duration-300 group-hover/card:translate-x-1" />
                             </span>
                           </div>
-                          <div className="flex items-center gap-3">
-                            <span aria-hidden="true" className="grid size-10 shrink-0 place-items-center rounded-full bg-foreground/10 text-sm font-semibold md:size-11">{initials(person.name)}</span>
-                            <div className="flex min-w-0 flex-col">
-                              <span className={`${text.base} truncate font-semibold leading-snug`}>{person.name}</span>
-                              <span className={`${text.base} truncate leading-snug text-foreground/60`}>{person.role} · {person.location}</span>
-                            </div>
+                          <div className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-focus-within/card:grid-rows-[1fr] group-hover/card:grid-rows-[1fr] motion-reduce:transition-none [@media(hover:none)]:grid-rows-[1fr]">
+                            <dl className="m-0 grid min-h-0 gap-4 overflow-hidden opacity-0 transition-opacity duration-500 group-focus-within/card:opacity-100 group-hover/card:opacity-100 [@media(hover:none)]:opacity-100">
+                              <div className="mt-5 grid gap-1.5 border-t border-foreground/10 pt-4">
+                                <dt className="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/45">Made for</dt>
+                                <dd className={`${text.base} m-0 text-pretty leading-snug text-foreground/75`}>{template.bestFor}.</dd>
+                              </div>
+                              <div className="grid gap-2.5 border-t border-foreground/10 pt-4">
+                                <dt className="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/45">Works best with</dt>
+                                <dd className="m-0 flex flex-wrap gap-1.5">
+                                  {template.needs.map((need) => (
+                                    <span key={need} className="rounded-full border border-foreground/10 bg-background px-3 py-1 text-xs font-medium text-foreground/80">{need}</span>
+                                  ))}
+                                </dd>
+                              </div>
+                            </dl>
                           </div>
                         </div>
-                        <PreviewPane slide={slide} flight={flight} position={position} ready={ready} paneRef={(element) => { paneRefs.current[slide] = element; }} />
                       </motion.div>
                       {/* The active card opens the templates page; its neighbours move the carousel. */}
                       {slide === pos && (
@@ -510,7 +517,7 @@ export default function TemplatesSlider() {
                           tabIndex={copy ? -1 : undefined}
                           aria-hidden={copy || undefined}
                           aria-label={`Open ${template.name} in the templates`}
-                          className={`${focusRing} absolute inset-0 z-10 rounded-[2rem]`}
+                          className={`${focusRing} absolute inset-0 z-10 rounded-[1.25rem]`}
                         />
                       )}
                       {Math.abs(slide - pos) === 1 && (
@@ -520,7 +527,7 @@ export default function TemplatesSlider() {
                           aria-hidden={copy || undefined}
                           aria-label={slide < pos ? "Previous template" : "Next template"}
                           onClick={() => moveTo(slide)}
-                          className={`${focusRing} absolute inset-0 z-10 cursor-pointer rounded-[2rem] [@media(hover:hover)]:cursor-none`}
+                          className={`${focusRing} absolute inset-0 z-10 cursor-pointer rounded-[1.25rem] [@media(hover:hover)]:cursor-none`}
                         />
                       )}
                     </motion.article>
@@ -563,7 +570,7 @@ export default function TemplatesSlider() {
                 className={`${focusRing} group inline-flex h-11 items-center gap-2 justify-self-start rounded bg-foreground pl-5 pr-4 text-sm font-medium text-white no-underline transition-colors hover:bg-foreground/85`}
               >
                 See all templates
-                <ArrowRight aria-hidden="true" className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+                <MoveRight aria-hidden="true" className="size-5 transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
               <div aria-hidden="true" className="flex items-center gap-1.5">
                 {TEMPLATES.map((template, i) => (

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { animate, motion, useInView, useMotionValue, useReducedMotionConfig } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { MoveRight } from "lucide-react";
 import { HERO, STACK } from "@/components/new-landing/content";
 import StackSlider from "@/components/new-landing/StackSlider";
 import { ease, focusRing, primaryButton } from "@/components/landing/landing-ui";
@@ -96,7 +96,7 @@ export default function HeroTemplates() {
 
   return (
     // The top padding keeps the content clear of the floating header.
-    <section ref={sectionRef} aria-label="Introduction" className="flex min-h-svh items-center pb-10 pt-[7.5rem] md:pt-28">
+    <section ref={sectionRef} id="home" aria-label="Introduction" className="flex min-h-svh items-center pb-10 pt-[7.5rem] md:pt-28">
       {/* Side by side: the text on the left, the card stack on the right (stacked on phones). */}
       <div className="mx-auto grid w-content-width grid-cols-1 items-center gap-10 px-3 md:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] md:gap-10 lg:gap-12 xl:px-4 2xl:px-5">
         <motion.div
@@ -114,7 +114,7 @@ export default function HeroTemplates() {
             {/* FloatingCta watches this id to show the button again once it has scrolled away. */}
             <Link id="hero-cta" href={HERO.primary.href} className={`${heroButton} ${primaryButton}`}>
               {HERO.primary.label}
-              <ArrowRight aria-hidden="true" className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+              <MoveRight aria-hidden="true" className="size-5 transition-transform duration-300 group-hover:translate-x-1" />
             </Link>          </div>
         </motion.div>
 

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu } from "../core/blocks";
+import { inMenu, menuName } from "../core/content";
 import { useField, useSectionId, useTemplate } from "../core/context";
 import { glideTo, scrollParent, viewOf } from "../core/scroll";
 import { STORY_CHANGE, STORY_GO } from "../core/StoryScroller";
@@ -24,13 +25,13 @@ type Item = { id: string; label: string };
 // Its section's field: `siteTitle`.
 export default function SideRail() {
   const id = useSectionId();
-  const { template, navigate } = useTemplate();
+  const { template, content, navigate } = useTemplate();
   const title = useField("siteTitle").node;
   const railRef = useRef<HTMLElement>(null);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const [items, setItems] = useState<Item[]>(() =>
-    template.sections.filter((section) => section.menu).map((section) => ({ id: section.id, label: section.menu ?? section.id })),
+    template.sections.filter((section) => inMenu(content, section)).map((section) => ({ id: section.id, label: menuName(content, section) })),
   );
   // The item in view: the last one whose top has passed the middle of the screen.
   useEffect(() => {
@@ -46,7 +47,7 @@ export default function SideRail() {
         const element = root.querySelector<HTMLElement>(`[data-section="${section.id}"]`);
         const panels = Array.from(element?.querySelectorAll<HTMLElement>("[data-rail-item]") ?? []);
         if (panels.length) return panels.map((panel) => ({ element: panel, id: panel.dataset.railItem!, label: panel.dataset.railLabel ?? "" }));
-        return section.menu ? [{ element, id: section.id, label: section.menu }] : [];
+        return inMenu(content, section) ? [{ element, id: section.id, label: menuName(content, section) }] : [];
       });
     const update = () => {
       const view = viewOf(parent);
@@ -78,7 +79,7 @@ export default function SideRail() {
       root.removeEventListener(STORY_CHANGE, update);
       observer.disconnect();
     };
-  }, [template]);
+  }, [template, content]);
 
   // A story panel: back to the story (if the page has scrolled past it) and
   // show that panel. A section: through the template's menu.

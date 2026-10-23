@@ -1,11 +1,6 @@
-import type { Metadata } from "next";
-import TemplateGallery from "@/components/gallery/TemplateGallery";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Portfolio templates | Portory",
-  description: "Browse every Portory template and pick the one that fits your work.",
-};
-
+// The gallery's address now leads to the templates page.
 export default function TemplateGalleryPage() {
-  return <TemplateGallery />;
+  redirect("/templates");
 }

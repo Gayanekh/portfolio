@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, Check, Copy, Globe, Lock } from "lucide-react";
+import Tooltip from "@/components/ui/tooltip";
 
 const smooth = [0.22, 1, 0.36, 1] as const;
 // As in the image panel (fluid/ImagePanel).
@@ -89,9 +90,11 @@ export default function PageSettings({
           >
             <div className="flex flex-col gap-2">
               <span className={label}>Page link</span>
-              <span className="truncate rounded-md bg-neutral-100 px-2.5 py-2.5 text-[13px] text-neutral-900" title={address}>
-                {address}
-              </span>
+              <Tooltip label={address} side="top">
+                <span className="truncate rounded-md bg-neutral-100 px-2.5 py-2.5 text-[13px] text-neutral-900">
+                  {address}
+                </span>
+              </Tooltip>
               {pendingChanges && <span className="text-[11px] leading-snug text-neutral-500">You have changes that are not live yet. Publish to update your page.</span>}
               <span className="mt-1 flex gap-2">
                 <button type="button" onClick={onCopy} className={outlineButton}>

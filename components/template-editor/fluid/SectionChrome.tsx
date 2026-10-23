@@ -3,8 +3,7 @@
 import { useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  ArrowDown,
-  ArrowUp,
+  Check,
   Copy,
   Image as ImageIcon,
   Layers,
@@ -17,6 +16,8 @@ import {
 } from "lucide-react";
 import GridOverlay from "./GridOverlay";
 import { editorUi, useCanvas } from "./canvas";
+import { menuCard, menuRow, menuTitle, ToolButton, ToolDivider, toolbarCard } from "./toolbar";
+import Tooltip from "@/components/ui/tooltip";
 
 // Keep receiving the pointer while dragging, even outside the element (a
 // pointer the browser no longer tracks is simply not captured).
@@ -54,46 +55,54 @@ export interface SectionChromeProps {
   onSelectBlock: (id: string) => void;
   // The extra height while dragging the handle, and once it is let go.
   onHeight: (rows: number, done: boolean) => void;
+  // The site's header or footer: locked (shown as visitors see it, "Edit
+  // header" on hover) until clicked, then open with all its tools and Done.
+  global?: { name: string; open: boolean; onOpen: () => void; onDone: () => void };
+  // Another section is open (a header or footer): this one dims, and a click
+  // on it closes that one.
+  dimmed?: boolean;
+  onUndim?: () => void;
   children: ReactNode;
 }
 
-type Open = "before" | "after" | "layouts" | "layers" | "block" | null;
+type Open = "before" | "after" | "layers" | "block" | null;
 const smooth = [0.22, 1, 0.36, 1] as const;
-const card = `rounded-md bg-white ${editorUi} shadow-[0_2px_12px_rgb(0_0_0/0.14)] ring-1 ring-black/5`;
-const row = "flex w-full cursor-pointer items-center gap-2.5 rounded px-2.5 py-2 text-left text-[10px] font-semibold uppercase tracking-[0.08em] text-neutral-800 transition-colors hover:bg-neutral-100";
-const iconCell = "grid size-7 cursor-pointer place-items-center rounded text-neutral-800 transition-colors hover:bg-neutral-100 disabled:cursor-default disabled:text-neutral-300 disabled:hover:bg-transparent";
+// Menus open with a small drop and fade.
+const pop = {
+  initial: { opacity: 0, y: -4, scale: 0.98 },
+  animate: { opacity: 1, y: 0, scale: 1 },
+  exit: { opacity: 0, y: -4, scale: 0.98 },
+  transition: { duration: 0.16, ease: smooth },
+};
 
 function Menu({ title, items, onPick, className }: { title: string; items: ChoiceItem[]; onPick: (id: string) => void; className: string }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -4, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -4, scale: 0.98 }}
-      transition={{ duration: 0.16, ease: smooth }}
-      className={`${card} absolute z-50 w-56 p-1 ${className}`}
-    >
-      <p className="m-0 px-2.5 pb-1 pt-1.5 text-[10px] font-medium uppercase tracking-[0.08em] text-neutral-400">{title}</p>
+    <motion.div {...pop} className={`${menuCard} absolute z-50 w-56 ${className}`}>
+      <p className={menuTitle}>{title}</p>
       {items.length ? (
         items.map((item) => (
-          <button key={item.id} type="button" onClick={() => onPick(item.id)} className={`${row} font-medium normal-case tracking-normal`}>
-            <span className="truncate text-xs">{item.label}</span>
+          <button key={item.id} type="button" onClick={() => onPick(item.id)} className={menuRow}>
+            <span className="truncate">{item.label}</span>
           </button>
         ))
       ) : (
-        <p className="m-0 px-2.5 py-2 text-xs text-neutral-500">Nothing here yet.</p>
+        <p className="m-0 px-2.5 py-2 text-[13px] text-neutral-500">Nothing here yet.</p>
       )}
     </motion.div>
   );
 }
 
+
 // A section while editing, after the reference's Fluid Engine: hovering it
-// outlines it in blue with "Add section" at its top and bottom edges, Layers
-// and Add block at its top left, and on the right its menu (Edit section,
-// View layouts, duplicate, move up, move down, Remove) and Edit content. A
+// outlines it in the brand colour with "Add section" at its top and bottom edges, Layers
+// and Add block at its top left, and on the right its tools in one row (Edit section,
+// Layouts, both coming soon; duplicate and Remove), all in
+// the canvas toolbar design (toolbar.tsx). A
 // handle at its bottom right drags its height. While a block in it is
-// dragged, it shows the grid.
+// dragged, it shows the grid. The site's header and footer are locked until
+// clicked (see `global`), and the rest of the page dims while one is open.
 export default function SectionChrome(props: SectionChromeProps) {
-  const { instance, first, last, layouts, blocks, extraRows, children } = props;
+  const { instance, layouts, blocks, extraRows, children } = props;
   const { dragging, setDragging } = useCanvas();
   const [hover, setHover] = useState(false);
   const [open, setOpen] = useState<Open>(null);
@@ -101,7 +110,8 @@ export default function SectionChrome(props: SectionChromeProps) {
   const [resizing, setResizing] = useState(false);
   // Hidden while a block is dragged (the grid shows instead), but not while
   // its own height handle is.
-  const shown = resizing || ((hover || open !== null) && !dragging);
+  // An open header or footer keeps its tools showing.
+  const shown = resizing || ((hover || open !== null || Boolean(props.global?.open)) && !dragging);
   const toggle = (menu: Open) => setOpen((current) => (current === menu ? null : menu));
   const close = () => setOpen(null);
 
@@ -123,6 +133,54 @@ export default function SectionChrome(props: SectionChromeProps) {
     setResizing(false);
     setDragging(null);
   };
+
+  // Dimmed while a header or footer is open: a click on it closes that one.
+  if (props.dimmed) {
+    return (
+      <div className="relative" data-section-chrome={instance}>
+        {children}
+        <motion.button
+          type="button"
+          aria-label="Back to the whole page"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.25 }}
+          onPointerDown={(event) => event.stopPropagation()}
+          onClick={props.onUndim}
+          className="absolute inset-0 z-[36] block cursor-pointer bg-white/70"
+        />
+      </div>
+    );
+  }
+
+  // A locked header or footer: as visitors see it; hovering outlines it and
+  // offers "Edit header", and a click anywhere on it opens it.
+  if (props.global && !props.global.open) {
+    const { name, onOpen } = props.global;
+    return (
+      <div className="relative" data-section-chrome={instance} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
+        {children}
+        <button
+          type="button"
+          aria-label={`Edit ${name.toLowerCase()}`}
+          onPointerDown={(event) => event.stopPropagation()}
+          onClick={onOpen}
+          className={`absolute inset-0 z-[35] block cursor-pointer ${editorUi} transition-shadow duration-150 ${hover && !dragging ? "shadow-[inset_0_0_0_2px_#bb4e1c]" : ""}`}
+        >
+          <AnimatePresence>
+            {hover && !dragging && (
+              <span key="edit" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
+                <motion.span {...pop} className={`${toolbarCard} h-11 px-3`}>
+                  <Pencil aria-hidden="true" className="h-4 w-4" strokeWidth={1.75} />
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.08em]">Edit {name.toLowerCase()}</span>
+                </motion.span>
+              </span>
+            )}
+          </AnimatePresence>
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -146,16 +204,19 @@ export default function SectionChrome(props: SectionChromeProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className={`pointer-events-none absolute inset-0 z-[35] ${editorUi} ring-1 ring-inset ring-[#3b82f6]`}
+            className={`pointer-events-none absolute inset-0 z-[35] ${editorUi} ring-1 ring-inset ring-[#bb4e1c]`}
           >
-            {/* Add section, at the top and bottom edges */}
-            {(["before", "after"] as const).map((where) => (
+            {/* Add section, at the top and bottom edges (not around an open
+                header or footer, which is too short for them) */}
+            {(props.global ? [] : (["before", "after"] as const)).map((where) => (
               <div key={where} className={`pointer-events-auto absolute left-1/2 -translate-x-1/2 ${where === "before" ? "top-0 -translate-y-1/2" : "bottom-0 translate-y-1/2"}`}>
                 <button
                   type="button"
                   onClick={() => toggle(where)}
-                  className="cursor-pointer rounded bg-[#3b82f6] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.08em] text-white shadow-sm transition-colors hover:bg-[#2563eb]"
+                  aria-expanded={open === where}
+                  className="flex h-7 cursor-pointer items-center gap-1 rounded-lg bg-[#bb4e1c] pl-2 pr-2.5 text-xs font-medium text-white shadow-[0_4px_12px_-4px_rgb(0_0_0/0.3)] transition-colors hover:bg-[#9c4117]"
                 >
+                  <Plus aria-hidden="true" className="h-3.5 w-3.5" strokeWidth={2} />
                   Add section
                 </button>
                 <AnimatePresence>
@@ -176,130 +237,84 @@ export default function SectionChrome(props: SectionChromeProps) {
             ))}
 
             {/* Layers and Add block */}
-            <div className="pointer-events-auto absolute left-3 top-3 flex items-start gap-1.5">
-              <div className="relative">
-                <button type="button" aria-label="Layers" onClick={() => toggle("layers")} className={`${card} grid size-8 cursor-pointer place-items-center text-neutral-800 hover:bg-neutral-50`}>
-                  <Layers className="h-3.5 w-3.5" />
-                </button>
-                <AnimatePresence>
-                  {open === "layers" && (
-                    <Menu
-                      key="layers"
-                      title="Layers"
-                      items={blocks}
-                      onPick={(id) => {
-                        props.onSelectBlock(id);
-                        close();
-                      }}
-                      className="left-0 top-full mt-2"
-                    />
-                  )}
-                </AnimatePresence>
+            <div className="pointer-events-auto absolute left-3 top-3">
+              <div className={toolbarCard}>
+                <ToolButton label="Layers" Icon={Layers} active={open === "layers"} onClick={() => toggle("layers")} />
+                <ToolDivider />
+                <ToolButton label="Add block" Icon={Plus} wide active={open === "block"} onClick={() => toggle("block")} />
               </div>
-              <div className="relative">
-                <button type="button" onClick={() => toggle("block")} className={`${card} flex h-8 cursor-pointer items-center gap-1.5 px-2.5 text-[9px] font-semibold uppercase tracking-[0.08em] text-neutral-800 hover:bg-neutral-50`}>
-                  <Plus className="h-3.5 w-3.5" />
-                  Add block
-                </button>
-                <AnimatePresence>
-                  {open === "block" && (
-                    <motion.div
-                      key="block"
-                      initial={{ opacity: 0, y: -4, scale: 0.98 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -4, scale: 0.98 }}
-                      transition={{ duration: 0.16, ease: smooth }}
-                      className={`${card} absolute left-0 top-full z-50 mt-2 grid w-44 grid-cols-2 gap-1 p-1`}
-                    >
-                      {([
-                        ["text", "Text", Type],
-                        ["image", "Image", ImageIcon],
-                      ] as const).map(([kind, name, Icon]) => (
-                        <button
-                          key={kind}
-                          type="button"
-                          onClick={() => {
-                            props.onAddBlock(kind);
-                            close();
-                          }}
-                          className="flex cursor-pointer flex-col items-center gap-1.5 rounded px-2 py-3 text-[11px] font-medium text-neutral-800 transition-colors hover:bg-neutral-100"
-                        >
-                          <Icon className="h-4 w-4" />
-                          {name}
-                        </button>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </div>
-
-            {/* The section's menu */}
-            <div className="pointer-events-auto absolute right-3 top-3 flex w-[176px] flex-col gap-2">
-              <div className={`${card} flex flex-col p-1`}>
-                {props.onEditSection && (
-                  <button type="button" onClick={props.onEditSection} className={row}>
-                    <Pencil className="h-3.5 w-3.5" />
-                    Edit section
-                  </button>
+              <AnimatePresence>
+                {open === "layers" && (
+                  <Menu
+                    key="layers"
+                    title="Layers"
+                    items={blocks}
+                    onPick={(id) => {
+                      props.onSelectBlock(id);
+                      close();
+                    }}
+                    className="left-0 top-full mt-2"
+                  />
                 )}
-                <div className="relative">
-                  <button type="button" onClick={() => toggle("layouts")} className={row}>
-                    <LayoutTemplate className="h-3.5 w-3.5" />
-                    View layouts
-                  </button>
-                  <AnimatePresence>
-                    {open === "layouts" && (
-                      <Menu
-                        key="layouts"
-                        title="Change to"
-                        items={layouts}
-                        onPick={(base) => {
-                          props.onLayout(base);
+                {open === "block" && (
+                  <motion.div key="block" {...pop} className={`${menuCard} absolute left-0 top-full z-50 mt-2 grid w-48 grid-cols-2 gap-1`}>
+                    {([
+                      ["text", "Text", Type],
+                      ["image", "Image", ImageIcon],
+                    ] as const).map(([kind, name, Icon]) => (
+                      <button
+                        key={kind}
+                        type="button"
+                        onClick={() => {
+                          props.onAddBlock(kind);
                           close();
                         }}
-                        className="right-full top-0 mr-2"
-                      />
-                    )}
-                  </AnimatePresence>
-                </div>
-                <div className="flex items-center gap-0.5 border-y border-neutral-100 px-1.5 py-1">
-                  <button type="button" aria-label="Duplicate section" title="Duplicate section" onClick={props.onDuplicate} className={iconCell}>
-                    <Copy className="h-3.5 w-3.5" />
-                  </button>
-                  <button type="button" aria-label="Move section up" title="Move up" disabled={first} onClick={() => props.onMove(-1)} className={iconCell}>
-                    <ArrowUp className="h-3.5 w-3.5" />
-                  </button>
-                  <button type="button" aria-label="Move section down" title="Move down" disabled={last} onClick={() => props.onMove(1)} className={iconCell}>
-                    <ArrowDown className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-                <button type="button" onClick={props.onRemove} disabled={!props.onRemove} className={`${row} text-red-600 hover:bg-red-50 disabled:cursor-default disabled:text-neutral-300 disabled:hover:bg-transparent`}>
-                  <Trash2 className="h-3.5 w-3.5" />
-                  Remove
-                </button>
-              </div>
-              {props.onEditContent && (
-                <button type="button" onClick={props.onEditContent} className={`${card} ${row} py-2.5`}>
-                  <Type className="h-3.5 w-3.5" />
-                  Edit content
-                </button>
-              )}
+                        className="flex cursor-pointer flex-col items-center gap-1.5 rounded-lg px-2 py-3 text-[13px] font-medium text-neutral-900 transition-colors hover:bg-neutral-100"
+                      >
+                        <Icon aria-hidden="true" className="h-5 w-5" strokeWidth={1.75} />
+                        {name}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            {/* The height handle */}
-            <button
-              type="button"
-              aria-label="Drag to change the section's height"
-              title="Section height"
-              onPointerDown={handleDown}
-              onPointerMove={handleMove}
-              onPointerUp={handleUp}
-              onPointerCancel={handleUp}
-              className="pointer-events-auto absolute bottom-6 right-28 grid h-5 w-6 cursor-ns-resize touch-none place-items-center rounded bg-[#3b82f6] text-white shadow-sm"
-            >
-              <MoveVertical className="h-3 w-3" />
-            </button>
+            {/* The section's tools, in one row: edit and layouts (coming
+                soon), duplicate, and Remove */}
+            <div className="pointer-events-auto absolute right-3 top-3">
+              <div className={toolbarCard}>
+                <ToolButton label="Edit section" Icon={Pencil} soon />
+                <ToolButton label="Layouts" Icon={LayoutTemplate} soon />
+                <ToolDivider />
+                <ToolButton label="Duplicate section" Icon={Copy} onClick={props.onDuplicate} />
+                <ToolDivider />
+                <ToolButton label="Remove section" Icon={Trash2} danger disabled={!props.onRemove} onClick={props.onRemove} />
+                {props.global?.open && (
+                  <>
+                    <ToolDivider />
+                    <ToolButton label="Done" Icon={Check} wide onClick={props.global.onDone} />
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* The height handle (not on an open header or footer) */}
+            {!props.global && (
+              <Tooltip label="Section height" side="left">
+                <button
+                  type="button"
+                  aria-label="Drag to change the section's height"
+                  onPointerDown={handleDown}
+                  onPointerMove={handleMove}
+                  onPointerUp={handleUp}
+                  onPointerCancel={handleUp}
+                  className="pointer-events-auto absolute bottom-6 right-28 grid h-7 w-8 cursor-ns-resize touch-none place-items-center rounded-lg bg-[#bb4e1c] text-white shadow-[0_4px_12px_-4px_rgb(0_0_0/0.3)] transition-colors hover:bg-[#9c4117]"
+                >
+                  <MoveVertical aria-hidden="true" className="h-3.5 w-3.5" />
+                </button>
+              </Tooltip>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

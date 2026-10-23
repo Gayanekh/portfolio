@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowUp } from "lucide-react";
-import Logo from "@/components/brand/Logo";
+import LogoMark from "@/components/brand/LogoMark";
 import { useLanding } from "@/components/landing/LandingProvider";
 import { Reveal } from "@/components/landing/Reveal";
 import { focusRing } from "@/components/landing/landing-ui";
@@ -34,10 +34,10 @@ export default function LandingFooter() {
         <div className="grid grid-cols-1 border-t border-white/10 sm:grid-cols-2 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)]">
           {/* The brand. */}
           <Reveal className="flex flex-col gap-8 py-10 sm:col-span-2 lg:col-span-1 lg:pr-12">
-            <Link href="/" aria-label="Portory home" className={`${focusRing} w-fit rounded`}>
-              <Logo className="h-9 w-auto !text-white" />
+            <Link href="/" aria-label="Portory home" className={`${focusRing} grid size-14 place-items-center rounded-2xl bg-white transition-transform duration-300 hover:-translate-y-0.5`}>
+              <LogoMark className="size-11" />
             </Link>
-            <p className="m-0 max-w-[26rem] text-balance text-[length:clamp(1.5rem,2.4vw,2.1rem)] font-light leading-[1.2] tracking-[-0.02em] text-white/85">{TAGLINE}</p>
+            <p className="m-0 max-w-[26rem] text-balance text-[length:clamp(1.15rem,1.6vw,1.45rem)] font-light leading-[1.3] tracking-[-0.02em] text-white/85">{TAGLINE}</p>
           </Reveal>
 
           {/* The page's links. */}

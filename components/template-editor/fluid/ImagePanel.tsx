@@ -2,13 +2,13 @@
 
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Link2, Plus, Trash2 } from "lucide-react";
+import { ImageUp, Link2, Plus, Trash2 } from "lucide-react";
 import type { FocalPoint } from "@/components/site-templates/core/layout";
 import { uploadPortfolioImage, validatePortfolioImage } from "@/lib/portfolio-images";
 import { LinkCard, LinkForm, type LinkPage } from "./LinkEditor";
+import Tooltip from "@/components/ui/tooltip";
 
 const label = "text-[10px] font-medium uppercase tracking-[0.08em] text-neutral-500";
-const input = "w-full rounded-md border border-transparent bg-neutral-100 px-2.5 py-2.5 text-[13px] text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-neutral-300 focus:bg-white";
 
 interface TextSetting {
   value: string;
@@ -20,7 +20,7 @@ interface TextSetting {
 // (drag the circle to choose the part kept in view when the box crops it),
 // its name, Replace and a delete button (or "Add an image" when there is
 // none), then its link (the same link editor and card as the text editor's,
-// see LinkEditor), its alternate filename and its alt text. Images
+// see LinkEditor). Images
 // upload to the account's image storage, like the template builder's; while
 // one uploads, a bar runs under the picture.
 export default function ImagePanel({
@@ -29,8 +29,6 @@ export default function ImagePanel({
   onImage,
   focal,
   link,
-  filename,
-  alt,
   pages = [],
   anchor,
   pickNow = false,
@@ -45,8 +43,6 @@ export default function ImagePanel({
   focal?: { value?: FocalPoint; onChange: (focal: FocalPoint, done: boolean) => void };
   // Images that can link somewhere (not those inside a card, which is a link itself).
   link?: TextSetting;
-  filename?: TextSetting;
-  alt?: TextSetting;
   // The site's pages, offered when linking (as in the text editor).
   pages?: LinkPage[];
   // The image's block on the page (its data-block id): the panel opens beside it.
@@ -232,29 +228,32 @@ export default function ImagePanel({
               <span className="truncate text-[13px] font-medium text-neutral-900">{state.uploading ? "Uploading..." : name}</span>
               <span className="text-[11px] text-neutral-500">Image</span>
             </div>
-            {/* The picture's actions, as in the reference: Replace (another file) and
-                the bin, which removes the picture and keeps its place: an empty box
-                with a "+" on the page and "Add an Image" here. (The toolbar's Delete
-                removes the whole image.) */}
-            <div className="flex items-center justify-between px-3 pb-3 pt-3.5">
+            {/* The picture's actions, as two buttons in the canvas toolbar's
+                style: Replace (another file) and the bin, which removes the
+                picture and keeps its place: an empty box with a "+" on the page
+                and "Add an Image" here. (The toolbar's Delete removes the whole
+                image.) */}
+            <div className="flex items-center gap-1.5 p-2.5 pt-3">
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
                 disabled={state.uploading}
-                className="cursor-pointer text-[12px] font-semibold uppercase tracking-[0.06em] text-neutral-950 hover:underline disabled:cursor-default disabled:opacity-40"
+                className="flex h-9 flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg bg-white text-[11px] font-semibold uppercase tracking-[0.08em] text-neutral-950 shadow-[0_1px_2px_rgb(0_0_0/0.06)] ring-1 ring-black/[0.06] transition-colors hover:bg-neutral-50 disabled:cursor-default disabled:opacity-40"
               >
+                <ImageUp aria-hidden="true" className="h-4 w-4" strokeWidth={1.75} />
                 {state.uploading ? "Uploading..." : "Replace"}
               </button>
-              <button
-                type="button"
-                onClick={() => onImage("")}
-                disabled={state.uploading}
-                aria-label="Remove image"
-                title="Remove image"
-                className="grid size-8 cursor-pointer place-items-center rounded text-neutral-950 transition-colors hover:bg-neutral-200 disabled:cursor-default disabled:opacity-40"
-              >
-                <Trash2 className="h-4 w-4" strokeWidth={2} />
-              </button>
+              <Tooltip label="Remove image">
+                <button
+                  type="button"
+                  onClick={() => onImage("")}
+                  disabled={state.uploading}
+                  aria-label="Remove image"
+                  className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-lg bg-white text-neutral-700 shadow-[0_1px_2px_rgb(0_0_0/0.06)] ring-1 ring-black/[0.06] transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-default disabled:opacity-40"
+                >
+                  <Trash2 aria-hidden="true" className="h-4 w-4" strokeWidth={1.75} />
+                </button>
+              </Tooltip>
             </div>
           </div>
         ) : (
@@ -295,19 +294,6 @@ export default function ImagePanel({
               </button>
             )}
           </div>
-        )}
-        {filename && (
-          <label className="flex flex-col gap-2">
-            <span className={label}>Alternate filename</span>
-            <input value={filename.value} placeholder={name || "Image"} onChange={(event) => filename.onChange(event.target.value)} onBlur={filename.onCommit} className={input} />
-          </label>
-        )}
-        {alt && (
-          <label className="flex flex-col gap-2">
-            <span className={label}>Image alt text</span>
-            <input value={alt.value} onChange={(event) => alt.onChange(event.target.value)} onBlur={alt.onCommit} className={input} />
-            <span className="text-[11px] leading-snug text-neutral-500">Describe your image to improve accessibility and SEO.</span>
-          </label>
         )}
       </div>
     </motion.div>

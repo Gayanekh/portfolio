@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Pencil } from "lucide-react";
+import Tooltip from "@/components/ui/tooltip";
 
 const smooth = [0.22, 1, 0.36, 1] as const;
 // As in the image panel (fluid/ImagePanel).
@@ -77,30 +78,31 @@ export default function PageNameField({
 
   return (
     <div ref={rootRef} className="relative flex justify-center">
-      <button
-        type="button"
-        onClick={() => (open ? close() : show())}
-        aria-haspopup="dialog"
-        aria-expanded={open}
-        title="Page name and settings"
-        className={`group relative flex h-6 max-w-[36vw] cursor-pointer items-center rounded px-1.5 text-sm font-semibold leading-none tracking-[-0.01em] transition-colors ${
-          open ? "bg-neutral-100" : "hover:bg-neutral-100"
-        }`}
-      >
-        <span className={`truncate ${named ? "text-neutral-950" : "text-neutral-500"}`}>{value || fallback}</span>
-        {/* Outside the name, so the name stays centred over the status */}
-        <Pencil
-          aria-hidden="true"
-          className={`absolute left-full top-1/2 ml-1 h-3.5 w-3.5 -translate-y-1/2 transition-[color,opacity] ${
-            open
-              ? "text-neutral-900 opacity-100"
-              : named
-                ? "text-neutral-400 opacity-0 group-hover:text-neutral-900 group-hover:opacity-100 group-focus-visible:opacity-100"
-                : "text-neutral-400 opacity-100 group-hover:text-neutral-900"
+      <Tooltip label="Page name and settings">
+        <button
+          type="button"
+          onClick={() => (open ? close() : show())}
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          className={`group relative flex h-6 max-w-[36vw] cursor-pointer items-center rounded px-1.5 text-sm font-semibold leading-none tracking-[-0.01em] transition-colors ${
+            open ? "bg-neutral-100" : "hover:bg-neutral-100"
           }`}
-        />
-        <span className="sr-only">Page name and settings</span>
-      </button>
+        >
+          <span className={`truncate ${named ? "text-neutral-950" : "text-neutral-500"}`}>{value || fallback}</span>
+          {/* Outside the name, so the name stays centred over the status */}
+          <Pencil
+            aria-hidden="true"
+            className={`absolute left-full top-1/2 ml-1 h-3.5 w-3.5 -translate-y-1/2 transition-[color,opacity] ${
+              open
+                ? "text-neutral-900 opacity-100"
+                : named
+                  ? "text-neutral-400 opacity-0 group-hover:text-neutral-900 group-hover:opacity-100 group-focus-visible:opacity-100"
+                  : "text-neutral-400 opacity-100 group-hover:text-neutral-900"
+            }`}
+          />
+          <span className="sr-only">Page name and settings</span>
+        </button>
+      </Tooltip>
 
       <AnimatePresence>
         {open && (

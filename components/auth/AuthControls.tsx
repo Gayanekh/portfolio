@@ -3,15 +3,16 @@
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, ChevronDown, LogOut } from "lucide-react";
+import { ChevronDown, LogOut, MoveRight } from "lucide-react";
 import { useAccount, type Account } from "@/components/auth/useAccount";
 
 const smooth = [0.22, 1, 0.36, 1] as const;
 
-// "Get started": dark, square, its arrow nudging on hover.
+// "Log in": outlined, filling dark on hover. "Get started": dark, square, its
+// arrow nudging on hover.
 const startButton =
   "group inline-flex h-10 items-center gap-1.5 rounded bg-foreground pl-4 pr-3.5 text-sm font-medium text-white transition-colors hover:bg-foreground/85";
-const startArrow = <ArrowRight aria-hidden="true" className="size-4 transition-transform duration-300 group-hover:translate-x-0.5" />;
+const startArrow = <MoveRight aria-hidden="true" className="size-5 transition-transform duration-300 group-hover:translate-x-1" />;
 
 // The account's photo, or its initials on a dark disc.
 function Avatar({ account, size }: { account: Account; size: "sm" | "lg" }) {
@@ -142,7 +143,7 @@ export default function AuthControls({ start = true, avatarOnly = false }: { sta
     <div className="flex items-center gap-1.5">
       <Link
         href="/login"
-        className="inline-flex h-10 items-center rounded px-3.5 text-sm font-medium text-foreground/70 transition-colors hover:bg-foreground/[0.05] hover:text-foreground"
+        className="inline-flex h-10 items-center rounded border border-foreground/20 px-4 text-sm font-medium text-foreground transition-colors hover:border-foreground hover:bg-foreground hover:text-white"
       >
         Log in
       </Link>

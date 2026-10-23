@@ -30,10 +30,10 @@ export default function GridOverlay() {
     >
       <div className="absolute inset-y-0 left-[4%] right-[4%] grid auto-rows-[24px] grid-cols-[repeat(24,minmax(0,1fr))]">
         {Array.from({ length: rows * 24 }, (_, i) => (
-          <span key={i} className="m-[2px] rounded-[3px] border border-sky-900/10 bg-white/25" />
+          <span key={i} className="m-[2px] rounded-[3px] border border-[#bb4e1c]/15 bg-white/25" />
         ))}
       </div>
-      <span className="absolute inset-y-0 left-1/2 border-l border-dashed border-sky-500/70" />
+      <span className="absolute inset-y-0 left-1/2 border-l border-dashed border-[#bb4e1c]/70" />
     </motion.div>
   );
 }

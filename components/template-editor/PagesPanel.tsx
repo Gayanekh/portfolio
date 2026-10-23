@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, ChevronLeft, ChevronUp, FileText, Home, Info, NotebookPen, Search, ShoppingCart, X } from "lucide-react";
+import Tooltip from "@/components/ui/tooltip";
 
 const ICONS: Record<string, ReactNode> = {
   Shop: <ShoppingCart className="h-3.5 w-3.5" />,
@@ -75,22 +76,25 @@ export default function PagesPanel({
           <span className="flex items-center gap-1.5 text-[13px] font-semibold text-neutral-900">
             {title}
             {info && (
-              <span title={info} className="text-neutral-500">
-                <Info className="h-3.5 w-3.5" />
-              </span>
+              <Tooltip label={info}>
+                <span tabIndex={0} aria-label={info} className="cursor-help rounded text-neutral-500 outline-none focus-visible:ring-2 focus-visible:ring-neutral-300">
+                  <Info className="h-3.5 w-3.5" />
+                </span>
+              </Tooltip>
             )}
           </span>
-          <button
-            type="button"
-            onClick={() => setOpen((o) => ({ ...o, [key]: !o[key] }))}
-            title={`${open[key] ? "Collapse" : "Expand"} the "${title}" group`}
-            aria-expanded={open[key]}
-            className="grid size-6 place-items-center rounded text-neutral-600 transition-colors hover:bg-neutral-100"
-          >
-            <motion.span animate={{ rotate: open[key] ? 0 : 180 }} transition={{ duration: 0.25 }}>
-              <ChevronUp className="h-3.5 w-3.5" />
-            </motion.span>
-          </button>
+          <Tooltip label={`${open[key] ? "Collapse" : "Expand"} the "${title}" group`}>
+            <button
+              type="button"
+              onClick={() => setOpen((o) => ({ ...o, [key]: !o[key] }))}
+              aria-expanded={open[key]}
+              className="grid size-6 place-items-center rounded text-neutral-600 transition-colors hover:bg-neutral-100"
+            >
+              <motion.span animate={{ rotate: open[key] ? 0 : 180 }} transition={{ duration: 0.25 }}>
+                <ChevronUp className="h-3.5 w-3.5" />
+              </motion.span>
+            </button>
+          </Tooltip>
         </div>
         <Collapse open={open[key] || Boolean(query)}>
           <ul className="m-0 mt-1.5 list-none p-0 pl-1">

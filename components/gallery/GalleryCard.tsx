@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
+import { MoveRight } from "lucide-react";
 import type { GalleryTemplate } from "@/components/gallery/gallery-templates";
 import LiveThumbnail from "@/components/template-detail/LiveThumbnail";
 import { templateDetailHref } from "@/components/template-detail/template-registry";
@@ -70,7 +70,7 @@ export default function GalleryCard({ template, index }: { template: GalleryTemp
               transition={{ duration: 0.35, ease }}
               className="grid size-9 place-items-center rounded-full bg-white text-foreground shadow-[0_2px_8px_rgb(0_0_0/0.15)]"
             >
-              <ArrowUpRight className="size-4" />
+              <MoveRight className="size-5" />
             </motion.span>
           </div>
         </div>      

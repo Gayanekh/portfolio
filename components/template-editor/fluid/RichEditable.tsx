@@ -33,6 +33,7 @@ import {
   type TextAlign,
   type ThemeColor,
 } from "@/components/site-templates/core/rich-format";
+import Tooltip from "@/components/ui/tooltip";
 import { COLOR_CLASS } from "@/components/site-templates/core/RichText";
 import { COLOR_MARK, HIGHLIGHT_MARK, adoptMarks, currentBlock, drawRich, readRich } from "./rich-dom";
 import { editorFont, editorUi } from "./canvas";
@@ -85,7 +86,7 @@ function Tool({
   children?: ReactNode;
 }) {
   return (
-    <span className="group/tool relative flex">
+    <Tooltip label={label}>
       <button
         type="button"
         aria-label={label}
@@ -101,10 +102,7 @@ function Tool({
       >
         {Icon ? <Icon className="h-[18px] w-[18px]" strokeWidth={active ? 2.75 : 2.25} fill={filled ? "currentColor" : "none"} /> : children}
       </button>
-      <span className="pointer-events-none absolute left-1/2 top-full z-50 mt-1.5 -translate-x-1/2 whitespace-nowrap rounded bg-neutral-900 px-2 py-1 text-[11px] font-medium text-white opacity-0 transition-opacity delay-300 duration-150 group-hover/tool:opacity-100">
-        {label}
-      </span>
-    </span>
+    </Tooltip>
   );
 }
 
@@ -144,7 +142,7 @@ export default function RichEditable({
     const update = () => {
       const root = ref.current;
       if (!root) return;
-      const area = (root.closest("[data-lenis-prevent]") ?? document.documentElement).getBoundingClientRect();
+      const area = (root.closest("[data-canvas-area]") ?? document.documentElement).getBoundingClientRect();
       setBelow(root.getBoundingClientRect().top - area.top < 64);
     };
     let frame = requestAnimationFrame(update);
@@ -492,17 +490,17 @@ export default function RichEditable({
                     {colorTab === "palette" ? (
                       <span className="flex justify-between gap-2 pt-3">
                         {TEXT_COLORS.map((color) => (
-                          <button
-                            key={color.id}
-                            type="button"
-                            aria-label={color.label}
-                            title={color.label}
-                            onMouseDown={(event) => {
-                              event.preventDefault();
-                              applyColor(COLOR_MARK[color.id]);
-                            }}
-                            className={`size-8 cursor-pointer rounded ring-1 ring-black/10 transition-transform hover:scale-110 ${SWATCH[color.id]} ${COLOR_CLASS[color.id]}`}
-                          />
+                          <Tooltip key={color.id} label={color.label} side="top">
+                            <button
+                              type="button"
+                              aria-label={color.label}
+                              onMouseDown={(event) => {
+                                event.preventDefault();
+                                applyColor(COLOR_MARK[color.id]);
+                              }}
+                              className={`size-8 cursor-pointer rounded ring-1 ring-black/10 transition-transform hover:scale-110 ${SWATCH[color.id]} ${COLOR_CLASS[color.id]}`}
+                            />
+                          </Tooltip>
                         ))}
                       </span>
                     ) : (

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Inter_Tight } from "next/font/google";
+import { Suspense } from "react";
 import LenisProvider from "@/components/LenisProvider";
+import { LastPageTracker } from "@/components/navigation/LastPage";
 
 import "./globals.css";
 
@@ -26,6 +28,9 @@ export default function RootLayout({
       <body className={`${inter.variable} ${interTight.variable}`}>
         <LenisProvider>
           {children}
+          <Suspense fallback={null}>
+            <LastPageTracker />
+          </Suspense>
         </LenisProvider>
       </body>
     </html>

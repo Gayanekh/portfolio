@@ -9,8 +9,7 @@ import { ease, focusRing } from "@/components/landing/landing-ui";
 
 const HERO_CTA = "hero-cta";
 
-// The same frosted card as the compact nav bar (LandingHeader), so the two
-// read as one set.
+// A frosted card, for the floating button.
 export const frostedCard = "rounded-2xl bg-white/75 shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_12px_32px_-12px_rgb(0_0_0/0.22)] backdrop-blur-xl backdrop-saturate-150";
 
 // Whether the hero's "Create Your Portfolio" has scrolled up out of view.
@@ -44,10 +43,10 @@ export function CreateButton({ className = "" }: { className?: string }) {
   );
 }
 
-// Below xl, where there is no room beside the compact nav bar, the button
-// floats centred at the bottom of the screen once the hero's has scrolled
-// away. (From xl it sits beside the bar, in LandingHeader.) Rendered outside
-// the nav because the nav's transform would break fixed positioning.
+// On phones, where the nav bar has no room for Get started, the button floats
+// centred at the bottom of the screen once the hero's has scrolled away.
+// Rendered outside the nav because the nav's transform would break fixed
+// positioning.
 export default function FloatingCta() {
   const gone = useHeroCtaGone();
 
@@ -59,7 +58,7 @@ export default function FloatingCta() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 24, scale: 0.94 }}
           transition={{ duration: 0.45, ease }}
-          className="pointer-events-none fixed inset-x-4 bottom-4 z-[1000] flex justify-center xl:hidden"
+          className="pointer-events-none fixed inset-x-4 bottom-4 z-[1000] flex justify-center sm:hidden"
         >
           <CreateButton className="h-14" />
         </motion.div>

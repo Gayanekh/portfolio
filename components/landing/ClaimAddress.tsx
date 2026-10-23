@@ -13,14 +13,15 @@ const CLAIM = {
   domain: "portory.net/",
   placeholder: "your-name",
   button: "Get started",
-  href: "/register",
+  href: "/templates",
 };
 
 // Lower case, letters, numbers and single hyphens: how an address reads.
 const toSlug = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+/, "").slice(0, 40);
 
 // "Claim your portory.net address": type a name and see it as an address,
-// then sign up. Nothing is reserved here; the address is chosen on publishing.
+// then go to the templates. Nothing is reserved here; the address is chosen
+// on publishing.
 // It follows the FAQ, dark like the
 // template wall and footer below it.
 export default function ClaimAddress() {
