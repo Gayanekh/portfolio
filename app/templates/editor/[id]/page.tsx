@@ -13,5 +13,5 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function TemplateEditorPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   if (!getSiteTemplate(id)) notFound();
-  return <TemplateBuilderPageEditor backHref="/templates/gallery" templateId={id} />;
+  return <TemplateBuilderPageEditor backHref="/templates" templateId={id} />;
 }

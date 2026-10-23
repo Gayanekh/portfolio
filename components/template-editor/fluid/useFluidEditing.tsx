@@ -18,6 +18,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { baseOf, definitionOf, newInstance, sectionOrder, type AddedBlock, type GridSpot, type MediaMeta, type PageLayout, type VerticalAlign } from "@/components/site-templates/core/layout";
+import { MENU_FIELD } from "@/components/site-templates/core/content";
 import { plainText } from "@/components/site-templates/core/rich-format";
 import type { EditHooks, TemplateContent, TemplateDefinition } from "@/components/site-templates/core/types";
 import BlockFrame, { type Resize, type ToolAction } from "./BlockFrame";
@@ -26,6 +27,7 @@ import ImagePanel from "./ImagePanel";
 import SectionChrome from "./SectionChrome";
 import SectionPanel from "./SectionPanel";
 import { editorFont, type CanvasState } from "./canvas";
+import Tooltip from "@/components/ui/tooltip";
 
 // The Fluid Engine editing of a site template page (see the reference): its
 // sections' chrome, its blocks selected, moved on the grid, duplicated and
@@ -50,6 +52,9 @@ type ImageTarget = ({ section: string; field: string } | { section: string; adde
 const uid = () => Math.random().toString(36).slice(2, 9);
 const isImageValue = (value: string) => /^(https?:)?\/\/|^\/|^data:image\//.test(value);
 const fileName = (src: string) => decodeURIComponent(src.split("?")[0].split("/").pop() || "Image");
+// The site's header and footer (and their copies): locked until clicked.
+const GLOBAL_SECTIONS = ["header", "footer"];
+const isGlobal = (instance: string) => GLOBAL_SECTIONS.includes(baseOf(instance));
 
 export function useFluidEditing<T extends FluidDoc>({
   template,
@@ -70,7 +75,18 @@ export function useFluidEditing<T extends FluidDoc>({
   // The section whose "Edit section" panel is open. One panel at a time:
   // opening the image panel closes it, and the other way round.
   const [sectionTarget, setSectionTarget] = useState<string | null>(null);
-  const openImage = (target: ImageTarget) => {
+  // The site's header and footer are locked (shown as visitors see them)
+  // until clicked; then that one is open, every part of it editable, and the
+  // rest of the page dims until Done, Esc or a click on it.
+  const [opened, setOpened] = useState<string | null>(null);
+  const openGlobal = (section: string | null) => {
+    setSelected(null);
+    setTyping(null);
+    setImageTarget(null);
+    setSectionTarget(null);
+    setOpened(section);
+  };
+  const openImage =(target: ImageTarget) => {
     setSectionTarget(null);
     setImageTarget(target);
   };
@@ -82,7 +98,8 @@ export function useFluidEditing<T extends FluidDoc>({
   // The site’s pages for links: its sections in the menu, by anchor.
   const pages = order.flatMap((instance) => {
     const menu = definitionOf(template, instance)?.menu;
-    return menu ? [{ label: menu, href: `#${instance}` }] : [];
+    const name = plainText(doc.content[instance]?.[MENU_FIELD] ?? "") || menu;
+    return menu && name ? [{ label: name, href: `#${instance}` }] : [];
   });
 
   const change = (next: (d: T) => T) => {
@@ -324,6 +341,19 @@ export function useFluidEditing<T extends FluidDoc>({
     return () => window.removeEventListener("keydown", onKey);
   });
 
+  // Esc closes an open header or footer, unless typing or a block is selected
+  // (Esc deselects that first).
+  useEffect(() => {
+    if (!opened) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || typing || selected) return;
+      if ((event.target as HTMLElement | null)?.closest("input, textarea, [contenteditable='true']")) return;
+      openGlobal(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
   /* ---------- The page's edit hooks ---------- */
 
   const layersOf = (section: string) => {
@@ -336,6 +366,11 @@ export function useFluidEditing<T extends FluidDoc>({
   };
 
   const edit: EditHooks = {
+    // A menu item renamed in the header: one step to undo.
+    rename: (section, field, value) => {
+      setContent(section, field, value);
+      history.commit();
+    },
     renderText: (section, field, value) => {
       const id = `${section}.${field}`;
       return (
@@ -412,12 +447,17 @@ export function useFluidEditing<T extends FluidDoc>({
         </BlockFrame>
       );
     },
+    locked: (section) => isGlobal(section) && opened !== section,
     renderSection: (section, children) => {
       const index = order.indexOf(section);
       const definition = definitionOf(template, section);
+      const global = isGlobal(section);
       return (
         <SectionChrome
           instance={section}
+          global={global ? { name: definition?.label ?? "Header", open: opened === section, onOpen: () => openGlobal(section), onDone: () => openGlobal(null) } : undefined}
+          dimmed={opened !== null && opened !== section}
+          onUndim={() => openGlobal(null)}
           first={index <= 0}
           last={index === order.length - 1}
           layouts={template.sections.map(({ id, label }) => ({ id, label }))}
@@ -484,8 +524,6 @@ export function useFluidEditing<T extends FluidDoc>({
               : undefined
           }
           link={imageKey && fixedImages.current.has(imageKey) ? undefined : imageSetting("href")}
-          filename={imageSetting("name")}
-          alt={imageSetting("alt")}
           pickNow={imageTarget.pick}
           pages={pages}
           linkNow={imageTarget.link}
@@ -533,6 +571,7 @@ export function useFluidEditing<T extends FluidDoc>({
     setTyping(null);
     setImageTarget(null);
     setSectionTarget(null);
+    setOpened(null);
   };
 
   return { edit, canvas, imagePanel, sectionPanel, reset, deselect: () => select(null) };
@@ -543,16 +582,17 @@ export function useFluidEditing<T extends FluidDoc>({
 function EmptyImage({ tall = false, onAdd }: { tall?: boolean; onAdd: () => void }) {
   return (
     <span className={`grid w-full place-items-center bg-white ${editorFont} ${tall ? "aspect-[4/3]" : "h-full min-h-32"}`}>
-      <button
-        type="button"
-        aria-label="Add an image"
-        title="Add an image"
-        onPointerDown={(event) => event.stopPropagation()}
-        onClick={onAdd}
-        className="grid size-9 cursor-pointer place-items-center rounded bg-neutral-100 text-neutral-900 transition-colors hover:bg-neutral-200"
-      >
-        <Plus className="h-4 w-4" />
-      </button>
+      <Tooltip label="Add an image">
+        <button
+          type="button"
+          aria-label="Add an image"
+          onPointerDown={(event) => event.stopPropagation()}
+          onClick={onAdd}
+          className="grid size-9 cursor-pointer place-items-center rounded bg-neutral-100 text-neutral-900 transition-colors hover:bg-neutral-200"
+        >
+          <Plus className="h-4 w-4" />
+        </button>
+      </Tooltip>
     </span>
   );
 }

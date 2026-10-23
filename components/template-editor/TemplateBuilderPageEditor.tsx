@@ -1,15 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
   Check,
-  ChevronLeft,
-  ChevronRight,
   Globe,
   LayoutGrid,
+  LogIn,
   Monitor,
   Paintbrush,
   Play,
@@ -19,6 +19,9 @@ import {
   Undo2,
   X,
 } from "lucide-react";
+import BackToHome from "@/components/BackToHome";
+import Tooltip from "@/components/ui/tooltip";
+import LogoMark from "@/components/brand/LogoMark";
 import { ease, focusRing } from "@/components/landing/landing-ui";
 import { loadPortfolio, RequestError, sendPortfolio, unpublishPortfolio } from "@/lib/portfolio-client";
 import EditorAccount from "@/components/template-editor/EditorAccount";
@@ -27,25 +30,27 @@ import PageSettings from "@/components/template-editor/PageSettings";
 import SectionNavigator from "@/components/template-editor/SectionNavigator";
 import TemplateRenderer from "@/components/site-templates/core/TemplateRenderer";
 import { baseOf, mergePageContent, readLayout, type PageLayout } from "@/components/site-templates/core/layout";
+import { inMenu, menuName } from "@/components/site-templates/core/content";
 import { plainText } from "@/components/site-templates/core/rich-format";
 import type { TemplateContent, TemplateDefinition } from "@/components/site-templates/core/types";
 import { getSiteTemplate, siteTemplateEditorHref } from "@/components/site-templates/registry";
-import { findFontPack, findPalette, themeFontVariables } from "@/components/template-detail/theme-options";
+import { StylePickers } from "@/components/template-detail/StyleCards";
+import { themeFontVariables } from "@/components/template-detail/theme-options";
 import ContentPanel from "@/components/template-editor/ContentPanel";
 import { CanvasProvider } from "@/components/template-editor/fluid/canvas";
 import { useFluidEditing } from "@/components/template-editor/fluid/useFluidEditing";
-import { ColorChoices, FontChoices } from "@/components/template-editor/StylesPanel";
 import { useEditHistory } from "@/components/template-editor/useEditHistory";
 
 type Mode = "view" | "edit" | "preview";
 type Device = "desktop" | "tablet" | "mobile";
-// The page's frame on the canvas for each device, centred: the full width for
-// desktop, a tablet's and a phone's width (narrower when the canvas is) as a
-// rounded, raised sheet. Switching animates the width and the frame.
+// The page's frame on the canvas for each device, centred: the full width and
+// height for desktop, a tablet's and a phone's width (narrower when the
+// canvas is) as a rounded, raised sheet. The page scrolls inside the frame.
+// Switching animates the width and the frame.
 const DEVICE_FRAME: Record<Device, string> = {
-  desktop: "w-full my-0 rounded-none shadow-none ring-0",
-  tablet: "w-[820px] max-w-[calc(100%-3rem)] my-6 rounded-2xl shadow-[0_14px_44px_-14px_rgb(0_0_0/0.3)] ring-1 ring-black/5",
-  mobile: "w-[390px] max-w-[calc(100%-3rem)] my-6 rounded-[1.75rem] shadow-[0_14px_44px_-14px_rgb(0_0_0/0.35)] ring-1 ring-black/5",
+  desktop: "w-full h-full my-0 rounded-none shadow-none ring-0",
+  tablet: "w-[820px] max-w-[calc(100%-3rem)] h-[calc(100%-3rem)] my-6 rounded-2xl shadow-[0_14px_44px_-14px_rgb(0_0_0/0.3)] ring-1 ring-black/5",
+  mobile: "w-[390px] max-w-[calc(100%-3rem)] h-[calc(100%-3rem)] my-6 rounded-[1.75rem] shadow-[0_14px_44px_-14px_rgb(0_0_0/0.35)] ring-1 ring-black/5",
 };
 const frameMotion = "transition-[width,max-width,margin,border-radius,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]";
 // What the canvas shows: the home page ("all"), or one of its sections.
@@ -104,6 +109,35 @@ const readLocalCopy = (template: TemplateDefinition): EditorDoc => {
   }
 };
 
+// A page kept in this browser while its editor signs in to save it ("Sign in
+// to save"): the editor opens on it again after signing in, unsaved, and
+// forgets it. Kept for a day at most.
+const draftKey = (template: TemplateDefinition) => `portory-draft-${template.id}`;
+const DRAFT_LIFETIME = 24 * 60 * 60 * 1000;
+const keepDraft = (template: TemplateDefinition, doc: EditorDoc) => {
+  try {
+    localStorage.setItem(draftKey(template), JSON.stringify({ at: Date.now(), doc }));
+  } catch {
+    // No storage: signing in still works, the changes are just not kept.
+  }
+};
+const readDraft = (template: TemplateDefinition): EditorDoc | null => {
+  try {
+    const raw = localStorage.getItem(draftKey(template));
+    const draft = raw ? (JSON.parse(raw) as { at?: unknown; doc?: unknown }) : null;
+    return draft && typeof draft.at === "number" && Date.now() - draft.at < DRAFT_LIFETIME ? toDoc(template, draft.doc) : null;
+  } catch {
+    return null;
+  }
+};
+const forgetDraft = (template: TemplateDefinition) => {
+  try {
+    localStorage.removeItem(draftKey(template));
+  } catch {
+    // Nothing kept.
+  }
+};
+
 // The account's saved portfolio, as the editor needs it. "failed" means it
 // could not be read, so saving would overwrite it with what the editor
 // shows; "signed-out" means there is no account to save to.
@@ -116,18 +150,6 @@ interface Stored {
   published: boolean;
 }
 
-// A small dark label under an icon button, as in the reference.
-function Tip({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <span className="group/tip relative flex">
-      {children}
-      <span className="pointer-events-none absolute right-0 top-full z-50 mt-2 whitespace-nowrap rounded bg-neutral-900 px-2 py-1 text-[11px] font-medium text-white opacity-0 transition-opacity delay-300 duration-150 group-hover/tip:opacity-100">
-        {label}
-      </span>
-    </span>
-  );
-}
-
 // The top bar is a strip of square cells, edge to edge, split by hairlines:
 // each control fills its cell's full height. Edit (left) and Publish (right)
 // are solid blocks at the two ends.
@@ -138,9 +160,15 @@ const cell = `${cellBase} text-neutral-800 hover:bg-neutral-50 hover:text-neutra
 const solidCell = `${cellBase} px-7 text-white hover:text-white`;
 const iconCell = `${cell} w-14 px-0`;
 const hairline = "border-neutral-200/80";
-// Every heading in the sidebar (Sections, Site styles, Fonts, Colors).
-const asideTitle = "m-0 text-base font-semibold tracking-[-0.01em] text-foreground";
 const iconButton = "grid size-8 place-items-center rounded text-neutral-800 transition-colors hover:bg-neutral-100 disabled:cursor-default disabled:text-neutral-300 disabled:hover:bg-transparent";
+// The sidebar's two tabs.
+type AsideTab = "sections" | "styles";
+const ASIDE_TABS: { id: AsideTab; label: string }[] = [
+  { id: "sections", label: "Sections" },
+  { id: "styles", label: "Styles" },
+];
+// The Portory mark on a small light tile, like an app icon (sized where used).
+const markTile = "grid shrink-0 place-items-center rounded bg-foreground/[0.06] transition-colors hover:bg-foreground/[0.1]";
 
 // The page editor from the reference, for any site template (see
 // components/site-templates):
@@ -185,7 +213,9 @@ export default function TemplateBuilderPageEditor({ backHref, templateId }: { ba
 }
 
 function Editor({ backHref, template, stored }: { backHref: string; template: TemplateDefinition; stored: Stored }) {
-  const [initial] = useState(() => stored.doc ?? readLocalCopy(template));
+  // A draft kept while signing in to save comes first (then it is forgotten).
+  const [initial] = useState(() => readDraft(template) ?? stored.doc ?? readLocalCopy(template));
+  useEffect(() => forgetDraft(template), [template]);
   const history = useEditHistory<EditorDoc>(initial);
   const doc = history.value;
   // The page as last saved to the account; null while the account has no
@@ -203,15 +233,21 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
   const [editAsideOpen, setEditAsideOpen] = useState(false);
   const asideOpen = mode === "edit" ? editAsideOpen : viewAsideOpen;
   const setAsideOpen = (open: boolean) => (mode === "edit" ? setEditAsideOpen(open) : setViewAsideOpen(open));
-  // Site Styles in the sidebar, open or closed; the rail's brush opens the
-  // sidebar with them open.
-  // Site Styles: the overview (null), or Fonts or Colors open to their choices.
-  const [stylesView, setStylesView] = useState<"fonts" | "colors" | null>(null);
+  // The sidebar's tab: Sections (to start) or Styles. The rail's buttons open
+  // the sidebar to theirs.
+  const [asideTab, setAsideTab] = useState<AsideTab>("sections");
+  const openAside = (tab: AsideTab) => {
+    setAsideTab(tab);
+    setAsideOpen(true);
+  };
   // Signing in comes back to this editor.
   const signInHref = `/login?next=${encodeURIComponent(siteTemplateEditorHref(template.id))}`;
-  const openStyles = () => {
-    setAsideOpen(true);
-    window.setTimeout(() => document.getElementById("site-styles")?.scrollIntoView({ behavior: "smooth", block: "start" }), 320);
+  // Signed out, Save becomes "Sign in to save": the page is kept in this
+  // browser, and the editor opens on it again after signing in.
+  const signedOut = stored.state === "signed-out";
+  const signInToSave = () => {
+    keepDraft(template, history.value);
+    window.location.assign(signInHref);
   };
   const [device, setDevice] = useState<Device>("desktop");
   // The section whose content panel is open.
@@ -226,11 +262,6 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
   const canSave = dirty && saveState !== "saving" && canPersist;
   const canPublish = publishState !== "publishing" && canPersist;
   const editing = mode === "edit";
-  // The page's palette and font pack, as Site Styles shows them.
-  const palette = findPalette(doc.palette);
-  const fontPack = findFontPack(doc.font);
-  // Its five colours, light to dark.
-  const colors = [...palette.swatches.slice(0, 3), palette.muted, palette.swatches[3]];
   const publicPath = slug ? `/p/${slug}` : null;
   const contentDefinition = contentSection ? template.sections.find((section) => section.id === baseOf(contentSection)) : undefined;
   // The same statuses as TemplateBuilderPage.
@@ -262,8 +293,48 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
             ? "bg-emerald-500"
             : "bg-neutral-300";
 
-  // A newly chosen section starts at its top.
+  // Each device keeps its own scroll position inside its frame: switching
+  // saves the one being left and restores the one chosen (its top the first
+  // time).
+  const scrollByDevice = useRef<Partial<Record<Device, number>>>({});
+  const switchDevice = (next: Device) => {
+    if (next === device) return;
+    scrollByDevice.current[device] = pageRef.current?.scrollTop ?? 0;
+    setDevice(next);
+  };
+  const deviceShown = useRef(false);
   useEffect(() => {
+    const page = pageRef.current;
+    if (!page || !deviceShown.current) {
+      deviceShown.current = true;
+      return;
+    }
+    // The frame's width animates (frameMotion), so the page's height changes
+    // for a moment: hold the position until it settles, unless the visitor
+    // scrolls first.
+    const target = scrollByDevice.current[device] ?? 0;
+    const until = performance.now() + 650;
+    let frame = 0;
+    const hold = () => {
+      page.scrollTop = target;
+      if (performance.now() < until) frame = requestAnimationFrame(hold);
+    };
+    const stop = () => cancelAnimationFrame(frame);
+    hold();
+    page.addEventListener("wheel", stop, { passive: true, once: true });
+    page.addEventListener("touchstart", stop, { passive: true, once: true });
+    page.addEventListener("pointerdown", stop, { once: true });
+    return () => {
+      stop();
+      page.removeEventListener("wheel", stop);
+      page.removeEventListener("touchstart", stop);
+      page.removeEventListener("pointerdown", stop);
+    };
+  }, [device]);
+
+  // A newly chosen section starts at its top, on every device.
+  useEffect(() => {
+    scrollByDevice.current = {};
     pageRef.current?.scrollTo({ top: 0 });
   }, [focus]);
 
@@ -426,16 +497,25 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
       setFeedback("Unable to copy the link.");
     }
   };
+  // The page as it was when editing started: Exit asks only when something
+  // changed since then and is not saved, and Exit without saving goes back to it.
+  const editStart = useRef<EditorDoc | null>(null);
+  const startEdit = () => {
+    editStart.current = doc;
+    setMode("edit");
+  };
   const leaveEdit = () => {
+    editStart.current = null;
     setMode("view");
     fluid.reset();
     setContentSection(null);
     setConfirmExit(false);
   };
-  const exit = () => (dirty ? setConfirmExit(true) : leaveEdit());
+  const changedSinceStart = editStart.current !== null && JSON.stringify(doc) !== JSON.stringify(editStart.current);
+  const exit = () => (dirty && changedSinceStart ? setConfirmExit(true) : leaveEdit());
 
   const discard = () => {
-    history.reset(saved ?? initial);
+    history.reset(editStart.current ?? saved ?? initial);
     leaveEdit();
   };
 
@@ -469,10 +549,15 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
         >
           <div className="min-h-0 flex-1 overflow-y-auto px-6 py-8 lg:px-8 lg:py-10" data-lenis-prevent>
             <div className="mx-auto flex max-w-sm flex-col gap-10">
-              <Link href={backHref} className={`${focusRing} group flex w-fit items-center gap-1.5 rounded text-base font-semibold tracking-[-0.01em] text-foreground no-underline`}>
-                <ArrowLeft className="size-4 transition-transform duration-300 group-hover:-translate-x-0.5" />
-                All templates
-              </Link>
+              {/* The Portory mark (home) left, All templates right */}
+              <div className="flex items-center justify-between gap-3">
+                <Tooltip label="Portory home">
+                  <Link href="/" aria-label="Portory home" className={`${focusRing} ${markTile} size-10`}>
+                    <LogoMark className="size-6" title={null} />
+                  </Link>
+                </Tooltip>
+                <BackToHome href={backHref} label="All templates" />
+              </div>
 
               <motion.div {...rise(0)} className="flex flex-col gap-2.5">
                 <h1 className="m-0 text-[length:clamp(1.9rem,5vw,2.25rem)] font-medium leading-none tracking-[-0.035em]">{template.name}</h1>
@@ -497,134 +582,71 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
                 )}
               </motion.div>
 
-              {/* The section to work on (the home page to start), as the page's outline */}
-              <motion.div {...rise(0.08)} className="flex flex-col gap-3">
-                <h2 id="section-label" className={`${asideTitle} flex items-baseline gap-2`}>
-                  Sections
-                  <span className="text-[13px] font-normal tabular-nums text-foreground/40">{template.sections.length}</span>
-                </h2>
-                <div className="-mx-4">
-                  <SectionNavigator
-                    value={focus}
-                    home={{ ...HOME_PAGE, detail: "All sections together" }}
-                    sections={template.sections.map(({ id, label, menu, fields }) => ({
-                      id,
-                      label,
-                      detail: menu ? `In the menu as “${menu}”` : fields?.length ? `${fields.length} ${fields.length === 1 ? "field" : "fields"} to edit` : undefined,
-                    }))}
-                    onChange={chooseSection}
-                    labelledBy="section-label"
-                  />
-                </div>
-              </motion.div>
-
-              {/* Site Styles: the page's colours and fonts (unsaved until Save). An
-                  overview (the theme as a preview, then Fonts and Colors as rows)
-                  that opens one of them to its choices, with a way back. */}
-              <motion.div {...rise(0.12)} id="site-styles" className="flex scroll-mt-6 flex-col gap-3">
-                <AnimatePresence mode="wait" initial={false}>
-                  {stylesView === null ? (
-                    <motion.div
-                      key="overview"
-                      initial={{ opacity: 0, x: -16 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -16 }}
-                      transition={{ duration: 0.25, ease: smooth }}
-                      className="flex flex-col gap-3"
-                    >
-                      <h2 className={asideTitle}>Site styles</h2>
-
-                      {/* The theme: the page's colours and fonts together */}
+              {/* Two tabs: Sections (the page's outline, to start) and Styles
+                  (the whole site's colours and fonts) */}
+              <motion.div {...rise(0.08)} className="flex flex-col gap-5">
+                <div role="tablist" aria-label="Sidebar" className="flex gap-1 border-b border-foreground/[0.07] pb-3">
+                  {ASIDE_TABS.map(({ id, label }, index) => {
+                    const active = asideTab === id;
+                    return (
                       <button
+                        key={id}
+                        id={`aside-tab-${id}`}
                         type="button"
-                        onClick={() => setStylesView("colors")}
-                        aria-label={`Theme: ${palette.name} colors, ${fontPack.name} fonts`}
-                        className={`${focusRing} group flex cursor-pointer flex-col gap-2.5 rounded bg-neutral-100 p-3 text-left transition-colors hover:bg-neutral-200/70`}
+                        role="tab"
+                        aria-selected={active}
+                        aria-controls={`aside-panel-${id}`}
+                        tabIndex={active ? 0 : -1}
+                        onClick={() => setAsideTab(id)}
+                        onKeyDown={(event) => {
+                          if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+                          event.preventDefault();
+                          const next = ASIDE_TABS[(index + 1) % ASIDE_TABS.length];
+                          setAsideTab(next.id);
+                          document.getElementById(`aside-tab-${next.id}`)?.focus();
+                        }}
+                        className={`${focusRing} relative flex cursor-pointer items-baseline gap-2 rounded px-4 py-2 text-sm font-medium transition-colors duration-200 ${active ? "text-foreground" : "text-foreground/60 hover:text-foreground"}`}
                       >
-                        <span className="text-[13px] text-neutral-500">Theme</span>
-                        <span aria-hidden="true" className={`flex h-[5.5rem] items-center gap-4 rounded px-4 ring-1 ring-black/[0.06] transition-colors duration-500 ${palette.swatches[0]}`}>
-                          <span className={`bg-clip-text text-[44px] leading-none text-transparent transition-colors duration-500 ${palette.swatches[3]} ${fontPack.heading}`}>Aa</span>
-                          {/* The five colours as overlapping chips: they deal in one by one
-                              when the palette changes, and fan out on hover */}
-                          <motion.span key={palette.id} initial="hidden" animate="shown" variants={{ shown: { transition: { staggerChildren: 0.06 } } }} className="flex h-12 items-stretch">
-                            {colors.map((swatch, index) => (
-                              <motion.span
-                                key={index}
-                                variants={{
-                                  hidden: { opacity: 0, y: 10, rotate: -8 },
-                                  shown: { opacity: 1, y: 0, rotate: 0, transition: { type: "spring", stiffness: 380, damping: 24 } },
-                                }}
-                                className={`w-6 rounded-sm shadow-[-2px_0_6px_rgb(0_0_0/0.18)] ring-1 ring-black/[0.06] transition-[margin] duration-300 ${index ? "-ml-2.5 group-hover:-ml-1" : ""} ${swatch}`}
-                              />
-                            ))}
-                          </motion.span>
-                        </span>
+                        {active && <motion.span layoutId="aside-tab" transition={{ type: "spring", stiffness: 420, damping: 36 }} aria-hidden="true" className="absolute inset-0 rounded bg-foreground/[0.07]" />}
+                        <span className="relative">{label}</span>
+                        {id === "sections" && <span className="relative text-xs tabular-nums text-foreground/40">{template.sections.length}</span>}
                       </button>
+                    );
+                  })}
+                </div>
 
-                      <hr className="my-2 border-0 border-t border-foreground/[0.08]" />
-
-                      {/* Fonts and Colors: each opens to its choices */}
-                      {(
-                        [
-                          ["fonts", "Fonts"],
-                          ["colors", "Colors"],
-                        ] as const
-                      ).map(([view, label]) => (
-                        <button
-                          key={view}
-                          type="button"
-                          onClick={() => setStylesView(view)}
-                          aria-label={`${label}: ${view === "fonts" ? fontPack.name : palette.name}`}
-                          className={`${focusRing} group grid cursor-pointer grid-cols-[1fr_2.75rem] gap-1.5 rounded text-left`}
-                        >
-                          <span className="flex min-w-0 flex-col gap-2.5 rounded bg-neutral-100 p-3.5 transition-colors group-hover:bg-neutral-200/70">
-                            <span className="text-[13px] text-neutral-500">{label}</span>
-                            {view === "fonts" ? (
-                              <span aria-hidden="true" className="flex flex-col gap-1">
-                                <span className={`text-[28px] leading-none text-neutral-950 ${fontPack.heading}`}>Heading</span>
-                                <span className={`truncate text-[13px] text-neutral-700 ${fontPack.body}`}>This is your paragraph.</span>
-                              </span>
-                            ) : (
-                              <span aria-hidden="true" className="flex h-10 overflow-hidden rounded-sm ring-1 ring-black/[0.06]">
-                                {colors.map((swatch, index) => (
-                                  <span key={index} className={`flex-1 transition-colors duration-500 ${swatch}`} />
-                                ))}
-                              </span>
-                            )}
-                          </span>
-                          <span className="grid place-items-center rounded bg-neutral-100 text-neutral-600 transition-colors group-hover:bg-neutral-200/70 group-hover:text-neutral-950">
-                            <ChevronRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-                          </span>
-                        </button>
-                      ))}
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key={stylesView}
-                      initial={{ opacity: 0, x: 16 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 16 }}
-                      transition={{ duration: 0.25, ease: smooth }}
-                      className="flex flex-col gap-4"
-                    >
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setStylesView(null)}
-                          aria-label="Back to site styles"
-                          className={`${focusRing} grid size-8 cursor-pointer place-items-center rounded bg-neutral-100 text-neutral-700 transition-colors hover:bg-neutral-200/70 hover:text-neutral-950`}
-                        >
-                          <ChevronLeft className="h-4 w-4" />
-                        </button>
-                        <h2 className={asideTitle}>{stylesView === "fonts" ? "Fonts" : "Colors"}</h2>
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.div
+                    key={asideTab}
+                    id={`aside-panel-${asideTab}`}
+                    role="tabpanel"
+                    aria-labelledby={`aside-tab-${asideTab}`}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.25, ease: smooth }}
+                  >
+                    {asideTab === "sections" ? (
+                      // The section to work on (the home page to start)
+                      <SectionNavigator
+                        value={focus}
+                        home={{ ...HOME_PAGE, detail: "All sections together" }}
+                        sections={template.sections.map(({ id, label, menu, fields }) => ({
+                          id,
+                          label,
+                          detail: menu ? (inMenu(doc.content, { id, menu }) ? `In the menu as “${menuName(doc.content, { id, menu })}”` : "Not in the menu") : fields?.length ? `${fields.length} ${fields.length === 1 ? "field" : "fields"} to edit` : undefined,
+                        }))}
+                        onChange={chooseSection}
+                        labelledBy="aside-tab-sections"
+                      />
+                    ) : (
+                      // The page's colours and fonts (unsaved until Save), both open
+                      <div className="flex flex-col gap-4">
+                        <p className="m-0 text-[13px] leading-relaxed text-foreground/55">Colours and fonts for your whole site. Changes show on the page straight away.</p>
+                        <StylePickers palette={doc.palette} font={doc.font} onPalette={(id) => setStyle("palette", id)} onFont={(id) => setStyle("font", id)} />
                       </div>
-                      {stylesView === "fonts" ? (
-                        <FontChoices value={doc.font} onChange={(id) => setStyle("font", id)} />
-                      ) : (
-                        <ColorChoices value={doc.palette} onChange={(id) => setStyle("palette", id)} />
-                      )}
-                    </motion.div>
-                  )}
+                    )}
+                  </motion.div>
                 </AnimatePresence>
               </motion.div>
             </div>
@@ -645,25 +667,37 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
           inert={asideOpen}
           className={`absolute inset-y-0 left-0 flex w-14 flex-col items-center gap-2 bg-white py-5 transition-opacity duration-300 ${asideOpen ? "pointer-events-none opacity-0" : "opacity-100 delay-150"}`}
         >
-          <Link href={backHref} aria-label="Back to templates" title="Back to templates" className={`${focusRing} ${iconButton} mb-2 no-underline`}>
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-          <button
-            type="button"
-            onClick={() => setAsideOpen(true)}
-            aria-label="Sections"
-            title="Sections"
-            className="grid size-10 cursor-pointer place-items-center rounded bg-primary text-white shadow-[0_6px_14px_-6px_color-mix(in_srgb,var(--primary),transparent_20%)] transition-transform hover:scale-105"
-          >
-            <LayoutGrid className="h-4 w-4" />
-          </button>
-          <button type="button" onClick={() => setAsideOpen(true)} aria-label={`Your site: ${statusText}`} title={statusText} className={`${iconButton} relative size-10`}>
-            <Globe className="h-4 w-4" />
-            <span aria-hidden="true" className={`absolute right-2 top-2 size-2 rounded-full ring-2 ring-white ${statusDot}`} />
-          </button>
-          <button type="button" onClick={openStyles} aria-label="Site styles" title="Site styles" className={`${iconButton} size-10`}>
-            <Paintbrush className="h-4 w-4" />
-          </button>
+          <Tooltip label="Portory home" side="right">
+            <Link href="/" aria-label="Portory home" className={`${focusRing} ${markTile} mb-3 size-8`}>
+              <LogoMark className="size-5" title={null} />
+            </Link>
+          </Tooltip>
+          <Tooltip label="Back to templates" side="right">
+            <Link href={backHref} aria-label="Back to templates" className={`${focusRing} ${iconButton} mb-2 no-underline`}>
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+          </Tooltip>
+          <Tooltip label="Sections" side="right">
+            <button
+              type="button"
+              onClick={() => openAside("sections")}
+              aria-label="Sections"
+              className="grid size-10 cursor-pointer place-items-center rounded bg-primary text-white shadow-[0_6px_14px_-6px_color-mix(in_srgb,var(--primary),transparent_20%)] transition-transform hover:scale-105"
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </button>
+          </Tooltip>
+          <Tooltip label={statusText} side="right">
+            <button type="button" onClick={() => setAsideOpen(true)} aria-label={`Your site: ${statusText}`} className={`${iconButton} relative size-10`}>
+              <Globe className="h-4 w-4" />
+              <span aria-hidden="true" className={`absolute right-2 top-2 size-2 rounded-full ring-2 ring-white ${statusDot}`} />
+            </button>
+          </Tooltip>
+          <Tooltip label="Site styles" side="right">
+            <button type="button" onClick={() => openAside("styles")} aria-label="Site styles" className={`${iconButton} size-10`}>
+              <Paintbrush className="h-4 w-4" />
+            </button>
+          </Tooltip>
           {/* At the bottom: the account (opens the sidebar, where Log out is) */}
           <div className="mt-auto">
             <EditorAccount compact unsaved={dirty && stored.state === "loaded"} signInHref={signInHref} onExpand={() => setAsideOpen(true)} />
@@ -675,27 +709,28 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
       <div className={`relative flex min-w-0 flex-1 flex-col ${slide} p-5 ${mode === "view" ? "" : ""}`}>
         {/* In the gutter beside the sidebar, opening and closing it: a short bar
             that bends, on hover, into an arrow the way the sidebar will go */}
-        <button
-          type="button"
-          onClick={() => setAsideOpen(!asideOpen)}
-          aria-label={asideOpen ? "Collapse sidebar" : "Expand sidebar"}
-          aria-expanded={asideOpen}
-          title={asideOpen ? "Collapse sidebar" : "Expand sidebar"}
-          className="group/edge absolute inset-y-0 left-0 z-20 hidden w-5 cursor-pointer place-items-center outline-none md:grid"
-        >
-          <span aria-hidden="true" className="flex flex-col items-center">
-            <span
-              className={`block h-3 w-1 translate-y-[1px] origin-bottom rounded-full bg-neutral-300 transition-[transform,background-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/edge:bg-neutral-600 group-focus-visible/edge:bg-primary ${
-                asideOpen ? "group-hover/edge:rotate-[18deg] group-focus-visible/edge:rotate-[18deg]" : "group-hover/edge:-rotate-[18deg] group-focus-visible/edge:-rotate-[18deg]"
-              }`}
-            />
-            <span
-              className={`block h-3 w-1 -translate-y-[1px] origin-top rounded-full bg-neutral-300 transition-[transform,background-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/edge:bg-neutral-600 group-focus-visible/edge:bg-primary ${
-                asideOpen ? "group-hover/edge:-rotate-[18deg] group-focus-visible/edge:-rotate-[18deg]" : "group-hover/edge:rotate-[18deg] group-focus-visible/edge:rotate-[18deg]"
-              }`}
-            />
-          </span>
-        </button>
+        <Tooltip label={asideOpen ? "Collapse sidebar" : "Expand sidebar"} side="right">
+          <button
+            type="button"
+            onClick={() => setAsideOpen(!asideOpen)}
+            aria-label={asideOpen ? "Collapse sidebar" : "Expand sidebar"}
+            aria-expanded={asideOpen}
+            className="group/edge absolute inset-y-0 left-0 z-20 hidden w-5 cursor-pointer place-items-center outline-none md:grid"
+          >
+            <span aria-hidden="true" className="flex flex-col items-center">
+              <span
+                className={`block h-3 w-1 translate-y-[1px] origin-bottom rounded-full bg-neutral-300 transition-[transform,background-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/edge:bg-neutral-600 group-focus-visible/edge:bg-primary ${
+                  asideOpen ? "group-hover/edge:rotate-[18deg] group-focus-visible/edge:rotate-[18deg]" : "group-hover/edge:-rotate-[18deg] group-focus-visible/edge:-rotate-[18deg]"
+                }`}
+              />
+              <span
+                className={`block h-3 w-1 -translate-y-[1px] origin-top rounded-full bg-neutral-300 transition-[transform,background-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/edge:bg-neutral-600 group-focus-visible/edge:bg-primary ${
+                  asideOpen ? "group-hover/edge:-rotate-[18deg] group-focus-visible/edge:-rotate-[18deg]" : "group-hover/edge:rotate-[18deg] group-focus-visible/edge:rotate-[18deg]"
+                }`}
+              />
+            </span>
+          </button>
+        </Tooltip>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -725,22 +760,22 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
                     <button type="button" onClick={exit} className={`${cell} border-r ${hairline}`}>
                       Exit
                     </button>
-                    <Tip label="Undo">
+                    <Tooltip label="Undo">
                       <button type="button" onClick={history.undo} disabled={!history.canUndo} aria-label="Undo" className={iconCell}>
                         <Undo2 className="h-[18px] w-[18px]" />
                       </button>
-                    </Tip>
-                    <Tip label="Redo">
+                    </Tooltip>
+                    <Tooltip label="Redo">
                       <button type="button" onClick={history.redo} disabled={!history.canRedo} aria-label="Redo" className={`${iconCell} border-l ${hairline}`}>
                         <Redo2 className="h-[18px] w-[18px]" />
                       </button>
-                    </Tip>
+                    </Tooltip>
                   </motion.div>
                 ) : (
                   <motion.button
                     key="edit"
                     type="button"
-                    onClick={() => setMode("edit")}
+                    onClick={startEdit}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
@@ -792,33 +827,42 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
                   ["tablet", "Tablet view", Tablet],
                   ["mobile", "Mobile view", Smartphone],
                 ] as const).map(([id, label, Icon]) => (
-                  <Tip key={id} label={label}>
+                  <Tooltip key={id} label={label}>
                     <button
                       type="button"
                       aria-label={label}
                       aria-pressed={device === id}
-                      onClick={() => setDevice(id)}
+                      onClick={() => switchDevice(id)}
                       className={`${iconCell} ${device === id ? "text-neutral-950" : "text-neutral-400"}`}
                     >
-                      <Icon className="h-[18px] w-[18px]" />
+                      {/* The tablet lies on its side, so it does not read as a phone */}
+                      <Icon aria-hidden="true" className={`h-[18px] w-[18px] ${id === "tablet" ? "-rotate-90" : ""}`} />
                       {device === id && <motion.span layoutId="device-line" transition={{ duration: 0.3, ease: smooth }} className="absolute inset-x-3 bottom-0 h-0.5 bg-neutral-950" />}
                     </button>
-                  </Tip>
+                  </Tooltip>
                 ))}
               </div>
-              <Tip label="Preview">
+              <Tooltip label="Preview">
                 <button type="button" aria-label="Preview" onClick={() => setMode("preview")} className={`${iconCell} border-l ${hairline}`}>
                   <Play className="h-[18px] w-[18px]" />
                 </button>
-              </Tip>
+              </Tooltip>
 
-              {/* Save (while editing, or whenever something is unsaved) and Publish */}
-              {(editing || (dirty && canPersist)) && (
-                <button type="button" onClick={() => save()} disabled={!canSave} className={`${cell} border-l ${hairline}`}>
-                  {canSave && <span aria-hidden="true" className="size-1.5 bg-amber-500" />}
-                  {saveState === "saving" ? "Saving..." : "Save"}
-                </button>
-              )}
+              {/* Save (while editing, or whenever something is unsaved) and
+                  Publish. Signed out, Save is "Sign in to save". */}
+              {signedOut
+                ? editing && (
+                    <button type="button" onClick={signInToSave} className={`${cell} border-l ${hairline}`}>
+                      <LogIn aria-hidden="true" className="h-4 w-4" />
+                      Sign in to save
+                    </button>
+                  )
+                : (editing || (dirty && canPersist)) && (
+                    <button type="button" onClick={() => save()} disabled={!canSave} className={`${cell} border-l ${hairline}`}>
+                      {canSave && <span aria-hidden="true" className="size-1.5 bg-amber-500" />}
+                      {saveState === "saving" ? "Saving..." : "Save"}
+                    </button>
+                  )}
               <button
                 type="button"
                 onClick={publish}
@@ -839,27 +883,34 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
             </div>
           </div>
 
-          {/* Page: double-click it to start editing, like the Edit button */}
+          {/* Page: double-click it to start editing, like the Edit button. The
+              canvas itself stays put; the page scrolls inside the device's
+              frame. (Toolbars keep within the whole canvas: data-canvas-area.) */}
           <div
-            ref={pageRef}
-            className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain bg-neutral-100"
-            data-lenis-prevent
+            className="relative flex min-h-0 flex-1 overflow-hidden bg-neutral-100"
+            data-canvas-area
             onPointerDown={() => fluid.deselect()}
             onDoubleClick={() => {
               if (mode !== "view") return;
               window.getSelection()?.removeAllRanges();
-              setMode("edit");
+              startEdit();
             }}
           >
-            <motion.div
-              key={focus}
-              initial={{ opacity: 0.35, y: focus === "all" ? 0 : 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, ease: smooth }}
-              className={`mx-auto min-h-full overflow-hidden bg-white ${frameMotion} ${DEVICE_FRAME[device]}`}
+            <div
+              ref={pageRef}
+              className={`mx-auto overflow-y-auto overflow-x-hidden overscroll-contain bg-white ${frameMotion} ${DEVICE_FRAME[device]}`}
+              data-lenis-prevent
             >
-              <CanvasProvider value={fluid.canvas}>{page(editing, true)}</CanvasProvider>
-            </motion.div>
+              <motion.div
+                key={focus}
+                initial={{ opacity: 0.35, y: focus === "all" ? 0 : 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45, ease: smooth }}
+                className="min-h-full"
+              >
+                <CanvasProvider value={fluid.canvas}>{page(editing, true)}</CanvasProvider>
+              </motion.div>
+            </div>
           </div>
         </motion.div>
 
@@ -881,41 +932,86 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
           )}
         </AnimatePresence>
 
-        {/* Exit without saving? */}
-        <AnimatePresence>
-          {confirmExit && (
-            <>
-              <motion.div
-                key="dim"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                onClick={() => setConfirmExit(false)}
-                className="absolute inset-0 top-11 z-40 bg-white/60"
-              />
-              <motion.div
-                key="ask"
-                role="alertdialog"
-                aria-labelledby="exit-title"
-                initial={{ opacity: 0, y: -6, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -6, scale: 0.98 }}
-                transition={{ duration: 0.2, ease: smooth }}
-                className="absolute left-8 top-12 z-50 w-[220px] rounded-md bg-white p-4 shadow-[0_8px_30px_rgb(0_0_0/0.18)] ring-1 ring-black/5"
-              >
-                <p id="exit-title" className="m-0 text-xs font-semibold text-neutral-900">Exit Without Saving?</p>
-                <p className="m-0 mt-1 text-xs leading-relaxed text-neutral-700">Any unsaved changes will be discarded when you exit.</p>
-                <div className="mt-4 flex justify-end gap-4 text-xs font-medium">
-                  <button type="button" onClick={() => { save(); leaveEdit(); }} className="text-neutral-900 hover:underline">Save</button>
-                  <button type="button" onClick={discard} className="text-red-600 hover:underline">Exit</button>
-                </div>
-              </motion.div>
-            </>
+        {/* Exit without saving? A dialog centred over the whole screen (on
+            the page body, so nothing around the editor clips it); clicking
+            outside it, its X or Esc keeps editing. */}
+        {typeof document !== "undefined" &&
+          createPortal(
+            <AnimatePresence>
+              {confirmExit && (
+                <motion.div
+                  key="exit"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.25, ease: smooth }}
+                  onClick={() => setConfirmExit(false)}
+                  className={`${themeFontVariables} fixed inset-0 z-[90] grid place-items-center bg-neutral-950/45 p-4 backdrop-blur-[3px]`}
+                >
+                  <motion.div
+                    role="alertdialog"
+                    aria-modal="true"
+                    aria-labelledby="exit-title"
+                    aria-describedby="exit-text"
+                    initial={{ opacity: 0, y: 16, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.98 }}
+                    transition={{ duration: 0.35, ease: smooth }}
+                    onClick={(event) => event.stopPropagation()}
+                    className="relative w-full max-w-[440px] bg-white px-8 pb-7 pt-8 text-neutral-950 shadow-[0_30px_80px_-20px_rgb(0_0_0/0.45)]"
+                  >
+                    <Tooltip label="Close" side="left">
+                      <button
+                        type="button"
+                        onClick={() => setConfirmExit(false)}
+                        aria-label="Close"
+                        className="absolute right-3 top-3 grid size-9 cursor-pointer place-items-center rounded text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-950"
+                      >
+                        <X aria-hidden="true" className="h-[18px] w-[18px]" strokeWidth={1.75} />
+                      </button>
+                    </Tooltip>
+                    <h2 id="exit-title" className="m-0 pr-8 text-[26px] font-medium leading-tight tracking-[-0.02em]">
+                      Exit without saving?
+                    </h2>
+                    <p id="exit-text" className="m-0 mt-3 text-sm leading-relaxed text-neutral-600">
+                      {signedOut
+                        ? "You're not signed in, so these changes can't be saved yet. Sign in to keep them, or exit and lose them."
+                        : "You have changes that are not saved yet. Save them before you leave, or exit and lose them."}
+                    </p>
+                    <div className="mt-8 flex justify-end">
+                      <div className="flex gap-2">
+                        {/* Signed out: sign in to save (the changes come back after) */}
+                        <button
+                          type="button"
+                          autoFocus
+                          onClick={
+                            signedOut
+                              ? signInToSave
+                              : () => {
+                                  save();
+                                  leaveEdit();
+                                }
+                          }
+                          className="h-11 cursor-pointer rounded px-5 text-sm font-medium text-neutral-950 transition-colors hover:bg-neutral-100"
+                        >
+                          {signedOut ? "Sign in to save" : "Save"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={discard}
+                          className="h-11 cursor-pointer rounded bg-primary px-5 text-sm font-medium text-white transition-colors hover:bg-[color:color-mix(in_srgb,var(--primary),black_14%)]"
+                        >
+                          Exit
+                        </button>
+                      </div>
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>,
+            document.body,
           )}
-        </AnimatePresence>
       </div>
-
 
       {/* Preview: the page alone, full screen */}
       <AnimatePresence>

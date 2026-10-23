@@ -1,10 +1,13 @@
 "use client";
 
-import { useRef, type ButtonHTMLAttributes, type MouseEvent, type ReactNode } from "react";
+import { useRef, useState, type ButtonHTMLAttributes, type MouseEvent, type ReactNode } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { motion, useInView, useReducedMotion } from "framer-motion";
+import { Plus, X } from "lucide-react";
+import Tooltip from "@/components/ui/tooltip";
 import { Moved } from "./Arranged";
 import { useField, useMediaMeta, useMoved, useSectionId, useTemplate } from "./context";
+import { inMenu, MENU_FIELD, MENU_HIDDEN_FIELD, menuName } from "./content";
 import { safeHref } from "./rich-format";
 import type { MediaMeta } from "./layout";
 
@@ -650,9 +653,45 @@ const menuLink = cva("text-foreground no-underline transition-colors duration-30
   defaultVariants: { size: "inline", current: false },
 });
 
+// One menu item renamed in place: a box the size of its words, in the link's
+// own type. Enter or leaving it keeps the name (an empty one goes back to the
+// template's), Esc keeps the old one.
+function MenuRename({ value, fallback, onDone }: { value: string; fallback: string; onDone: (name: string | null) => void }) {
+  const [draft, setDraft] = useState(value);
+  const done = useRef(false);
+  const finish = (name: string | null) => {
+    if (done.current) return;
+    done.current = true;
+    onDone(name === null ? null : name.trim() || fallback);
+  };
+  return (
+    <input
+      autoFocus
+      aria-label="Menu item name"
+      value={draft}
+      size={Math.max(draft.length, 2)}
+      onChange={(event) => setDraft(event.target.value)}
+      onFocus={(event) => event.currentTarget.select()}
+      onClick={(event) => event.stopPropagation()}
+      onPointerDown={(event) => event.stopPropagation()}
+      onKeyDown={(event) => {
+        event.stopPropagation();
+        if (event.key === "Enter") finish(draft);
+        else if (event.key === "Escape") finish(null);
+      }}
+      onBlur={() => finish(draft)}
+      className="m-0 min-w-0 border-0 bg-transparent p-0 text-inherit outline outline-1 outline-offset-2 outline-[#bb4e1c] [font:inherit] [letter-spacing:inherit] [text-transform:inherit]"
+    />
+  );
+}
+
 // `onFollow` runs after a link is followed (to close a menu panel).
-// The links are the template's sections with a `menu` name, or `items` with
-// `onPick` (such as the panels of a pinned story).
+// The links are the template's sections with a `menu` name (renamed and taken
+// out with the page's text), or `items` with `onPick` (such as the panels of
+// a pinned story). While its section is open in the editor, the section's
+// items are edited instead of followed: hovering one outlines it, a click
+// renames it in place, and its × takes it out of the menu; items taken out
+// show faintly, with a + to put them back.
 export function Menu({
   size,
   onFollow,
@@ -665,11 +704,19 @@ export function Menu({
   onPick?: (id: string) => void;
   active?: string;
 }) {
-  const { template, current, navigate } = useTemplate();
-  const links = items ?? template.sections.filter((item) => item.menu).map(({ id, menu }) => ({ id, label: menu ?? id }));
+  const { template, content, edit, current, navigate } = useTemplate();
+  const editable = !items && Boolean(edit?.rename);
+  const links = (
+    items?.map((item) => ({ ...item, fallback: item.label, hidden: false })) ??
+    template.sections
+      .filter((section) => section.menu)
+      .map((section) => ({ id: section.id, label: menuName(content, section), fallback: section.menu ?? section.id, hidden: !inMenu(content, section) }))
+  ).filter((link) => editable || !link.hidden);
   const selected = active ?? current;
+  const [renaming, setRenaming] = useState<string | null>(null);
   const follow = (event: MouseEvent, id: string) => {
     event.preventDefault();
+    if (editable) return setRenaming(id);
     if (onPick) onPick(id);
     else navigate(id);
     onFollow?.();
@@ -677,16 +724,41 @@ export function Menu({
   return (
     <nav>
       <ul className={menuList({ size })}>
-        {links.map(({ id, label }) => (
-          <li key={id}>
-            <a
-              href={`#${id}`}
-              onClick={(event) => follow(event, id)}
-              aria-current={selected === id ? "location" : undefined}
-              className={menuLink({ size, current: selected === id })}
-            >
-              {label}
-            </a>
+        {links.map(({ id, label, fallback, hidden }) => (
+          <li key={id} className={editable ? "group/menu relative" : undefined}>
+            <Tooltip label="Click to rename" disabled={!editable || renaming === id}>
+              <a
+                href={`#${id}`}
+                onClick={(event) => follow(event, id)}
+                aria-current={selected === id ? "location" : undefined}
+                className={`${menuLink({ size, current: selected === id })} ${editable ? "cursor-text rounded-sm outline-offset-4 hover:outline hover:outline-1 hover:outline-[#bb4e1c]" : ""} ${hidden ? "line-through opacity-35" : ""}`}
+              >
+                {renaming === id ? (
+                  <MenuRename
+                    value={label}
+                    fallback={fallback}
+                    onDone={(name) => {
+                      setRenaming(null);
+                      if (name !== null && name !== label) edit?.rename?.(id, MENU_FIELD, name);
+                    }}
+                  />
+                ) : (
+                  label
+                )}
+              </a>
+            </Tooltip>
+            {editable && renaming !== id && (
+              <Tooltip label={hidden ? "Put back in the menu" : "Remove from the menu"} side="top">
+                <button
+                  type="button"
+                  aria-label={hidden ? `Put ${label} back in the menu` : `Remove ${label} from the menu`}
+                  onClick={() => edit?.rename?.(id, MENU_HIDDEN_FIELD, hidden ? "" : "1")}
+                  className="absolute -right-3 -top-3 z-10 hidden size-[18px] cursor-pointer place-items-center rounded-full bg-[#bb4e1c] p-0 text-white shadow-[0_2px_6px_rgb(0_0_0/0.25)] transition-colors hover:bg-[#9c4117] group-hover/menu:grid"
+                >
+                  {hidden ? <Plus aria-hidden="true" className="size-3" strokeWidth={2.5} /> : <X aria-hidden="true" className="size-3" strokeWidth={2.5} />}
+                </button>
+              </Tooltip>
+            )}
           </li>
         ))}
       </ul>

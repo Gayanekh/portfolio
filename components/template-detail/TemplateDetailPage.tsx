@@ -37,7 +37,7 @@ export default function TemplateDetailPage({ id }: { id: string }) {
       {/* Preview */}
       <section aria-label={`${template.name} preview`} className="flex min-w-0 flex-col">
         <div className="flex items-center gap-4 px-4 py-3 md:px-6">
-          <Link href="/templates/gallery" className={`${focusRing} group flex items-center gap-1.5 rounded text-xs font-semibold uppercase tracking-[0.08em] text-foreground no-underline`}>
+          <Link href="/templates" className={`${focusRing} group flex items-center gap-1.5 rounded text-xs font-semibold uppercase tracking-[0.08em] text-foreground no-underline`}>
             <ArrowLeft className="size-4 transition-transform duration-300 group-hover:-translate-x-0.5" />
             Templates
           </Link>

@@ -1,5 +1,5 @@
-import { mergeContent } from "./content";
-import type { SectionContent, SectionDefinition, TemplateContent, TemplateDefinition } from "./types";
+import { mergeContent, sectionDefaults } from "./content";
+import type { SectionDefinition, TemplateContent, TemplateDefinition } from "./types";
 
 // A page's layout on top of its template, as arranged in the editor (after
 // Squarespace's Fluid Engine): the order of its sections (with copies of
@@ -107,8 +107,8 @@ export const mergePageContent = (template: TemplateDefinition, saved: unknown, l
     const definition = definitionOf(template, instance);
     if (!definition) continue;
     const own = stored[instance] && typeof stored[instance] === "object" ? (stored[instance] as Record<string, unknown>) : {};
-    const text: SectionContent = { ...definition.defaults };
-    for (const [field, value] of Object.entries(own)) if (field in definition.defaults && typeof value === "string") text[field] = value;
+    const text = sectionDefaults(definition);
+    for (const [field, value] of Object.entries(own)) if (field in text && typeof value === "string") text[field] = value;
     content[instance] = text;
   }
   return content;

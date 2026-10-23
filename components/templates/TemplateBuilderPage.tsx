@@ -15,6 +15,7 @@ import { templates } from "@/components/templates/template-data";
 import { createClient } from "@/lib/supabase/client";
 import { templateEditorNext } from "@/lib/auth-routing";
 import { loadPortfolio, RequestError, sendPortfolio } from "@/lib/portfolio-client";
+import Tooltip from "@/components/ui/tooltip";
 
 /* ─── initial portfolio data ─── */
 
@@ -374,7 +375,7 @@ export default function TemplateBuilderPage({
             className="flex h-full min-h-0 w-full flex-col lg:w-[420px] xl:w-[460px]"
           >
             <div className="hidden shrink-0 px-6 pt-5 sm:px-7 lg:block">
-              <Link href="/templates/gallery" className={` group flex items-center gap-1.5 rounded text-xs font-semibold uppercase tracking-[0.08em] text-foreground no-underline`}>
+              <Link href="/templates" className={` group flex items-center gap-1.5 rounded text-xs font-semibold uppercase tracking-[0.08em] text-foreground no-underline`}>
               <ArrowLeft className="size-4 transition-transform duration-300 group-hover:-translate-x-0.5" />
               Templates
             </Link>
@@ -382,15 +383,16 @@ export default function TemplateBuilderPage({
                 <h1 className="m-0 text-2xl font-semibold tracking-[-0.02em] text-foreground">
                   Editor
                 </h1>
-                <button
-                  type="button"
-                  onClick={() => setEditorOpen(false)}
-                  aria-label="Hide editor"
-                  title="Hide editor"
-                  className="grid size-8 place-items-center rounded text-foreground/45 transition-colors duration-200 hover:bg-foreground/[0.05] hover:text-foreground"
-                >
-                  <PanelLeftClose className="h-4 w-4" />
-                </button>
+                <Tooltip label="Hide editor" side="left">
+                  <button
+                    type="button"
+                    onClick={() => setEditorOpen(false)}
+                    aria-label="Hide editor"
+                    className="grid size-8 place-items-center rounded text-foreground/45 transition-colors duration-200 hover:bg-foreground/[0.05] hover:text-foreground"
+                  >
+                    <PanelLeftClose className="h-4 w-4" />
+                  </button>
+                </Tooltip>
               </div>
             </div>
             <div

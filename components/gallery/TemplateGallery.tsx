@@ -1,15 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
-import AuthControls from "@/components/auth/AuthControls";
+import BackToHome from "@/components/BackToHome";
 import BackToTop from "@/components/BackToTop";
-import Logo from "@/components/brand/Logo";
 import GalleryCard from "@/components/gallery/GalleryCard";
 import { GALLERY_STYLES, GALLERY_TEMPLATES, type GalleryStyle } from "@/components/gallery/gallery-templates";
-import { ease, focusRing } from "@/components/landing/landing-ui";
+import LandingHeader from "@/components/landing/LandingHeader";
+import { accentText, ease, focusRing } from "@/components/landing/landing-ui";
 
 const rise = (delay: number) => ({
   initial: { opacity: 0, y: 24 },
@@ -17,32 +15,24 @@ const rise = (delay: number) => ({
   transition: { duration: 0.8, ease, delay },
 });
 
-// Every Portory template on one page, after the reference gallery: a large
+// Every Portory template on one page, under the landing page's header (without
+// its section links), after the reference gallery: a large
 // heading with a short description beside it, a results count with style
 // filters, and a grid of template previews. Cards open the builder in the
 // same tab; a back-to-top button appears once you've scrolled.
 export default function TemplateGallery() {
   const [style, setStyle] = useState<GalleryStyle | "all">("all");
+  const [hovered, setHovered] = useState<GalleryStyle | "all" | null>(null);
 
   const shown = style === "all" ? GALLERY_TEMPLATES : GALLERY_TEMPLATES.filter((t) => t.style === style);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="mx-auto flex w-content-width items-center justify-between gap-4 py-5">
-        <Link href="/" aria-label="Portory home" className={`${focusRing} flex items-center rounded`}>
-          <Logo className="h-9 w-auto" />
-        </Link>
-        <div className="flex items-center gap-2 [&_a]:no-underline">
-          <AuthControls />
-        </div>
-      </header>
+    <div className="relative min-h-screen bg-background text-foreground">
+      <LandingHeader links={false} />
 
-      <main className="mx-auto w-content-width pb-24 pt-10 md:pt-16">
+      <main className="mx-auto w-content-width pb-24 pt-28 md:pt-36">
         <motion.div {...rise(0)}>
-          <Link href="/" className={`${focusRing} group mb-8 inline-flex items-center gap-1.5 rounded text-sm text-foreground/60 no-underline transition-colors hover:text-foreground`}>
-            <ArrowLeft className="size-4 transition-transform duration-300 group-hover:-translate-x-0.5" />
-            Back to home
-          </Link>
+          <BackToHome className="mb-8" />
         </motion.div>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-[1.15fr_1fr] md:gap-16">
@@ -60,23 +50,28 @@ export default function TemplateGallery() {
 
         <motion.div {...rise(0.25)} className="mt-14 flex flex-col gap-4 md:mt-20 md:flex-row md:items-center md:justify-between">
           <p aria-live="polite" className="m-0 text-sm font-medium">
-            <motion.span key={shown.length} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, ease }} className="inline-block">
+            <motion.span key={shown.length} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, ease }} className={`${accentText} inline-block`}>
               {shown.length}
             </motion.span>{" "}
             {shown.length === 1 ? "Result" : "Results"}
           </p>
-          <div role="group" aria-label="Filter by style" className="flex flex-wrap gap-1 rounded bg-foreground/5 p-1">
+          {/* Plain filters, moving like the landing page's template tabs: a
+              dark pill marks the chosen one and slides to the one hovered,
+              then back when the pointer leaves */}
+          <div role="group" aria-label="Filter by style" onMouseLeave={() => setHovered(null)} className="flex flex-wrap gap-1">
             {GALLERY_STYLES.map((option) => {
               const active = option.id === style;
+              const lit = (hovered ?? style) === option.id;
               return (
                 <button
                   key={option.id}
                   type="button"
                   aria-pressed={active}
                   onClick={() => setStyle(option.id)}
-                  className={`${focusRing} relative cursor-pointer rounded px-3.5 py-1.5 text-sm transition-colors ${active ? "text-background" : "text-foreground/65 hover:text-foreground"}`}
+                  onMouseEnter={() => setHovered(option.id)}
+                  className={`${focusRing} relative cursor-pointer rounded px-4 py-2.5 text-sm font-medium transition-colors duration-200 ${lit ? "text-white" : "text-foreground"}`}
                 >
-                  {active && <motion.span layoutId="gallery-filter" transition={{ duration: 0.4, ease }} className="absolute inset-0 rounded bg-foreground" />}
+                  {lit && <motion.span layoutId="gallery-filter" transition={{ type: "spring", stiffness: 420, damping: 36 }} aria-hidden="true" className="absolute inset-0 rounded bg-foreground" />}
                   <span className="relative">{option.label}</span>
                 </button>
               );

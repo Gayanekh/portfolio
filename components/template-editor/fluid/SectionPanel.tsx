@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Check, RotateCcw, Type, X } from "lucide-react";
 import type { ChoiceItem } from "./SectionChrome";
+import Tooltip from "@/components/ui/tooltip";
 
 const label = "text-[10px] font-medium uppercase tracking-[0.08em] text-neutral-500";
 // One grid row of extra height, in px (as SectionChrome's height handle).
@@ -58,16 +59,17 @@ export default function SectionPanel({
             <span className={label}>Height</span>
             <span className="flex items-center gap-2">
               <span className="text-[11px] tabular-nums text-neutral-600">{extraRows ? `+${extraRows * ROW_PX}px` : "Fit content"}</span>
-              <button
-                type="button"
-                onClick={() => onHeight(0, true)}
-                disabled={!extraRows}
-                aria-label="Reset height"
-                title="Reset height"
-                className="grid size-6 cursor-pointer place-items-center rounded text-neutral-600 hover:bg-neutral-100 disabled:cursor-default disabled:text-neutral-300 disabled:hover:bg-transparent"
-              >
-                <RotateCcw className="h-3 w-3" />
-              </button>
+              <Tooltip label="Reset height">
+                <button
+                  type="button"
+                  onClick={() => onHeight(0, true)}
+                  disabled={!extraRows}
+                  aria-label="Reset height"
+                  className="grid size-6 cursor-pointer place-items-center rounded text-neutral-600 hover:bg-neutral-100 disabled:cursor-default disabled:text-neutral-300 disabled:hover:bg-transparent"
+                >
+                  <RotateCcw className="h-3 w-3" />
+                </button>
+              </Tooltip>
             </span>
           </div>
           <input

@@ -47,6 +47,8 @@ export default function TemplateRenderer({ template, content, palette, font, edi
     const target = rootRef.current?.querySelector<HTMLElement>(`[data-stack-anchor="${section}"], [data-section="${section}"]`);
     if (target) glideTo(target);
   };
+  // What every block reads (a locked section gets it without the editor's hooks).
+  const state = { template, content: text, edit, layout, current: activeSection ?? followed, navigate };
 
   // The sections in the page's order, copies included, each with its instance id.
   const sections = sectionOrder(template, layout)
@@ -59,23 +61,23 @@ export default function TemplateRenderer({ template, content, palette, font, edi
   return (
     <div data-template-font className={cn(themeFontVariables, template.theme, "min-h-full")}>
       <div ref={rootRef} data-site-template className={cn(findPalette(palette).className, findFontPack(font).className, "@container relative min-h-full bg-card font-sans text-foreground")}>
-        <TemplateProvider value={{ template, content: text, edit, layout, current: activeSection ?? followed, navigate }}>
+        <TemplateProvider value={state}>
           <Provider>
             {sections.map(({ id, Component, stack }, index) => {
+              const frame = (
+                <SectionFrame instance={id}>
+                  <Component />
+                </SectionFrame>
+              );
               const section = (
                 <SectionScope key={id} id={id}>
-                  {edit ? (
-                    edit.renderSection(
-                      id,
-                      <SectionFrame instance={id}>
-                        <Component />
-                      </SectionFrame>,
-                    )
-                  ) : (
-                    <SectionFrame instance={id}>
-                      <Component />
-                    </SectionFrame>
-                  )}
+                  {edit
+                    ? edit.renderSection(
+                        id,
+                        // A locked section (header, footer) shows as visitors see it.
+                        edit.locked?.(id) ? <TemplateProvider value={{ ...state, edit: undefined }}>{frame}</TemplateProvider> : frame,
+                      )
+                    : frame}
                 </SectionScope>
               );
               if (template.scroll !== "stack" || stack === false || sections.length === 1) return section;

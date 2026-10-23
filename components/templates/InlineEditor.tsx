@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp, Plus, Trash2, Upload, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import Tooltip from "@/components/ui/tooltip";
 import { PortfolioData, ProjectData } from "@/context/PortfolioContext";
 import {
   ACCEPTED_IMAGE_TYPES,
@@ -668,19 +669,16 @@ export default function InlineEditor({
                           />
                         </div>
                       </div>
-                      <button
-                        onClick={() => removeProject(pi)}
-                        type="button"
-                        disabled={anyUploadActive}
-                        title={
-                          anyUploadActive
-                            ? "Wait for image uploads to finish"
-                            : undefined
-                        }
-                        className="flex items-center gap-1.5 text-[10px] font-mono tracking-[0.1em] uppercase text-red-500/70 hover:text-red-600 transition-colors mt-1 disabled:cursor-not-allowed disabled:opacity-40"
-                      >
-                        <Trash2 className="w-3 h-3" /> Remove
-                      </button>
+                      <Tooltip label="Wait for image uploads to finish" disabled={!anyUploadActive}>
+                        <button
+                          onClick={() => removeProject(pi)}
+                          type="button"
+                          disabled={anyUploadActive}
+                          className="flex items-center gap-1.5 text-[10px] font-mono tracking-[0.1em] uppercase text-red-500/70 hover:text-red-600 transition-colors mt-1 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          <Trash2 className="w-3 h-3" /> Remove
+                        </button>
+                      </Tooltip>
                     </div>
                   </motion.div>
                 )}

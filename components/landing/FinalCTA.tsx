@@ -8,7 +8,7 @@ import { TEMPLATES, TEMPLATE_IMAGE } from "@/components/landing/sample-portfolio
 import { ease, easedStops, focusRing } from "@/components/landing/landing-ui";
 
 const BROWSE = {
-  href: "/templates/gallery",
+  href: "/templates",
   label: "Browse templates",
   lead: "Create with",
   name: "Portory",

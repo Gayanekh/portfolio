@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronUp, LogIn, LogOut } from "lucide-react";
 import { useAccount, type Account } from "@/components/auth/useAccount";
+import Tooltip from "@/components/ui/tooltip";
 
 const smooth = [0.22, 1, 0.36, 1] as const;
 
@@ -53,17 +54,28 @@ export default function EditorAccount({ compact = false, unsaved, signInHref, on
 
   if (loading) return <span aria-hidden="true" className={compact ? "size-8" : "h-12"} />;
 
+  // Signed out, Sign in is an outlined button that fills dark on hover (like
+  // the site header's Log in), so it is easy to find without competing with
+  // Edit: with a line on why in the sidebar, a square on the rail.
   if (!account) {
+    const signIn = "inline-flex shrink-0 items-center justify-center gap-2 rounded border border-foreground/20 text-sm font-medium text-foreground no-underline transition-colors hover:border-foreground hover:bg-foreground hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground";
+    if (compact) {
+      return (
+        <Tooltip label="Sign in" side="right">
+          <Link href={signInHref} aria-label="Sign in" className={`${signIn} size-10`}>
+            <LogIn aria-hidden="true" className="h-4 w-4" />
+          </Link>
+        </Tooltip>
+      );
+    }
     return (
-      <Link
-        href={signInHref}
-        aria-label="Sign in"
-        title="Sign in"
-        className={`flex items-center gap-2 rounded text-sm font-semibold text-foreground no-underline transition-colors hover:bg-foreground/[0.05] ${compact ? "size-10 justify-center" : "h-11 px-3"}`}
-      >
-        <LogIn className="h-4 w-4" />
-        {!compact && "Sign in"}
-      </Link>
+      <div className="flex items-center justify-between gap-3">
+        <span className="min-w-0 text-[13px] leading-snug text-foreground/60">Sign in to save your work</span>
+        <Link href={signInHref} className={`${signIn} group h-10 px-4`}>
+          <LogIn aria-hidden="true" className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+          Sign in
+        </Link>
+      </div>
     );
   }
 
@@ -74,28 +86,29 @@ export default function EditorAccount({ compact = false, unsaved, signInHref, on
 
   return (
     <div ref={rootRef} className="relative">
-      <button
-        type="button"
-        aria-haspopup={compact ? undefined : "menu"}
-        aria-expanded={compact ? undefined : open}
-        aria-label={`Account: ${account.fullName}`}
-        title={compact ? account.fullName : undefined}
-        onClick={() => (compact && onExpand ? onExpand() : setOpen((value) => !value))}
-        className={`flex cursor-pointer items-center gap-3 rounded text-left transition-colors hover:bg-foreground/[0.05] ${
-          compact ? "size-10 justify-center" : "w-full px-2 py-2"
-        } ${open ? "bg-foreground/[0.05]" : ""}`}
-      >
-        <Avatar account={account} size="sm" />
-        {!compact && (
-          <>
-            <span className="flex min-w-0 flex-1 flex-col leading-tight">
-              <span className="truncate text-sm font-semibold text-foreground">{account.fullName}</span>
-              {account.email && <span className="truncate text-xs text-foreground/50">{account.email}</span>}
-            </span>
-            <ChevronUp className={`h-4 w-4 shrink-0 text-foreground/40 transition-transform duration-300 ${open ? "" : "rotate-180"}`} />
-          </>
-        )}
-      </button>
+      <Tooltip label={account.fullName} side="right" disabled={!compact}>
+        <button
+          type="button"
+          aria-haspopup={compact ? undefined : "menu"}
+          aria-expanded={compact ? undefined : open}
+          aria-label={`Account: ${account.fullName}`}
+          onClick={() => (compact && onExpand ? onExpand() : setOpen((value) => !value))}
+          className={`flex cursor-pointer items-center gap-3 rounded text-left transition-colors hover:bg-foreground/[0.05] ${
+            compact ? "size-10 justify-center" : "w-full px-2 py-2"
+          } ${open ? "bg-foreground/[0.05]" : ""}`}
+        >
+          <Avatar account={account} size="sm" />
+          {!compact && (
+            <>
+              <span className="flex min-w-0 flex-1 flex-col leading-tight">
+                <span className="truncate text-sm font-semibold text-foreground">{account.fullName}</span>
+                {account.email && <span className="truncate text-xs text-foreground/50">{account.email}</span>}
+              </span>
+              <ChevronUp className={`h-4 w-4 shrink-0 text-foreground/40 transition-transform duration-300 ${open ? "" : "rotate-180"}`} />
+            </>
+          )}
+        </button>
+      </Tooltip>
 
       <AnimatePresence>
         {open && (

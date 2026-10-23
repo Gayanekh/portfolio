@@ -61,6 +61,11 @@ export interface EditHooks {
   renderMedia?: (section: string, field: string, image: ReactNode, options?: { fixed?: boolean }) => ReactNode;
   // A block added with "Add block" (see ./layout), made editable.
   renderAdded?: (section: string, block: import("./layout").AddedBlock) => ReactNode;
+  // A short plain field renamed in place (a menu item), kept as one step.
+  rename?: (section: string, field: string, value: string) => void;
+  // A section shown as visitors see it until it is opened for editing (the
+  // site's header and footer): its parts are not editable meanwhile.
+  locked?: (section: string) => boolean;
 }
 
 // Typing helper for template files.

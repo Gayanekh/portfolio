@@ -4,7 +4,8 @@ import { useEffect, useRef, useState, type PointerEvent, type ReactNode } from "
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useMotionValue } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
-import { editorFont, editorUi, gridCell, useCanvas } from "./canvas";
+import { editorFont, gridCell, useCanvas } from "./canvas";
+import { ToolButton, ToolDivider, toolbarCard } from "./toolbar";
 
 // Keep receiving the pointer while dragging, even outside the element (a
 // pointer the browser no longer tracks is simply not captured).
@@ -41,7 +42,14 @@ export interface Resize {
 // The gap between a block and its toolbar, in px.
 const TOOLBAR_GAP = 12;
 
-type Edge = "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw";
+// The selected frame: a bold line in the brand colour (fixed, not the
+// template's own primary) with a light halo, so it shows on
+// photos too. Around text it sits outside the block; images are clipped by
+// their container, so theirs is drawn inside the edge.
+const FRAME_OUTSIDE = "ring-2 ring-[#bb4e1c] shadow-[0_0_0_4px_rgb(255_255_255/0.6)]";
+const FRAME_INSIDE = "ring-2 ring-inset ring-[#bb4e1c] shadow-[inset_0_0_0_4px_rgb(255_255_255/0.6)]";
+
+type Edge ="n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw";
 // The eight square handles: where each sits and its pointer.
 const HANDLES: { edge: Edge; place: string }[] = [
   { edge: "nw", place: "left-0 top-0 cursor-nwse-resize" },
@@ -56,7 +64,8 @@ const HANDLES: { edge: Edge; place: string }[] = [
 
 // One block of the page while editing, after the reference's Fluid Engine:
 // hover it for its outline and tag ("TEXT", "IMAGE"); click it to select it (a
-// blue frame with eight square handles and a toolbar above it); double-click
+// bold brand-colour frame with a light halo, so it shows on photos too, eight square
+// handles and a toolbar above it); double-click
 // it to edit it; drag it to move it; drag a handle to resize it. While it is
 // moved or resized it snaps to grid steps and its section shows the grid.
 export default function BlockFrame({
@@ -113,7 +122,7 @@ export default function BlockFrame({
       const block = ref.current;
       const bar = toolbarRef.current;
       if (!block) return;
-      const area = (block.closest("[data-lenis-prevent]") ?? document.documentElement).getBoundingClientRect();
+      const area = (block.closest("[data-canvas-area]") ?? document.documentElement).getBoundingClientRect();
       const box = block.getBoundingClientRect();
       const width = bar?.offsetWidth ?? 320;
       const height = bar?.offsetHeight ?? 48;
@@ -232,7 +241,7 @@ export default function BlockFrame({
         onEdit?.();
       }}
       className={`relative ${fill ? "block h-full w-full" : "block"} ${isTyping ? "cursor-text" : moving ? "z-40 cursor-grabbing" : "cursor-default"} ${
-        isSelected || dragging ? "" : "outline-none hover:outline hover:outline-1 hover:outline-[#3b82f6]"
+        isSelected || dragging ? "" : `outline-none hover:outline hover:outline-2 hover:outline-[#bb4e1c] ${fill ? "hover:outline-offset-[-2px]" : ""}`
       }`}
     >
       {children}
@@ -245,22 +254,27 @@ export default function BlockFrame({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.12 }}
-            className="pointer-events-none absolute inset-0 z-20 block ring-1 ring-[#3b82f6]"
+            className={`pointer-events-none absolute inset-0 z-20 block ${fill ? FRAME_INSIDE : FRAME_OUTSIDE}`}
           >
-            {!moving &&
-              HANDLES.map(({ edge, place }) => (
-                <span
-                  key={edge}
-                  aria-hidden="true"
-                  onPointerDown={handleDown(edge)}
-                  onPointerMove={handleMove}
-                  onPointerUp={handleUp}
-                  onPointerCancel={handleUp}
-                  className={`absolute size-[7px] -translate-x-1/2 -translate-y-1/2 touch-none border border-[#3b82f6] bg-white ${onResize ? "pointer-events-auto" : ""} ${place}`}
-                />
-              ))}
+            {/* Images: the handles sit just inside the edges, which their
+                container would clip */}
+            {!moving && (
+              <span className={`absolute ${fill ? "inset-[7px]" : "inset-0"}`}>
+                {HANDLES.map(({ edge, place }) => (
+                  <span
+                    key={edge}
+                    aria-hidden="true"
+                    onPointerDown={handleDown(edge)}
+                    onPointerMove={handleMove}
+                    onPointerUp={handleUp}
+                    onPointerCancel={handleUp}
+                    className={`absolute size-2.5 -translate-x-1/2 -translate-y-1/2 touch-none rounded-[2px] border-[1.5px] border-[#bb4e1c] bg-white shadow-[0_1px_3px_rgb(0_0_0/0.35)] ${onResize ? "pointer-events-auto" : ""} ${place}`}
+                  />
+                ))}
+              </span>
+            )}
             {(moving || resizing) && (
-              <span className={`absolute -top-5 left-0 rounded-sm bg-[#3b82f6] px-1.5 py-0.5 ${editorFont} text-[9px] font-semibold uppercase tracking-[0.08em] text-white`}>{tag}</span>
+              <span className={`absolute -top-5 left-0 rounded-sm bg-[#bb4e1c] px-1.5 py-0.5 ${editorFont} text-[9px] font-semibold uppercase tracking-[0.08em] text-white`}>{tag}</span>
             )}
           </motion.span>
         )}
@@ -271,7 +285,7 @@ export default function BlockFrame({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.12 }}
-            className={`pointer-events-none absolute -top-5 left-0 z-30 rounded-sm bg-[#3b82f6] px-1.5 py-0.5 ${editorFont} text-[9px] font-semibold uppercase tracking-[0.08em] text-white`}
+            className={`pointer-events-none absolute -top-5 left-0 z-30 rounded-sm bg-[#bb4e1c] px-1.5 py-0.5 ${editorFont} text-[9px] font-semibold uppercase tracking-[0.08em] text-white`}
           >
             {tag}
           </motion.span>
@@ -290,31 +304,12 @@ export default function BlockFrame({
                 transition={{ duration: 0.16 }}
                 onPointerDown={(event) => event.stopPropagation()}
                 style={place ? { top: place.top, left: place.left } : undefined}
-                className={`fixed z-[55] flex items-center gap-1 whitespace-nowrap rounded-xl bg-white px-2 py-1.5 ${editorUi} text-neutral-950 shadow-[0_6px_24px_-4px_rgb(0_0_0/0.16),0_1px_3px_rgb(0_0_0/0.06)] ${place ? "" : "invisible left-0 top-0"}`}
+                className={`${toolbarCard} fixed z-[55] ${place ? "" : "invisible left-0 top-0"}`}
               >
                 {actions.map(({ label, Icon, onClick, keys, danger, group, text }) => (
-                  <span key={label} className="group/tool relative flex items-center">
-                    {group && <span aria-hidden="true" className="mx-1.5 h-6 w-px bg-neutral-200" />}
-                    <button
-                      type="button"
-                      aria-label={label}
-                      onClick={onClick}
-                      className={`grid h-9 min-w-9 cursor-pointer place-items-center rounded px-1.5 transition-colors ${danger ? "text-red-600 hover:bg-red-50" : "text-neutral-950 hover:bg-neutral-100"}`}
-                    >
-                      {text ? (
-                        <span className="text-[15px] font-bold leading-none tracking-[-0.02em]">{text}</span>
-                      ) : (
-                        <Icon className="h-5 w-5" strokeWidth={1.75} />
-                      )}
-                    </button>
-                    <span className="pointer-events-none absolute left-1/2 top-full z-50 mt-1.5 flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded bg-neutral-900 px-2 py-1 text-[11px] font-medium text-white opacity-0 transition-opacity delay-200 duration-150 group-hover/tool:opacity-100">
-                      {label}
-                      {keys?.map((key) => (
-                        <kbd key={key} className={`rounded bg-white/15 px-1 ${editorFont} text-[9px] font-semibold`}>
-                          {key}
-                        </kbd>
-                      ))}
-                    </span>
+                  <span key={label} className="flex items-center">
+                    {group && <ToolDivider />}
+                    <ToolButton label={label} Icon={Icon} text={text} keys={keys} danger={danger} onClick={onClick} />
                   </span>
                 ))}
               </motion.span>
