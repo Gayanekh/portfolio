@@ -7,7 +7,8 @@ import { usePathname, useSearchParams } from "next/navigation";
 // sign-in pages' Back button can return to it (wherever the visitor came
 // from, and however often they switched between Log in and Register).
 const KEY = "portory:last-page";
-const isAuthPage = (path: string) => path === "/login" || path === "/register" || path.startsWith("/auth/");
+const AUTH_PAGES = new Set(["/login", "/register", "/forgot-password", "/reset-password", "/verify-email"]);
+const isAuthPage = (path: string) => AUTH_PAGES.has(path) || path.startsWith("/auth/");
 
 // Remembers each page as it is visited, its query included (the builder is
 // /templates?template=…). Rendered once, in the root layout, inside Suspense.

@@ -5,7 +5,6 @@ import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
-import { createProfile } from "@/lib/profile";
 
 interface VerifyEmailFormProps {
   email: string;
@@ -58,32 +57,7 @@ export default function VerifyEmailForm({ email, next }: VerifyEmailFormProps) {
       return;
     }
 
-    const firstName = String(data.user.user_metadata?.first_name || "").trim();
-    const lastName = String(data.user.user_metadata?.last_name || "").trim();
-    if (firstName && lastName) {
-      const { error: profileError } = await createProfile(
-        supabase,
-        data.user.id,
-        firstName,
-        lastName,
-      );
-      if (profileError) {
-        console.error("Profile creation failed after email OTP verification", {
-          userId: data.user.id,
-          message: profileError.message,
-          code: profileError.code,
-          details: profileError.details,
-          hint: profileError.hint,
-          hasSession: Boolean(data.session),
-          sessionMatchesUser: data.session?.user.id === data.user.id,
-        });
-      }
-    } else {
-      console.error("Verified user is missing profile name metadata", {
-        userId: data.user.id,
-      });
-    }
-
+    // The profile was created with the account (a database trigger, FIX 4).
     if (data.session) {
       const { error: signOutError } = await supabase.auth.signOut();
       if (signOutError) {

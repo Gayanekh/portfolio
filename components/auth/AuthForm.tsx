@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import LoginExperience, { MIN_PASSWORD_LENGTH } from "@/components/auth/LoginExperience";
 import { useSetAuthBusy } from "@/components/auth/AuthShell";
 import { createClient } from "@/lib/supabase/client";
-import { createProfile } from "@/lib/profile";
 import { getSafeNext } from "@/lib/auth-routing";
 
 type AuthMode = "login" | "register";
@@ -81,29 +80,8 @@ export default function AuthForm({ mode, next, verified = false }: AuthFormProps
       return;
     }
 
-    if (isRegister && result.data.user && result.data.session) {
-      const { error: profileError } = await createProfile(
-        supabase,
-        result.data.user.id,
-        firstName.trim(),
-        lastName.trim(),
-      );
-      if (profileError) {
-        console.error("Profile creation failed after registration", {
-          userId: result.data.user.id,
-          message: profileError.message,
-          code: profileError.code,
-          details: profileError.details,
-          hint: profileError.hint,
-        });
-        setError(
-          "Your account was created, but your profile could not be saved.",
-        );
-        setIsLoading(false);
-        return;
-      }
-    }
-
+    // The profile is created with the account, from the first and last name
+    // sent as sign-up metadata (a database trigger, FIX 4).
     if (isRegister) {
       if (result.data.session) {
         const { error: signOutError } = await supabase.auth.signOut();

@@ -164,7 +164,7 @@ There is no trigger that creates a profile when a user signs up.
 | ID | Issue | Severity | Evidence | Planned fix |
 |---|---|---|---|---|
 | DB-1 | Unpublished drafts are publicly readable. Anyone with the public key can read `portfolio_data`, `user_id` and timestamps of published rows, because RLS filters rows, not columns. Every save after publishing lands in `portfolio_data`. | High | Anonymous role test: draft column readable and different from the published snapshot | FIX 2 |
-| DB-2 | Profiles never get created. `authenticated` has RLS policies but no table privileges on `profiles`, so every profile read/write fails with `42501`. | High | 7 users, 0 profiles | FIX 4 |
+| DB-2 | Profiles never get created. `authenticated` has RLS policies but no table privileges on `profiles`, so every profile read/write fails with `42501`. | High | 7 users, 0 profiles | FIX 4: `20261024042426_fix4_profiles_access.sql`, applied 2026-10-24 to project `ocuaks…` (11 users, 11 profiles; all checks in `fix4_verify.sql` pass) |
 | DB-3 | Users can bypass API validation by writing their own portfolio row directly through REST (any `template_id`, slug, JSON). | Medium | INSERT/UPDATE grants plus ownership-only policies | FIX 5 |
 | DB-4 | Slug check cannot see other users' drafts, so a colliding first save fails on `portfolios_slug_key`. | Low–Medium | Policies plus unique index | FIX 2, FIX 6 |
 | DB-5 | API roles hold TRUNCATE, REFERENCES, TRIGGER and MAINTAIN. Not reachable: PostgREST cannot issue them, and the roles cannot log in or create objects. | Low | Privilege and role checks, baseline | FIX 11 |
@@ -184,7 +184,14 @@ This is where the planned fixes lead. **None of it is implemented yet.**
 | portfolios | none on the table; published `template_id` + `published_portfolio_data` by slug through a dedicated function | SELECT, INSERT, UPDATE, DELETE | none |
 | profiles | none | SELECT; UPDATE of `first_name`, `last_name`, `avatar_url` | none |
 
-Profiles are created by a trigger on `auth.users`, not by application code.
+Profiles are created by a trigger on `auth.users`, not by application code
+(FIX 4, `20261024042426`). Users delete their own account through
+`public.delete_own_account()` (`20261024042427`), a SECURITY DEFINER function
+only `authenticated` can call; their profile and portfolio follow through the
+existing cascades, and the app removes their images through the Storage API
+first. Both migrations were applied on 2026-10-24 to project `ocuaks…` and pass
+every check in
+`supabase/tests/fix4_verify.sql`.
 The DELETE policy on portfolios stays: it only covers the user's own row and
 will be needed for deleting a portfolio or account.
 
