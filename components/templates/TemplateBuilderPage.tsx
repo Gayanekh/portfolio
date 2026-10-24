@@ -231,13 +231,13 @@ export default function TemplateBuilderPage({
           className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 sm:px-8 lg:px-10 py-5 bg-background/80 backdrop-blur-xl"
         >
           <Link
-            href="/demo/minimal"
+            href="/templates/demo/minimal"
             className="text-[10px] sm:text-[11px] font-mono text-foreground/40 tracking-[0.15em] uppercase hover:text-foreground/70 transition-colors duration-300"
           >
             Gayane Khachatryan
           </Link>
           <Link
-            href="/demo/minimal"
+            href="/templates/demo/minimal"
             className="text-[10px] sm:text-[11px] font-mono tracking-[0.15em] uppercase text-foreground/30 hover:text-foreground/60 transition-colors duration-300"
           >
             View Demo

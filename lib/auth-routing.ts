@@ -19,7 +19,7 @@ export function getSafeNext(value: string | null | undefined) {
 
 export function templateEditorNext(templateId: string) {
   const template = allowedTemplates.has(templateId) ? templateId : "minimal";
-  return `/templates?template=${template}&edit=1`;
+  return `/templates/editor/${template}`;
 }
 
 export function getInitials(firstName: string, lastName: string) {

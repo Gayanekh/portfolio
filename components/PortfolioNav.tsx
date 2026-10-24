@@ -48,7 +48,7 @@ const PortfolioNav = () => {
           Available for Work
         </span>
         <Link
-          href="/templates?template=minimal&edit=1"
+          href="/templates/editor/minimal"
           className="ml-3 text-[10px] sm:text-xs font-mono tracking-widest uppercase whitespace-nowrap hover:opacity-60 transition-opacity duration-200"
         >
           Use Template

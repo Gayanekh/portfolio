@@ -103,8 +103,8 @@ const LIVE_TEMPLATES: TemplateDetail[] = [
     description:
       "A light, editorial layout with a sticky profile column and stacked project cards. Pick a palette and a font pack below, then make it yours in the editor.",
     bestFor: "Designers and creatives",
-    useHref: "/templates?template=minimal&edit=1",
-    demoHref: "/demo/minimal",
+    useHref: "/templates/editor/minimal",
+    demoHref: "/templates/demo/minimal",
     Preview: MinimalSample,
   },
   // TEST TEMPLATE — delete with components/site-templates/product after testing.

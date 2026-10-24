@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import TemplateGallery from "@/components/gallery/TemplateGallery";
 import TemplateBuilderPage from "@/components/templates/TemplateBuilderPage";
 
@@ -12,12 +13,14 @@ interface TemplatesPageProps {
 }
 
 // /templates shows the template gallery; with a template chosen
-// (?template=…, and &edit=1 to open the editor) it shows the builder.
+// (?template=…) it shows the builder; its editor lives at
+// /templates/editor/<template>, where ?template=…&edit=1 now leads.
 export default async function TemplatesPage({
   searchParams,
 }: TemplatesPageProps) {
   const params = await searchParams;
   if (!params.template) return <TemplateGallery />;
+  if (params.edit === "1") redirect(`/templates/editor/${encodeURIComponent(params.template)}`);
 
   return (
     <TemplateBuilderPage
