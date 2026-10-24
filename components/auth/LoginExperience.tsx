@@ -17,17 +17,17 @@ export const MIN_PASSWORD_LENGTH = 8;
 const focusRing =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground";
 // Labels stay for assistive tech; placeholders carry the visible prompt.
-const labelClass = "sr-only";
+export const labelClass = "sr-only";
 // Underlined fields on the open page: the shared Input supplies the
 // states; only the bottom border shows, brightening on hover and focus.
-const inputClass =
+export const inputClass =
   "h-11 w-full min-w-0 rounded-none border-0 border-b border-foreground/25 bg-transparent px-0 text-[15px] font-normal text-foreground placeholder:text-foreground/45 hover:border-foreground/50 focus:border-foreground disabled:bg-transparent disabled:text-foreground/50 disabled:hover:border-foreground/25 read-only:bg-transparent";
-const quietLinkClass = `${focusRing} rounded text-foreground/55 transition-colors hover:text-foreground`;
-const textLinkClass = `${focusRing} rounded font-medium text-foreground underline decoration-foreground/30 decoration-1 underline-offset-[3px] transition-colors hover:decoration-foreground`;
-const iconButtonClass = `${focusRing} grid size-8 place-items-center rounded text-foreground/55 transition-colors hover:text-foreground`;
+export const quietLinkClass = `${focusRing} rounded text-foreground/55 transition-colors hover:text-foreground`;
+export const textLinkClass = `${focusRing} rounded font-medium text-foreground underline decoration-foreground/30 decoration-1 underline-offset-[3px] transition-colors hover:decoration-foreground`;
+export const iconButtonClass = `${focusRing} grid size-8 place-items-center rounded text-foreground/55 transition-colors hover:text-foreground`;
 // The outline button, filling black on hover.
-const buttonClass = `${focusRing} h-12 w-full gap-2.5 rounded border border-foreground bg-transparent px-5 text-[12px] font-semibold uppercase tracking-[0.18em] text-foreground shadow-none transition-[background-color,color,transform] duration-300 enabled:hover:bg-foreground enabled:hover:text-white focus-visible:ring-0 enabled:active:translate-y-px disabled:pointer-events-auto disabled:cursor-wait disabled:opacity-60`;
-const spinner = <span aria-hidden="true" className="h-4 w-4 animate-spin rounded-full border-2 border-foreground/30 border-t-foreground" />;
+export const buttonClass = `${focusRing} h-12 w-full gap-2.5 rounded border border-foreground bg-transparent px-5 text-[12px] font-semibold uppercase tracking-[0.18em] text-foreground shadow-none transition-[background-color,color,transform] duration-300 enabled:hover:bg-foreground enabled:hover:text-white focus-visible:ring-0 enabled:active:translate-y-px disabled:pointer-events-auto disabled:cursor-wait disabled:opacity-60`;
+export const spinner = <span aria-hidden="true" className="h-4 w-4 animate-spin rounded-full border-2 border-foreground/30 border-t-foreground" />;
 
 function GoogleMark() {
   return (
@@ -133,7 +133,7 @@ export default function LoginExperience(props: LoginExperienceProps) {
             </span>
           </div>
           {isRegister && <p id="password-hint" className="text-[13px] text-foreground/50">{passwordHint}</p>}
-          {!isRegister && <p className="text-[13px]"><Link href="#" className={`${quietLinkClass} font-medium`}>Forgot your password?</Link></p>}
+          {!isRegister && <p className="text-[13px]"><Link href={`/forgot-password${email ? `?${new URLSearchParams({ email })}` : ""}`} aria-disabled={busy || undefined} onClick={(event) => (busy ? event.preventDefault() : requestHeadingFocus())} className={`${quietLinkClass} font-medium aria-disabled:pointer-events-none aria-disabled:opacity-50`}>Forgot your password?</Link></p>}
         </div>
         {message && <p role="status" className="text-sm text-foreground/70">{message}</p>}
         {error && <p id="login-error" className="text-[13px] text-destructive" role="alert">{error}</p>}

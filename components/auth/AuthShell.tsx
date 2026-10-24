@@ -9,7 +9,7 @@ import { authSans, authSerif } from "@/components/auth/auth-fonts";
 import { requestHeadingFocus } from "@/components/auth/LoginExperience";
 import { getSafeNext } from "@/lib/auth-routing";
 
-type AuthMode = "login" | "register";
+type AuthMode = "login" | "register" | "recover";
 
 // Lets the form tell the shell a submission is in flight, so its switch link
 // stays inert like the form's own link.
@@ -35,6 +35,15 @@ const copy = {
     switchAction: "Log in",
     target: "login",
   },
+  // Forgot password and choosing a new one.
+  recover: {
+    lines: ["A fresh", "start for your", "password"],
+    noteTop: "It happens to everyone. A secure link sends you straight to a new password.",
+    noteSide: "Your portfolio, templates and every edit stay exactly as you left them.",
+    switchLead: "Remembered it?",
+    switchAction: "Log in",
+    target: "login",
+  },
 } as const;
 
 // Entrance animations (tailwindcss-animate); none with reduced motion.
@@ -46,12 +55,12 @@ const note = "m-0 max-w-[26ch] text-[11.5px] leading-[1.5] text-foreground/75";
 // notes beside it, the form on the right, a turning badge and long arrow at
 // the edge, and a thin labelled rule along the bottom. On desktop it fits one
 // screen; below 861px the parts stack and the page scrolls. Shared by the
-// /login and /register pages.
+// /login, /register, /forgot-password and /reset-password pages.
 export default function AuthShell({ header, children }: { header: React.ReactNode; children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
-  const mode: AuthMode = pathname === "/register" ? "register" : "login";
+  const mode: AuthMode = pathname === "/register" ? "register" : pathname === "/forgot-password" || pathname === "/reset-password" ? "recover" : "login";
   const text = copy[mode];
 
   // Switch to the other mode, carrying a non-default destination along.

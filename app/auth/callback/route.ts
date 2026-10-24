@@ -8,7 +8,19 @@ export async function GET(request: Request) {
   const code = requestUrl.searchParams.get("code");
   const next = getSafeNext(requestUrl.searchParams.get("next"));
   const oauth = requestUrl.searchParams.get("flow") === "oauth";
+  // A password reset link: signed in for the reset, on to choosing a new
+  // password; a link that no longer works goes back to ask for a new one.
+  const recovery = requestUrl.searchParams.get("flow") === "recovery";
   const supabase = await createClient();
+
+  if (recovery) {
+    const { error: recoveryError } = code ? await supabase.auth.exchangeCodeForSession(code) : { error: new Error("No code") };
+    if (recoveryError) {
+      console.error("Password reset link could not be used", { message: recoveryError.message });
+      return NextResponse.redirect(new URL("/forgot-password?expired=1", requestUrl.origin));
+    }
+    return NextResponse.redirect(new URL("/reset-password", requestUrl.origin));
+  }
 
   const loginUrl = (verified = false) => {
     const url = new URL("/login", requestUrl.origin);
