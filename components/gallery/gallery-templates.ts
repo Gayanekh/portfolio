@@ -35,7 +35,9 @@ export const GALLERY_TEMPLATES: GalleryTemplate[] = [
   // IN PROGRESS — built step by step from a design reference.
   { id: "gallery", name: "Gallery", style: "image", bestFor: "Photographers and artists", live: true, href: "/templates/demo/gallery" },
   { id: "deck", name: "Deck", style: "image", bestFor: "Product and brand designers, studios", live: true, href: "/templates/demo/deck" },
-  { id: "minimal", name: "Minimal", style: "case", bestFor: "Designers and creatives", live: true },
+  // An earlier template with its own demo (components/templates/MinimalDemo), which opens
+  // its editor (/templates/editor/minimal).
+  { id: "minimal", name: "Minimal", style: "case", bestFor: "Designers and creatives", live: true, href: "/templates/demo/minimal" },
   // TEST TEMPLATE — delete after testing (see components/site-templates/product).
   { id: "product", name: "Product", style: "image", bestFor: "Makers and small shops", live: true, href: "/templates/demo/product" },
   { id: "atelier", name: "Atelier", style: "image", bestFor: "Designers and makers", image: photo("photo-1487014679447-9f8336841d58") },
@@ -50,3 +52,8 @@ export const GALLERY_TEMPLATES: GalleryTemplate[] = [
   { id: "canvas", name: "Canvas", style: "image", bestFor: "Illustrators and painters", image: photo("photo-1649442746245-f51f4b76963f") },
   { id: "practice", name: "Practice", style: "text", bestFor: "Healthcare and legal professionals", image: photo("photo-1627896181038-a0cf83c86008") },
 ];
+
+// The templates shown to visitors (the templates page and the landing): those
+// with a demo to open. The others (the placeholders) are hidden;
+// the old template detail screen they led to is no longer used.
+export const SHOWN_TEMPLATES = GALLERY_TEMPLATES.filter((template): template is GalleryTemplate & { href: string } => Boolean(template.href));

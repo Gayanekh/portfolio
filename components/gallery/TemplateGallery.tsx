@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import BackToHome from "@/components/BackToHome";
 import BackToTop from "@/components/BackToTop";
 import GalleryCard from "@/components/gallery/GalleryCard";
-import { GALLERY_STYLES, GALLERY_TEMPLATES, type GalleryStyle } from "@/components/gallery/gallery-templates";
+import { GALLERY_STYLES, SHOWN_TEMPLATES, type GalleryStyle } from "@/components/gallery/gallery-templates";
 import LandingHeader from "@/components/landing/LandingHeader";
 import { accentText, ease, focusRing } from "@/components/landing/landing-ui";
 
@@ -24,7 +24,9 @@ export default function TemplateGallery() {
   const [style, setStyle] = useState<GalleryStyle | "all">("all");
   const [hovered, setHovered] = useState<GalleryStyle | "all" | null>(null);
 
-  const shown = style === "all" ? GALLERY_TEMPLATES : GALLERY_TEMPLATES.filter((t) => t.style === style);
+  const shown = style === "all" ? SHOWN_TEMPLATES : SHOWN_TEMPLATES.filter((t) => t.style === style);
+  // Only the styles some template has (a filter with nothing in it is left out).
+  const styles = GALLERY_STYLES.filter((option) => option.id === "all" || SHOWN_TEMPLATES.some((t) => t.style === option.id));
 
   return (
     <div className="relative min-h-screen bg-background text-foreground">
@@ -59,7 +61,7 @@ export default function TemplateGallery() {
               dark pill marks the chosen one and slides to the one hovered,
               then back when the pointer leaves */}
           <div role="group" aria-label="Filter by style" onMouseLeave={() => setHovered(null)} className="flex flex-wrap gap-1">
-            {GALLERY_STYLES.map((option) => {
+            {styles.map((option) => {
               const active = option.id === style;
               const lit = (hovered ?? style) === option.id;
               return (

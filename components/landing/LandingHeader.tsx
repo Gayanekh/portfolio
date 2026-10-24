@@ -114,7 +114,7 @@ function Bar({ compact, active, links }: { compact: boolean; active: string | nu
 
           <div className={`ml-auto flex shrink-0 items-center gap-2 [&_a]:no-underline ${links ? "lg:ml-6 xl:ml-10" : ""}`}>
             <div className={links ? "hidden sm:block" : undefined}>
-              <AuthControls start={links} />
+              <AuthControls start={links} avatarOnly />
             </div>
             {links && (
               <button

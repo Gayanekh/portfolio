@@ -7,7 +7,7 @@ export default function BoldDemoPage() {
     <>
       <BoldPreview data={demoPortfolioData} />
       <Link
-        href="/templates?template=bold&edit=1"
+        href="/templates/editor/bold"
         className="fixed bottom-5 right-5 z-50 rounded bg-white px-4 py-2 text-[10px] font-mono uppercase tracking-[0.12em] text-foreground"
       >
         Use Template

@@ -1,5 +1,5 @@
-import { GALLERY_TEMPLATES } from "@/components/gallery/gallery-templates";
-import { getTemplateDetail, templateDetailHref } from "@/components/template-detail/template-registry";
+import { SHOWN_TEMPLATES } from "@/components/gallery/gallery-templates";
+import { getTemplateDetail } from "@/components/template-detail/template-registry";
 
 // Everything the new landing page says, in page order. The sections only lay
 // it out, so copy changes happen here.
@@ -22,13 +22,13 @@ export const HERO = {
 // The real templates, in the gallery's order. (Product is a test template.)
 // Each has a 2560×1600 (double resolution) screenshot of its opening screen in
 // public/images/templates/<id>.jpg; retake it when the template changes.
-export const TEMPLATES = GALLERY_TEMPLATES.filter((template) => template.live && template.id !== "product").map((template) => ({
+export const TEMPLATES = SHOWN_TEMPLATES.filter((template) => template.id !== "product").map((template) => ({
   id: template.id,
   name: template.name,
   style: template.style,
   bestFor: template.bestFor,
   description: getTemplateDetail(template.id)?.description ?? "",
-  href: template.href ?? templateDetailHref(template.id),
+  href: template.href,
   image: `/images/templates/${template.id}.jpg`,
 }));
 

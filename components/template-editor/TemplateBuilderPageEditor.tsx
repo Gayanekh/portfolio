@@ -50,7 +50,7 @@ type Device = "desktop" | "tablet" | "mobile";
 const DEVICE_FRAME: Record<Device, string> = {
   desktop: "w-full h-full my-0 rounded-none shadow-none ring-0",
   tablet: "w-[820px] max-w-[calc(100%-3rem)] h-[calc(100%-3rem)] my-6 rounded-2xl shadow-[0_14px_44px_-14px_rgb(0_0_0/0.3)] ring-1 ring-black/5",
-  mobile: "w-[390px] max-w-[calc(100%-3rem)] h-[calc(100%-3rem)] my-6 rounded-[1.75rem] shadow-[0_14px_44px_-14px_rgb(0_0_0/0.35)] ring-1 ring-black/5",
+  mobile: "w-[390px] max-w-[calc(100%-3rem)] h-[calc(100%-3rem)] my-6 rounded-2xl shadow-[0_14px_44px_-14px_rgb(0_0_0/0.35)] ring-1 ring-black/5",
 };
 const frameMotion = "transition-[width,max-width,margin,border-radius,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]";
 // What the canvas shows: the home page ("all"), or one of its sections.
@@ -896,20 +896,21 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
               startEdit();
             }}
           >
-            <div
-              ref={pageRef}
-              className={`mx-auto overflow-y-auto overflow-x-hidden overscroll-contain bg-white ${frameMotion} ${DEVICE_FRAME[device]}`}
-              data-lenis-prevent
-            >
-              <motion.div
-                key={focus}
-                initial={{ opacity: 0.35, y: focus === "all" ? 0 : 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45, ease: smooth }}
-                className="min-h-full"
-              >
-                <CanvasProvider value={fluid.canvas}>{page(editing, true)}</CanvasProvider>
-              </motion.div>
+            {/* The device's frame (rounded, raised, clipping its corners) and
+                inside it the page, scrolling, so the scrollbar keeps within
+                the rounded shape */}
+            <div className={`mx-auto overflow-hidden bg-white ${frameMotion} ${DEVICE_FRAME[device]}`}>
+              <div ref={pageRef} className="h-full overflow-y-auto overflow-x-hidden overscroll-contain" data-lenis-prevent>
+                <motion.div
+                  key={focus}
+                  initial={{ opacity: 0.35, y: focus === "all" ? 0 : 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.45, ease: smooth }}
+                  className="min-h-full"
+                >
+                  <CanvasProvider value={fluid.canvas}>{page(editing, true)}</CanvasProvider>
+                </motion.div>
+              </div>
             </div>
           </div>
         </motion.div>

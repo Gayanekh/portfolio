@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { MoveRight } from "lucide-react";
 import type { GalleryTemplate } from "@/components/gallery/gallery-templates";
 import LiveThumbnail from "@/components/template-detail/LiveThumbnail";
-import { templateDetailHref } from "@/components/template-detail/template-registry";
 import { ease, focusRing } from "@/components/landing/landing-ui";
 
 const MotionLink = motion.create(Link);
@@ -14,7 +13,7 @@ const MotionLink = motion.create(Link);
 // lifts on hover while the page inside slowly scrolls, with the template's
 // name and an arrow sliding in at the bottom. Opens the template's own page
 // in this tab. A real template shows itself live instead of a photo.
-export default function GalleryCard({ template, index }: { template: GalleryTemplate; index: number }) {
+export default function GalleryCard({ template, index }: { template: GalleryTemplate & { href: string }; index: number }) {
   return (
     <motion.li
       layout
@@ -25,7 +24,7 @@ export default function GalleryCard({ template, index }: { template: GalleryTemp
       className="list-none"
     >
       <MotionLink
-        href={template.href ?? templateDetailHref(template.id)}
+        href={template.href}
         aria-label={`View the ${template.name} template, for ${template.bestFor.toLowerCase()}`}
         initial="rest"
         animate="rest"

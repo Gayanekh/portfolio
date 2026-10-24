@@ -18,7 +18,7 @@ export const templates: TemplateData[] = [
       "A light, editorial layout with a sticky sidebar and stacked project cards. Perfect for designers and creatives who want their work to speak for itself.",
     badge: "Light",
     theme: "light",
-    demoHref: "/demo/minimal",
+    demoHref: "/templates/demo/minimal",
     previewImages: [
       "https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=800&q=80",
       "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
