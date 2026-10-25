@@ -8,7 +8,8 @@ export function getSafeNext(value: string | null | undefined) {
   try {
     const url = new URL(value, "http://portory.internal");
     if (url.origin !== "http://portory.internal") return "/templates";
-    if (!url.pathname.startsWith("/templates")) return "/templates";
+    // Back into the templates and editors, or to the account page.
+    if (!url.pathname.startsWith("/templates") && url.pathname !== "/account") return "/templates";
     const template = url.searchParams.get("template");
     if (template && !allowedTemplates.has(template)) return "/templates";
     return `${url.pathname}${url.search}${url.hash}`;

@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -20,6 +19,7 @@ import {
   X,
 } from "lucide-react";
 import BackToHome from "@/components/BackToHome";
+import Modal from "@/components/ui/modal";
 import Tooltip from "@/components/ui/tooltip";
 import LogoMark from "@/components/brand/LogoMark";
 import { ease, focusRing } from "@/components/landing/landing-ui";
@@ -933,85 +933,45 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
           )}
         </AnimatePresence>
 
-        {/* Exit without saving? A dialog centred over the whole screen (on
-            the page body, so nothing around the editor clips it); clicking
-            outside it, its X or Esc keeps editing. */}
-        {typeof document !== "undefined" &&
-          createPortal(
-            <AnimatePresence>
-              {confirmExit && (
-                <motion.div
-                  key="exit"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.25, ease: smooth }}
-                  onClick={() => setConfirmExit(false)}
-                  className={`${themeFontVariables} fixed inset-0 z-[90] grid place-items-center bg-neutral-950/45 p-4 backdrop-blur-[3px]`}
-                >
-                  <motion.div
-                    role="alertdialog"
-                    aria-modal="true"
-                    aria-labelledby="exit-title"
-                    aria-describedby="exit-text"
-                    initial={{ opacity: 0, y: 16, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 10, scale: 0.98 }}
-                    transition={{ duration: 0.35, ease: smooth }}
-                    onClick={(event) => event.stopPropagation()}
-                    className="relative w-full max-w-[440px] bg-white px-8 pb-7 pt-8 text-neutral-950 shadow-[0_30px_80px_-20px_rgb(0_0_0/0.45)]"
-                  >
-                    <Tooltip label="Close" side="left">
-                      <button
-                        type="button"
-                        onClick={() => setConfirmExit(false)}
-                        aria-label="Close"
-                        className="absolute right-3 top-3 grid size-9 cursor-pointer place-items-center rounded text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-950"
-                      >
-                        <X aria-hidden="true" className="h-[18px] w-[18px]" strokeWidth={1.75} />
-                      </button>
-                    </Tooltip>
-                    <h2 id="exit-title" className="m-0 pr-8 text-[26px] font-medium leading-tight tracking-[-0.02em]">
-                      Exit without saving?
-                    </h2>
-                    <p id="exit-text" className="m-0 mt-3 text-sm leading-relaxed text-neutral-600">
-                      {signedOut
-                        ? "You're not signed in, so these changes can't be saved yet. Sign in to keep them, or exit and lose them."
-                        : "You have changes that are not saved yet. Save them before you leave, or exit and lose them."}
-                    </p>
-                    <div className="mt-8 flex justify-end">
-                      <div className="flex gap-2">
-                        {/* Signed out: sign in to save (the changes come back after) */}
-                        <button
-                          type="button"
-                          autoFocus
-                          onClick={
-                            signedOut
-                              ? signInToSave
-                              : () => {
-                                  save();
-                                  leaveEdit();
-                                }
-                          }
-                          className="h-11 cursor-pointer rounded px-5 text-sm font-medium text-neutral-950 transition-colors hover:bg-neutral-100"
-                        >
-                          {signedOut ? "Sign in to save" : "Save"}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={discard}
-                          className="h-11 cursor-pointer rounded bg-primary px-5 text-sm font-medium text-white transition-colors hover:bg-[color:color-mix(in_srgb,var(--primary),black_14%)]"
-                        >
-                          Exit
-                        </button>
-                      </div>
-                    </div>
-                  </motion.div>
-                </motion.div>
-              )}
-            </AnimatePresence>,
-            document.body,
-          )}
+        {/* Exit without saving? (the app's Modal); clicking outside it, its X
+            or Esc keeps editing. */}
+        <Modal open={confirmExit} onClose={() => setConfirmExit(false)} labelledBy="exit-title" describedBy="exit-text" alert>
+          <h2 id="exit-title" className="m-0 pr-8 text-[26px] font-medium leading-tight tracking-[-0.02em]">
+            Exit without saving?
+          </h2>
+          <p id="exit-text" className="m-0 mt-3 text-sm leading-relaxed text-neutral-600">
+            {signedOut
+              ? "You're not signed in, so these changes can't be saved yet. Sign in to keep them, or exit and lose them."
+              : "You have changes that are not saved yet. Save them before you leave, or exit and lose them."}
+          </p>
+          <div className="mt-8 flex justify-end">
+            <div className="flex gap-2">
+              {/* Signed out: sign in to save (the changes come back after) */}
+              <button
+                type="button"
+                autoFocus
+                onClick={
+                  signedOut
+                    ? signInToSave
+                    : () => {
+                        save();
+                        leaveEdit();
+                      }
+                }
+                className="h-11 cursor-pointer rounded px-5 text-sm font-medium text-neutral-950 transition-colors hover:bg-neutral-100"
+              >
+                {signedOut ? "Sign in to save" : "Save"}
+              </button>
+              <button
+                type="button"
+                onClick={discard}
+                className="h-11 cursor-pointer rounded bg-primary px-5 text-sm font-medium text-white transition-colors hover:bg-[color:color-mix(in_srgb,var(--primary),black_14%)]"
+              >
+                Exit
+              </button>
+            </div>
+          </div>
+        </Modal>
       </div>
 
       {/* Preview: the page alone, full screen */}

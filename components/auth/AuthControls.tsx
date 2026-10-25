@@ -39,7 +39,7 @@ function Avatar({ account, size }: { account: Account; size: "sm" | "lg" }) {
 }
 
 // Signed out: Log in and Get started. Signed in: the account (its avatar and
-// first name, opening a menu with who is signed in, Profile (soon) and Log
+// first name, opening a menu with who is signed in, Profile and Log
 // out on hover, click or Arrow Down) and Get started. `start={false}` leaves Get started out
 // (where another button already leads to the templates); `avatarOnly` shows
 // the account as its avatar alone (in tight spots, like the compact nav bar).
@@ -152,16 +152,17 @@ export default function AuthControls({ start = true, avatarOnly = false }: { sta
                         {email && <p className="m-0 mt-1 truncate text-[13px] text-foreground/55">{email}</p>}
                       </motion.div>
     
-                      {/* Profile: no page for it yet */}
-                      <motion.span
-                        variants={menuItem}
-                        role="menuitem"
-                        aria-disabled="true"
-                        className="flex w-full cursor-default items-center justify-between px-5 py-2.5 text-[15px] text-foreground/45"
-                      >
-                        Profile
-                        <span className="rounded bg-foreground/[0.06] px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-foreground/50">Soon</span>
-                      </motion.span>
+                      {/* Profile: the account's settings page */}
+                      <motion.div variants={menuItem}>
+                        <Link
+                          href="/account"
+                          role="menuitem"
+                          onClick={() => setIsMenuOpen(false)}
+                          className="flex w-full items-center px-5 py-2.5 text-[15px] text-foreground no-underline transition-colors hover:bg-foreground/[0.04] focus-visible:bg-foreground/[0.04] focus-visible:outline-none"
+                        >
+                          Profile
+                        </Link>
+                      </motion.div>
     
                       <motion.button
                         variants={menuItem}

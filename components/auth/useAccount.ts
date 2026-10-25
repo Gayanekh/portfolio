@@ -12,6 +12,11 @@ type Profile = {
   avatar_url: string | null;
 };
 
+// Sent when the signed-in user's profile changes (the profile page), so every
+// useAccount (the header's avatar and menu) reloads it.
+const PROFILE_CHANGED = "portory:profile-changed";
+export const announceProfileChange = () => window.dispatchEvent(new Event(PROFILE_CHANGED));
+
 export interface Account {
   fullName: string;
   email: string;
@@ -48,7 +53,16 @@ export function useAccount() {
       if (session?.user) loadProfile(session.user.id);
       else setProfile(null);
     });
-    return () => listener.subscription.unsubscribe();
+    // The profile page saved a new name or photo: show it everywhere.
+    const onProfileChange = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (data.user) loadProfile(data.user.id);
+    };
+    window.addEventListener(PROFILE_CHANGED, onProfileChange);
+    return () => {
+      listener.subscription.unsubscribe();
+      window.removeEventListener(PROFILE_CHANGED, onProfileChange);
+    };
   }, [supabase]);
 
   let account: Account | null = null;
