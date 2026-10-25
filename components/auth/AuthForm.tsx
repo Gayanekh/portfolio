@@ -110,12 +110,28 @@ export default function AuthForm({ mode, next, verified = false }: AuthFormProps
     setError("");
     setMessage("");
     setIsGoogleLoading(true);
+    const unavailable = "Google sign-in isn't available right now. Please use your email.";
+    // Check Google is switched on first: otherwise Supabase would show its
+    // raw error page instead of this form.
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/settings`, {
+        headers: { apikey: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY! },
+      });
+      const settings = (await response.json()) as { external?: { google?: boolean } };
+      if (settings.external?.google === false) {
+        setError(unavailable);
+        setIsGoogleLoading(false);
+        return;
+      }
+    } catch {
+      // The check itself failed: try signing in anyway.
+    }
     const { error: oauthError } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: `${window.location.origin}/auth/callback?${new URLSearchParams({ next: safeNext, flow: "oauth" })}` },
     });
     if (oauthError) {
-      setError("Google sign-in isn't available right now. Please use your email.");
+      setError(unavailable);
       setIsGoogleLoading(false);
     }
   }
