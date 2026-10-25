@@ -9,7 +9,7 @@ import PreviewFrame from "@/components/template-detail/PreviewFrame";
 import { getTemplateDetail } from "@/components/template-detail/template-registry";
 import { FontCard, PaletteCard, glowOf, signature } from "@/components/template-detail/StyleCards";
 import { COLOR_PALETTES, FONT_PACKS, findFontPack, findPalette, themeFontVariables } from "@/components/template-detail/theme-options";
-import { displayTitle, ease, focusRing, kicker, lead, section, solidButton } from "@/components/landing/landing-ui";
+import { displayTitle, ease, focusRing, kicker, lead, section, solidButton, fit } from "@/components/landing/landing-ui";
 
 // Content from the landing-redesign branch's "Make it yours" section.
 const STYLER = {
@@ -55,7 +55,7 @@ export default function Styler() {
   };
 
   return (
-    <section id="make-it-yours" aria-label={STYLER.title} className={`${section} ${themeFontVariables} md:py-32`}>
+    <section id="make-it-yours" aria-label={STYLER.title} className={`${section} ${themeFontVariables} ${fit.sectionY}`}>
       <div className="mx-auto flex w-content-width flex-col gap-12 md:gap-20">
         <Reveal className="grid grid-cols-1 items-end gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-16">
           <div className="flex flex-col gap-5">
@@ -97,7 +97,7 @@ export default function Styler() {
               <span aria-hidden="true" className="absolute inset-y-4 left-0 right-2 -z-10 rounded-[3rem] bg-white/50 blur-3xl lg:hidden" />
               <span aria-hidden="true" className="absolute inset-x-[14%] top-0 -z-10 hidden h-8 -translate-y-1/3 rounded-full bg-black/[0.05] blur-2xl lg:block" />
               <span aria-hidden="true" className="absolute inset-x-[12%] bottom-0 -z-10 hidden h-10 translate-y-1/3 rounded-full bg-black/[0.09] blur-2xl lg:block" />
-              <PreviewFrame template={template} device={wide ? "desktop" : "mobile"} palette={palette} font={font} fill />
+              <PreviewFrame template={template} device={wide ? "desktop" : "mobile"} palette={palette} font={font} fill height={fit.previewHeight} />
             </div>
 
             {/* The palettes and font packs from the editor's Site styles, as two cards. */}

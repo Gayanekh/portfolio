@@ -7,7 +7,7 @@ import { Camera, Check, Eye, EyeOff, ImageUp, KeyRound, type LucideIcon, LogOut,
 import { announceProfileChange } from "@/components/auth/useAccount";
 import { MIN_PASSWORD_LENGTH } from "@/components/auth/LoginExperience";
 import LandingHeader from "@/components/landing/LandingHeader";
-import { focusRing } from "@/components/landing/landing-ui";
+import { focusRing, fluidText } from "@/components/landing/landing-ui";
 import Modal from "@/components/ui/modal";
 import { getInitials } from "@/lib/auth-routing";
 import { ACCEPTED_IMAGE_TYPES, uploadPortfolioImage, validatePortfolioImage } from "@/lib/portfolio-images";
@@ -369,7 +369,7 @@ export default function AccountPage(props: {
 
           <div className="text-center md:text-left">
             <p className="m-0 text-[15px] font-light text-foreground/50">Your account</p>
-            <h1 className="m-0 mt-2 text-[length:clamp(2.4rem,5.5vw,3.6rem)] font-semibold leading-[1.05] tracking-[-0.035em]">{fullName || "Welcome"}</h1>
+            <h1 className={`m-0 mt-2 ${fluidText.profileName} font-semibold leading-[1.05] tracking-[-0.035em]`}>{fullName || "Welcome"}</h1>
             <p className="m-0 mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-foreground/60 md:mx-0">
               {email}
               <br />

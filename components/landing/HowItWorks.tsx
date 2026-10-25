@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Reveal } from "@/components/landing/Reveal";
 import { LandingSection, SectionHeader } from "@/components/landing/Section";
-import { ease, text } from "@/components/landing/landing-ui";
+import { ease, text, fluidText } from "@/components/landing/landing-ui";
 
 const STEPS = [
   { title: "Choose a template", text: "Pick a layout that suits how you like to present your work. Switch any time; your content stays put." },
@@ -98,7 +98,7 @@ export default function HowItWorks() {
                 className="flex flex-col justify-center gap-4 py-10 md:min-h-[75vh] md:py-0"
               >
                 <span className="grid size-8 place-items-center rounded-full bg-foreground text-sm font-semibold text-background">{i + 1}</span>
-                <h3 className="m-0 text-balance text-[length:clamp(1.6rem,7vw,2.25rem)] font-semibold leading-[1.1] tracking-[-0.02em] md:text-[length:clamp(1.75rem,3vw,2.75rem)]">{step.title}</h3>
+                <h3 className={`m-0 text-balance ${fluidText.cardTitle} font-semibold leading-[1.1] tracking-[-0.02em]`}>{step.title}</h3>
                 <p className={`${text.lgXl} m-0 max-w-[30rem] text-balance leading-snug text-foreground/65`}>{step.text}</p>
                 <div className="mt-4 h-64 md:hidden">
                   <StepCard step={i} />

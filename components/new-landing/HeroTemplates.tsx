@@ -6,7 +6,7 @@ import { animate, motion, useInView, useMotionValue, useReducedMotionConfig } fr
 import { MoveRight } from "lucide-react";
 import { HERO, STACK } from "@/components/new-landing/content";
 import StackSlider from "@/components/new-landing/StackSlider";
-import { ease, focusRing, primaryButton } from "@/components/landing/landing-ui";
+import { ease, focusRing, primaryButton, fluidText } from "@/components/landing/landing-ui";
 
 // The hero, side by side: the headline, text and buttons on the left and the
 // card stack on the right (the text first on phones).
@@ -106,7 +106,7 @@ export default function HeroTemplates() {
           className="flex max-w-[36rem] flex-col items-start gap-5"
         >
           {/* The page's largest heading: a step above the section titles at every width. */}
-          <h1 className="m-0 text-balance text-[length:clamp(2.5rem,11vw,3.5rem)] font-semibold leading-[0.95] tracking-[-0.045em] md:text-[length:clamp(2.75rem,4.6vw,4.5rem)]">
+          <h1 className={`m-0 text-balance ${fluidText.heroTitle} font-semibold leading-[0.95] tracking-[-0.045em]`}>
             {HERO.title} <span className="text-foreground/40">{HERO.accent}</span>
           </h1>
           <p className="m-0 max-w-[36rem] text-pretty text-base leading-relaxed text-foreground/65">{HERO.text}</p>

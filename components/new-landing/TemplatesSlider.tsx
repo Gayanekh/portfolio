@@ -8,7 +8,7 @@ import { ArrowUpRight, Pause, Play } from "lucide-react";
 import { Reveal, SplitWords } from "@/components/landing/Reveal";
 import { STYLE_LABEL } from "@/components/landing/sample-portfolios";
 import { TEMPLATES, TEMPLATES_INTRO } from "@/components/new-landing/content";
-import { ease, focusRing, sectionIntro, sectionTitle, text } from "@/components/landing/landing-ui";
+import { ease, focusRing, sectionIntro, sectionTitle, text, fluidText } from "@/components/landing/landing-ui";
 
 // The landing page's templates slider (components/landing/TemplatesSlider),
 // with the real templates and their screenshots in place of the sample ones.
@@ -283,7 +283,7 @@ export default function TemplatesSlider({ start = 0, arrival }: { start?: number
                         <div className="flex min-w-0 flex-col justify-between gap-8 p-3 md:p-6">
                           <div className="flex flex-col items-start gap-4">
                             <span className="rounded-full border border-foreground/10 bg-background px-3 py-1 text-xs font-medium">{STYLE_LABEL[template.style]}</span>
-                            <h3 className="m-0 text-balance text-[length:clamp(1.6rem,7vw,2.25rem)] font-medium leading-[1.05] tracking-[-0.03em] md:text-[length:clamp(1.75rem,3vw,2.75rem)]">{template.name}</h3>
+                            <h3 className={`m-0 text-balance ${fluidText.cardTitle} font-medium leading-[1.05] tracking-[-0.03em]`}>{template.name}</h3>
                             <p className={`${text.base} m-0 text-balance leading-snug text-foreground/75`}>{template.description}</p>
                             <span aria-hidden="true" className="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold">
                               {TEMPLATES_INTRO.link} <ArrowUpRight className="size-4" />

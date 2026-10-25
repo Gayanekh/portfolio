@@ -22,7 +22,7 @@ import ScaledPreview from "@/components/landing/ScaledPreview";
 import { CtaLink } from "@/components/landing/Section";
 import { STYLE_LABEL, TEMPLATES, type TemplateId } from "@/components/landing/sample-portfolios";
 import { templates as appTemplates } from "@/components/templates/template-data";
-import { displayTitle, ease, focusRing, glassPill, kicker, lead, secondaryOnCard, text } from "@/components/landing/landing-ui";
+import { displayTitle, ease, focusRing, glassPill, kicker, lead, secondaryOnCard, text, fit } from "@/components/landing/landing-ui";
 
 // One headline per template; everything else comes from the template data.
 const HEADLINE: Record<TemplateId, string> = {
@@ -473,7 +473,7 @@ export default function TemplatesSlider() {
                       aria-roledescription="slide"
                       aria-label={`${slide % COUNT + 1} of ${COUNT}`}
                       aria-hidden={copy || undefined}
-                      className="group/card relative mb-10 mr-5 w-full flex-none select-none md:w-[80%] lg:aspect-[1280/700] lg:w-[min(1280px,calc(100vw-9rem))]"
+                      className={`group/card relative mb-10 mr-5 w-full flex-none select-none md:w-[80%] lg:aspect-[1280/700] ${fit.slideWidth}`}
                     >
                       <motion.div
                         style={{ opacity: shell }}

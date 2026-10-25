@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { animate, motion, useInView, useMotionValue, useReducedMotionConfig, useSpring, useTransform, type MotionValue } from "framer-motion";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Pause, Play } from "lucide-react";
 import { TEMPLATES, TEMPLATES_INTRO } from "@/components/new-landing/content";
-import { ease, focusRing, text } from "@/components/landing/landing-ui";
+import { ease, focusRing, text, fluidText } from "@/components/landing/landing-ui";
 
 const COUNT = TEMPLATES.length;
 const GAP = 20;
@@ -63,7 +63,7 @@ function Slide({
             <span className="rounded-full border border-foreground/10 bg-background px-3 py-1 text-xs font-medium tabular-nums">
               {String((slide % COUNT) + 1).padStart(2, "0")} / {String(COUNT).padStart(2, "0")}
             </span>
-            <h3 className="m-0 text-balance text-[length:clamp(1.6rem,7vw,2.25rem)] font-medium leading-[1.05] tracking-[-0.03em] md:text-[length:clamp(1.75rem,3vw,2.75rem)]">{template.name}</h3>
+            <h3 className={`m-0 text-balance ${fluidText.cardTitle} font-medium leading-[1.05] tracking-[-0.03em]`}>{template.name}</h3>
             <p className={`${text.base} m-0 text-balance leading-snug text-foreground/75`}>{template.description}</p>
             <span aria-hidden="true" className="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold">
               {TEMPLATES_INTRO.link} <ArrowUpRight className="size-4" />

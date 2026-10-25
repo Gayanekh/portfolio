@@ -22,7 +22,7 @@ import BackToHome from "@/components/BackToHome";
 import Modal from "@/components/ui/modal";
 import Tooltip from "@/components/ui/tooltip";
 import LogoMark from "@/components/brand/LogoMark";
-import { ease, focusRing } from "@/components/landing/landing-ui";
+import { ease, focusRing, fluidText } from "@/components/landing/landing-ui";
 import { loadPortfolio, RequestError, sendPortfolio, unpublishPortfolio } from "@/lib/portfolio-client";
 import EditorAccount from "@/components/template-editor/EditorAccount";
 import PageNameField from "@/components/template-editor/PageNameField";
@@ -560,7 +560,7 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
               </div>
 
               <motion.div {...rise(0)} className="flex flex-col gap-2.5">
-                <h1 className="m-0 text-[length:clamp(1.9rem,5vw,2.25rem)] font-medium leading-none tracking-[-0.035em]">{template.name}</h1>
+                <h1 className={`m-0 ${fluidText.editorTitle} font-medium leading-none tracking-[-0.035em]`}>{template.name}</h1>
                 <p className="m-0 text-sm leading-relaxed text-foreground/55">{template.description}</p>
 
                 {/* Saving is off: the saved page could not be read, or no one is signed in */}

@@ -7,7 +7,7 @@ import BackToTop from "@/components/BackToTop";
 import GalleryCard from "@/components/gallery/GalleryCard";
 import { GALLERY_STYLES, SHOWN_TEMPLATES, type GalleryStyle } from "@/components/gallery/gallery-templates";
 import LandingHeader from "@/components/landing/LandingHeader";
-import { accentText, ease, focusRing } from "@/components/landing/landing-ui";
+import { accentText, ease, focusRing, fluidText } from "@/components/landing/landing-ui";
 
 const rise = (delay: number) => ({
   initial: { opacity: 0, y: 24 },
@@ -40,7 +40,7 @@ export default function TemplateGallery() {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-[1.15fr_1fr] md:gap-16">
           <motion.h1
             {...rise(0.05)}
-            className="m-0 text-balance text-[length:clamp(2.5rem,9vw,3.5rem)] font-medium leading-[1.02] tracking-[-0.035em] md:text-[length:clamp(3rem,5vw,5rem)]"
+            className={`m-0 text-balance ${fluidText.pageTitle} font-medium leading-[1.02] tracking-[-0.035em]`}
           >
             Find the template that fits your work.
           </motion.h1>

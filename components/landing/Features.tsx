@@ -5,7 +5,7 @@ import { AnimatePresence, motion, useInView, useMotionValueEvent, useReducedMoti
 import { ArrowLeftRight, Check, Lock } from "lucide-react";
 import { Reveal } from "@/components/landing/Reveal";
 import { PEOPLE, TEMPLATES, TEMPLATE_IMAGE } from "@/components/landing/sample-portfolios";
-import { displayTitle, ease, focusRing, kicker, lead, section } from "@/components/landing/landing-ui";
+import { displayTitle, ease, focusRing, kicker, lead, section, fluidText } from "@/components/landing/landing-ui";
 
 // Content from the landing-redesign branch's "Everything you need" section.
 type FeatureVisual = "templates" | "edit" | "phone" | "address" | "switch" | "draft";
@@ -273,7 +273,7 @@ export default function Features() {
                       tabIndex={selected ? 0 : -1}
                       onClick={() => show(k)}
                       onKeyDown={onTabKey}
-                      className={`${focusRing} block cursor-pointer text-left text-[length:clamp(1.75rem,3.4vw,3rem)] md:text-[length:clamp(1.25rem,min(3.4vw,4svh),3rem)] font-medium leading-[1.05] tracking-[-0.045em] transition-colors duration-300 ${
+                      className={`${focusRing} block cursor-pointer text-left ${fluidText.featureTitle} font-medium leading-[1.05] tracking-[-0.045em] transition-colors duration-300 ${
                         selected ? "text-foreground" : "text-foreground/30 hover:text-foreground/55"
                       }`}
                     >

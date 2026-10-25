@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus } from "lucide-react";
 import { Reveal } from "@/components/landing/Reveal";
-import { displayTitle, ease, focusRing, kicker, section } from "@/components/landing/landing-ui";
+import { displayTitle, ease, focusRing, kicker, section, fit, fluidText } from "@/components/landing/landing-ui";
 
 const FAQ: [string, string][] = [
   ["Can I edit my portfolio after publishing?", "Yes, as often as you like. Edits stay in your draft until you choose Publish changes, so visitors never see half-finished work. You can also unpublish at any time and publish again later."],
@@ -22,7 +22,7 @@ export default function Questions({ className = "bg-neutral-50" }: { className?:
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section id="faq" aria-label="Frequently asked questions" className={`${section} ${className} md:py-32`}>
+    <section id="faq" aria-label="Frequently asked questions" className={`${section} ${className} ${fit.sectionY}`}>
       <div className="mx-auto grid w-content-width grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] lg:gap-16">
         <Reveal className="flex max-w-[52rem] flex-col gap-5">
           <p className={kicker}>FAQ</p>
@@ -42,7 +42,7 @@ export default function Questions({ className = "bg-neutral-50" }: { className?:
                     onClick={() => setOpen(isOpen ? null : i)}
                     className={`${focusRing} flex w-full cursor-pointer items-center justify-between gap-6 py-6 text-left`}
                   >
-                    <span className="text-[length:clamp(1.15rem,1.8vw,1.5rem)] font-medium leading-snug tracking-[-0.02em] text-black">{question}</span>
+                    <span className={`${fluidText.question} font-medium leading-snug tracking-[-0.02em] text-black`}>{question}</span>
                     <span aria-hidden="true" className="grid size-6 shrink-0 place-items-center">
                       <AnimatePresence mode="wait" initial={false}>
                         <motion.span

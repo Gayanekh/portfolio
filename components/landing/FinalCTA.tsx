@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { AnimatePresence, motion, useMotionTemplate, useMotionValue, useReducedMotionConfig, useSpring, useTransform, type MotionValue } from "framer-motion";
 import { themeFontVariables } from "@/components/template-detail/theme-options";
 import { TEMPLATES, TEMPLATE_IMAGE } from "@/components/landing/sample-portfolios";
-import { ease, easedStops, focusRing } from "@/components/landing/landing-ui";
+import { ease, easedStops, focusRing, fluidText } from "@/components/landing/landing-ui";
 
 const BROWSE = {
   href: "/templates",
@@ -233,7 +233,7 @@ export default function FinalCTA() {
               whileInView="shown"
               viewport={{ once: true, amount: 0.5 }}
               transition={{ staggerChildren: 0.14 }}
-              className="m-0 flex flex-col items-center text-[length:clamp(1.75rem,3.5vw,3.25rem)] leading-[1.05] text-white [text-shadow:0_2px_40px_rgb(0_0_0/0.5)]"
+              className={`m-0 flex flex-col items-center ${fluidText.ctaTitle} leading-[1.05] text-white [text-shadow:0_2px_40px_rgb(0_0_0/0.5)]`}
             >
               <motion.span aria-hidden="true" variants={line} className="block font-[family-name:var(--tf-fraunces)] font-light tracking-[-0.01em]">
                 {BROWSE.lead}

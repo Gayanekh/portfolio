@@ -5,7 +5,7 @@ import { ArrowUp } from "lucide-react";
 import LogoMark from "@/components/brand/LogoMark";
 import { useLanding } from "@/components/landing/LandingProvider";
 import { Reveal } from "@/components/landing/Reveal";
-import { focusRing } from "@/components/landing/landing-ui";
+import { focusRing, fluidText } from "@/components/landing/landing-ui";
 
 const TAGLINE = "A simple way to create and publish a portfolio that feels like you.";
 
@@ -37,7 +37,7 @@ export default function LandingFooter() {
             <Link href="/" aria-label="Portory home" className={`${focusRing} grid size-14 place-items-center rounded-2xl bg-white transition-transform duration-300 hover:-translate-y-0.5`}>
               <LogoMark className="size-11" />
             </Link>
-            <p className="m-0 max-w-[26rem] text-balance text-[length:clamp(1.15rem,1.6vw,1.45rem)] font-light leading-[1.3] tracking-[-0.02em] text-white/85">{TAGLINE}</p>
+            <p className={`m-0 max-w-[26rem] text-balance ${fluidText.footerLead} font-light leading-[1.3] tracking-[-0.02em] text-white/85`}>{TAGLINE}</p>
           </Reveal>
 
           {/* The page's links. */}

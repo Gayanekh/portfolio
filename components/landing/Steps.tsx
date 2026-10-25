@@ -5,7 +5,7 @@ import { motion, useInView, useReducedMotionConfig } from "framer-motion";
 import { ArrowRight, Check, Copy, Link2, Plus } from "lucide-react";
 import { Reveal } from "@/components/landing/Reveal";
 import { PEOPLE, TEMPLATES, TEMPLATE_IMAGE } from "@/components/landing/sample-portfolios";
-import { focusRing, kicker, section } from "@/components/landing/landing-ui";
+import { focusRing, kicker, section, fit, fluidText } from "@/components/landing/landing-ui";
 
 // How it works on the landing page: the three steps in an editorial grid.
 // (The scrolling HowItWorks section is kept for use in other layouts.)
@@ -139,20 +139,20 @@ export default function Steps() {
   };
 
   return (
-    <section id="how-it-works" aria-label={INTRO.kicker} className={`${section} md:py-32`}>
+    <section id="how-it-works" aria-label={INTRO.kicker} className={`${section} ${fit.sectionY}`}>
       <Reveal>
         <div
           ref={gridRef}
           onMouseLeave={() => setPaused(false)}
           onBlur={(event) => !event.currentTarget.contains(event.relatedTarget) && setPaused(false)}
-          className="mx-auto grid w-content-width grid-cols-1 border-y border-foreground/10 lg:min-h-[40rem] lg:grid-cols-[minmax(0,1.25fr)_minmax(0,2.75fr)]"
+          className="mx-auto grid w-content-width grid-cols-1 border-y border-foreground/10 lg:min-h-[40rem] lg:grid-cols-[minmax(0,1.6fr)_minmax(0,2.75fr)] 2xl:grid-cols-[minmax(0,1.25fr)_minmax(0,2.75fr)]"
         >
           {/* The intro column: the section's label in the accent colour (as on the
               other sections), the heading, and the intro at the foot. */}
           <div className="flex flex-col justify-between gap-12 py-10 lg:py-8 lg:pr-10">
             <p className={kicker}>{INTRO.kicker}</p>
             <div className="flex items-end justify-between gap-6">
-              <h2 className="m-0 max-w-[14ch] text-balance text-[length:clamp(2.25rem,4vw,3.5rem)] font-light leading-[1.08] tracking-[-0.03em] text-foreground">{INTRO.title}.</h2>
+              <h2 className={`m-0 max-w-[14ch] text-balance ${fluidText.stepsTitle} font-light leading-[1.08] tracking-[-0.03em] text-foreground`}>{INTRO.title}.</h2>
               <ArrowRight aria-hidden="true" strokeWidth={1} className="mb-3 hidden size-9 shrink-0 text-foreground/70 lg:block" />
             </div>
             <p className="m-0 max-w-[19rem] text-sm leading-snug text-foreground/55">{INTRO.text}</p>
@@ -182,7 +182,7 @@ export default function Steps() {
                     )}
                   </span>
 
-                  <span aria-hidden="true" className={`select-none text-[length:clamp(4rem,6vw,5.75rem)] font-light leading-[0.85] tracking-[-0.04em] transition-colors duration-500 ${on ? "text-foreground/80" : "text-foreground/[0.12]"}`}>
+                  <span aria-hidden="true" className={`select-none ${fluidText.stepNumber} font-light leading-[0.85] tracking-[-0.04em] transition-colors duration-500 ${on ? "text-foreground/80" : "text-foreground/[0.12]"}`}>
                     {number(i)}
                   </span>
 
@@ -195,7 +195,7 @@ export default function Steps() {
                         type="button"
                         aria-pressed={on}
                         onClick={() => setStep(i)}
-                        className={`${focusRing} cursor-pointer rounded text-left text-[length:clamp(1.25rem,1.6vw,1.5rem)] font-light leading-[1.2] tracking-[-0.01em] text-foreground`}
+                        className={`${focusRing} cursor-pointer rounded text-left ${fluidText.stepTitle} font-light leading-[1.2] tracking-[-0.01em] text-foreground`}
                       >
                         {item.title}
                       </button>

@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Reveal } from "@/components/landing/Reveal";
-import { displayTitle, kickerOnDark, lead, section, solidButton } from "@/components/landing/landing-ui";
+import { displayTitle, kickerOnDark, lead, section, solidButton, fit } from "@/components/landing/landing-ui";
 
 // Content from the landing-redesign branch's "Claim your address" section.
 const CLAIM = {
@@ -30,7 +30,7 @@ export default function ClaimAddress() {
   const slug = toSlug(name);
 
   return (
-    <section aria-label={CLAIM.title} className={`${section} bg-foreground text-white md:py-32 [&_:focus-visible]:outline-white`}>
+    <section aria-label={CLAIM.title} className={`${section} bg-foreground text-white ${fit.sectionY} [&_:focus-visible]:outline-white`}>
       <Reveal className="mx-auto flex w-content-width flex-col items-center gap-6 text-center">
         <p className={kickerOnDark}>{CLAIM.kicker}</p>
         <h2 className={`${displayTitle} text-white`}>{CLAIM.title}</h2>

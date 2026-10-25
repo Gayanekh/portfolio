@@ -7,6 +7,7 @@ import AuthBadge from "@/components/auth/AuthBadge";
 import AuthGlow from "@/components/auth/AuthGlow";
 import { authSans, authSerif } from "@/components/auth/auth-fonts";
 import { requestHeadingFocus } from "@/components/auth/LoginExperience";
+import { fluidText } from "@/components/landing/landing-ui";
 import { getSafeNext } from "@/lib/auth-routing";
 
 type AuthMode = "login" | "register" | "recover";
@@ -84,7 +85,7 @@ export default function AuthShell({ header, children }: { header: React.ReactNod
         <div className="grid flex-1 gap-14 px-4 pb-10 pt-10 sm:px-6 min-[861px]:min-h-0 min-[861px]:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)] min-[861px]:items-center min-[861px]:gap-16 min-[861px]:px-12 min-[861px]:py-6 min-[1101px]:pl-[8vw] min-[1101px]:pr-[9vw]">
           {/* Headline, its notes and the switch link */}
           <section key={mode} className="grid gap-10">
-            <div className={`${authSerif.className} text-[clamp(48px,7vw,116px)] font-light leading-[0.98] tracking-[-0.025em] [@media(min-width:861px)_and_(max-height:760px)]:text-[clamp(48px,5.6vw,88px)]`}>
+            <div className={`${authSerif.className} ${fluidText.authTitle} font-light leading-[0.98] tracking-[-0.025em]`}>
               <div className="flex flex-wrap items-start gap-x-10 gap-y-4">
                 <p className={`${enter} fade-in slide-in-from-bottom-4 duration-700 m-0`}>{text.lines[0]}</p>
                 <p className={`${enter} ${authSans.className} fade-in delay-500 duration-700 ${note} mt-[0.4em] tracking-normal`}>{text.noteTop}</p>

@@ -22,6 +22,12 @@ const config: Config = {
       },
     },
     extend: {
+      // Full HD and large monitors; the other screens are Tailwind's own
+      // (see the responsive system note in components/landing/landing-ui.ts).
+      screens: {
+        "3xl": "1920px",
+        "4xl": "2400px",
+      },
       width: {
         "content-width": "min(85vw, clamp(40rem, 72.5vw, 100rem))",
       },
