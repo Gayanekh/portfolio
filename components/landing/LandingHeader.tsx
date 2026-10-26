@@ -209,6 +209,18 @@ export default function LandingHeader({ links = true }: { links?: boolean }) {
     return () => cancelAnimationFrame(frame);
   }, [scrollY]);
 
+  // The page's width without the scrollbar (--page-width), for the fixed bar.
+  useEffect(() => {
+    // The body's width: <html> keeps the scrollbar's strip (scrollbar-gutter),
+    // so its own width still includes it.
+    const root = document.documentElement;
+    const measure = () => root.style.setProperty("--page-width", `${document.body.clientWidth}px`);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(document.body);
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <>
       {links && <FloatingCta />}
@@ -222,10 +234,10 @@ export default function LandingHeader({ links = true }: { links?: boolean }) {
           <Bar compact={false} active={active} links={links} />
         </nav>
       </motion.div>
-      {/* Sticky in the page (not fixed to the window), so the bar is exactly
-          as wide as the page and its contents line up with every section's,
-          whatever space the scrollbar takes. It has no height of its own. */}
-      <div className="pointer-events-none sticky top-0 z-[1000] h-0">
+      {/* Fixed to the window (a sticky bar jitters while scrolling on iPhones),
+          and exactly as wide as the page (--page-width, without the desktop
+          scrollbar's strip), so its contents line up with every section's. */}
+      <div className="pointer-events-none fixed left-0 top-0 z-[1000] h-0 w-[var(--page-width,100%)]">
         <AnimatePresence>
           {compact && (
             <motion.nav
