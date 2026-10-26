@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, ChevronLeft, Copy, Eye, PanelLeftClose, Pen } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Copy, Eye, PanelLeftClose, Pen } from "lucide-react";
 import { PortfolioData, ProjectData } from "@/context/PortfolioContext";
 import HeroSection from "@/components/templates/HeroSection";
 import TemplateCard from "@/components/templates/TemplateCard";

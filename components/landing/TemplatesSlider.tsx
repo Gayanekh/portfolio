@@ -15,14 +15,12 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import { ExternalLink, MoveRight, Pause, Play } from "lucide-react";
+import { MoveRight, Pause, Play } from "lucide-react";
 import { useLanding } from "@/components/landing/LandingProvider";
 import { Reveal } from "@/components/landing/Reveal";
 import ScaledPreview from "@/components/landing/ScaledPreview";
-import { CtaLink } from "@/components/landing/Section";
 import { STYLE_LABEL, TEMPLATES, type TemplateId } from "@/components/landing/sample-portfolios";
-import { templates as appTemplates } from "@/components/templates/template-data";
-import { displayTitle, ease, focusRing, glassPill, kicker, lead, secondaryOnCard, text, fit } from "@/components/landing/landing-ui";
+import { displayTitle, ease, focusRing, glassPill, kicker, lead, text, fit } from "@/components/landing/landing-ui";
 
 // One headline per template; everything else comes from the template data.
 const HEADLINE: Record<TemplateId, string> = {
