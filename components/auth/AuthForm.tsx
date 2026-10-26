@@ -60,6 +60,9 @@ export default function AuthForm({ mode, next, verified = false }: AuthFormProps
           email,
           password,
           options: {
+            // The confirmation email's link comes back through the callback,
+            // which confirms the account and leads on to log in.
+            emailRedirectTo: `${window.location.origin}/auth/callback?${new URLSearchParams({ next: safeNext })}`,
             data: {
               first_name: firstName.trim(),
               last_name: lastName.trim(),

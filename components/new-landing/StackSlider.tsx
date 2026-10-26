@@ -74,7 +74,7 @@ export default function StackSlider({
   return (
     <div aria-roledescription="carousel" aria-label="Templates" className="flex w-full min-w-0 items-center justify-center gap-[clamp(1rem,calc(0.364rem_+_2.367vw),1.5rem)] md:justify-end">
       {/* The stage clips everything: no card ever shows outside it. */}
-      <div className="relative isolate aspect-square w-full min-w-0 max-w-[min(52svh,34rem)] flex-1 md:max-w-[min(80svh,46rem)] overflow-hidden rounded-3xl">
+      <div className="relative isolate aspect-square w-full min-w-0 max-w-[max(14rem,calc(100svh-6rem))] flex-1 md:max-w-[min(max(10rem,calc(100svh-11rem)),56rem)] overflow-hidden rounded-3xl">
         {items.map((item, k) => (
           <Card key={item.id} item={item} index={k} count={count} position={position} priority={k === 0} />
         ))}

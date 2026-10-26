@@ -10,7 +10,7 @@ import { requestHeadingFocus } from "@/components/auth/LoginExperience";
 import { fluidText } from "@/components/landing/landing-ui";
 import { getSafeNext } from "@/lib/auth-routing";
 
-type AuthMode = "login" | "register" | "recover";
+type AuthMode = "login" | "register" | "recover" | "verify";
 
 // Lets the form tell the shell a submission is in flight, so its switch link
 // stays inert like the form's own link.
@@ -35,6 +35,15 @@ const copy = {
     switchLead: "Have an account?",
     switchAction: "Log in",
     target: "login",
+  },
+  // The second step of signing up: the link sent by email.
+  verify: {
+    lines: ["One last", "step to your", "portfolio"],
+    noteTop: "We sent a link to your email, so we know the address is really yours.",
+    noteSide: "No email? Check your spam folder, or send it again.",
+    switchLead: "Wrong email?",
+    switchAction: "Sign up again",
+    target: "register",
   },
   // Forgot password and choosing a new one.
   recover: {
@@ -63,7 +72,7 @@ export default function AuthShell({ header, children }: { header: React.ReactNod
   const pathname = usePathname();
   const router = useRouter();
   const [busy, setBusy] = useState(false);
-  const mode: AuthMode = pathname === "/register" ? "register" : pathname === "/forgot-password" || pathname === "/reset-password" ? "recover" : "login";
+  const mode: AuthMode = pathname === "/register" ? "register" : pathname === "/verify-email" ? "verify" : pathname === "/forgot-password" || pathname === "/reset-password" ? "recover" : "login";
   const text = copy[mode];
 
   // Switch to the other mode, carrying a non-default destination along.
