@@ -15,14 +15,17 @@ const DESKTOP_WIDTH = 1280;
 // laid out at full desktop width and scaled down to fit (or at phone width on
 // mobile); a placeholder shows its image. Palette and font changes are sent to
 // the frame and the preview settles in (a soft fade out of a slight blur).
-// `fill` lets the desktop window take its column's full width; `address`
-// replaces the one in the browser bar and `height` the window's height.
+// `fill` lets the desktop window take its column's full width, and
+// `fillPhone` the phone window too (the template then lays itself out for
+// that width, e.g. a tablet's); `address` replaces the one in the browser
+// bar and `height` the window's height.
 export default function PreviewFrame({
   template,
   device,
   palette,
   font,
   fill = false,
+  fillPhone = false,
   address,
   height = "h-[min(76vh,46rem)]",
 }: {
@@ -31,6 +34,7 @@ export default function PreviewFrame({
   palette: string;
   font: string;
   fill?: boolean;
+  fillPhone?: boolean;
   address?: string;
   height?: string;
 }) {
@@ -96,7 +100,7 @@ export default function PreviewFrame({
     <motion.div
       layout
       transition={{ duration: 0.6, ease }}
-      className={`flex ${height} flex-col overflow-hidden rounded-2xl bg-white shadow-[0_1px_2px_rgb(0_0_0/0.04),0_24px_60px_-28px_rgb(0_0_0/0.35)] ring-1 ring-black/[0.06] ${device === "desktop" ? (fill ? "w-full" : "w-full max-w-[64rem]") : "w-[390px] max-w-full"}`}
+      className={`flex ${height} flex-col overflow-hidden rounded-2xl bg-white shadow-[0_1px_2px_rgb(0_0_0/0.04),0_24px_60px_-28px_rgb(0_0_0/0.35)] ring-1 ring-black/[0.06] ${device === "desktop" ? (fill ? "w-full" : "w-full max-w-[64rem]") : fillPhone ? "w-full" : "w-[390px] max-w-full"}`}
     >
       {/* A soft browser bar: three dots and the page's address */}
       <motion.div layout="position" aria-hidden="true" className="relative flex h-9 shrink-0 items-center gap-1.5 bg-gradient-to-b from-white to-neutral-50 px-3.5 shadow-[inset_0_-1px_0_rgb(0_0_0/0.05)]">

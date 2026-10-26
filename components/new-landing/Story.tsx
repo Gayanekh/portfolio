@@ -55,7 +55,7 @@ function Chapter({ index, setRef, children }: { index: number; setRef: (element:
     <div
       id={chapter.id}
       ref={setRef}
-      className="flex scroll-mt-[calc(30svh+10rem)] flex-col justify-center gap-8 py-14 lg:min-h-svh lg:scroll-mt-0 lg:py-24"
+      className="flex scroll-mt-[calc(30svh+10rem)] flex-col justify-center gap-8 py-[clamp(3.5rem,calc(-4rem_+_15.625vw),6rem)] lg:min-h-svh lg:scroll-mt-0"
     >
       <Reveal className="flex flex-col gap-5">
         <p className={kicker}>{chapter.tag}</p>
@@ -130,7 +130,7 @@ export default function Story() {
         {/* The stage: pinned while the chapters scroll. On phones it pins to the top,
             behind the floating header, on the page's own background, fading out at its foot
             so the chapters slip under it without an edge. */}
-        <div className="sticky top-0 z-10 order-1 -mx-[7.5vw] flex flex-col gap-4 bg-background px-[7.5vw] pb-3 pt-20 lg:order-2 lg:top-0 lg:mx-0 lg:h-svh lg:justify-center lg:bg-transparent lg:px-0 lg:pb-8 lg:pt-24">
+        <div className="sticky top-0 z-10 order-1 -mx-[7.5vw] flex flex-col gap-4 bg-background px-[7.5vw] pb-3 pt-[clamp(5rem,calc(2rem_+_6.25vw),6rem)] lg:order-2 lg:top-0 lg:mx-0 lg:h-svh lg:justify-center lg:bg-transparent lg:px-0 lg:pb-8">
           <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-full h-10 bg-gradient-to-b from-background to-transparent lg:hidden" />
 
           <nav aria-label="Steps" className="flex gap-3">
@@ -144,7 +144,7 @@ export default function Story() {
                     <motion.span initial={false} animate={{ scaleX: reached ? 1 : 0 }} transition={{ duration: 0.6, ease }} className="absolute inset-0 origin-left bg-primary" />
                   </span>
                   <span
-                    className={`flex min-w-0 items-baseline gap-1.5 text-xs transition-colors duration-300 sm:text-sm ${
+                    className={`flex min-w-0 items-baseline gap-1.5 text-[length:clamp(0.75rem,calc(0.555rem_+_0.8vw),0.875rem)] transition-colors duration-300 leading-[clamp(1rem,calc(0.61rem_+_1.6vw),1.25rem)] ${
                       current ? "text-foreground" : reached ? "text-foreground/55" : "text-foreground/35 group-hover:text-foreground/60"
                     }`}
                   >
@@ -179,12 +179,12 @@ export default function Story() {
             />
 
             {/* The status line: one pill that reshapes as the chapter changes. */}
-            <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center px-3 lg:bottom-5">
+            <div className="pointer-events-none absolute inset-x-0 bottom-[clamp(0.75rem,calc(-0.75rem_+_3.125vw),1.25rem)] flex justify-center px-3">
               <motion.p
                 layout
                 aria-live="polite"
                 transition={{ duration: 0.5, ease }}
-                className="m-0 flex max-w-full items-center gap-2 overflow-hidden rounded-full bg-white/90 px-4 py-2 text-[13px] text-neutral-500 shadow-[0_1px_2px_rgb(0_0_0/0.06),0_12px_30px_-12px_rgb(0_0_0/0.35)] ring-1 ring-foreground/5 backdrop-blur-xl"
+                className="m-0 flex max-w-full items-center gap-2 overflow-hidden rounded-full bg-white/90 px-4 py-2 text-[0.8125rem] text-neutral-500 shadow-[0_1px_2px_rgb(0_0_0/0.06),0_12px_30px_-12px_rgb(0_0_0/0.35)] ring-1 ring-foreground/5 backdrop-blur-xl"
               >
                 <AnimatePresence mode="popLayout" initial={false}>
                   <motion.span

@@ -55,10 +55,10 @@ function Slide({
       aria-label={`${template.name}, ${(slide % COUNT) + 1} of ${COUNT}`}
       aria-hidden={!middle || undefined}
       style={{ marginRight: GAP }}
-      className="relative mb-10 w-full flex-none select-none md:w-[80%] lg:aspect-[1280/700] lg:w-[min(1280px,calc(100vw-9rem))]"
+      className="relative mb-10 w-full flex-none select-none md:w-[80%] lg:aspect-[1280/700] lg:w-[min(80rem,calc(100vw-9rem))]"
     >
-      <div className="card grid h-full grid-cols-1 gap-4 rounded-[2rem] p-3 md:grid-cols-2 md:gap-8 md:p-4">
-        <div className="flex min-w-0 flex-col justify-between gap-8 p-3 md:p-6">
+      <div className="card grid h-full grid-cols-1 gap-[clamp(1rem,calc(-0.272rem_+_4.734vw),2rem)] rounded-[2rem] p-[clamp(0.75rem,calc(0.432rem_+_1.183vw),1rem)] md:grid-cols-2">
+        <div className="flex min-w-0 flex-col justify-between gap-8 p-[clamp(0.75rem,calc(-0.204rem_+_3.55vw),1.5rem)]">
           <div className="flex flex-col items-start gap-4">
             <span className="rounded-full border border-foreground/10 bg-background px-3 py-1 text-xs font-medium tabular-nums">
               {String((slide % COUNT) + 1).padStart(2, "0")} / {String(COUNT).padStart(2, "0")}
@@ -246,7 +246,7 @@ export default function TemplateSlider({
 
   return (
     <>
-      <div role="tablist" aria-label="Template" className="relative mx-auto mt-4 flex w-fit max-w-full flex-wrap justify-center gap-1 rounded bg-foreground/[0.04] p-1 md:mt-5">
+      <div role="tablist" aria-label="Template" className="relative mx-auto mt-[clamp(1rem,calc(0.682rem_+_1.183vw),1.25rem)] flex w-fit max-w-full flex-wrap justify-center gap-1 rounded bg-foreground/[0.04] p-1">
         {TEMPLATES.map((template, i) => {
           const active = i === index;
           return (
@@ -282,7 +282,7 @@ export default function TemplateSlider({
           setHovered(true);
         }}
         onMouseLeave={() => setHovered(false)}
-        className={`relative mt-8 md:mt-10 ${landed ? "" : "pointer-events-none"}`}
+        className={`relative mt-[clamp(2rem,calc(1.364rem_+_2.367vw),2.5rem)] ${landed ? "" : "pointer-events-none"}`}
       >
         <div ref={windowRef} className="mx-auto w-content-width">
           {/* Not clipped: the neighbouring cards run past the content width. */}

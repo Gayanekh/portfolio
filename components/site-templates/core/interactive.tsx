@@ -121,7 +121,7 @@ function ExpandRow({ item, index, open, onToggle, editing }: { item: ExpandItem;
     <>
       {/* The accent sweeping in on hover */}
       <span aria-hidden="true" className="absolute inset-0 origin-left scale-x-0 bg-primary transition-transform duration-500 ease-[cubic-bezier(0.65,0,0.35,1)] group-hover/row:scale-x-100" />
-      <span className="relative grid w-full grid-cols-[2.5rem_1fr_auto] items-baseline gap-x-4 gap-y-1 px-1 py-6 transition-colors duration-300 group-hover/row:text-card @xl:grid-cols-[3rem_1.2fr_1fr_auto_2rem] @xl:px-3 @xl:py-7">
+      <span className="relative grid w-full grid-cols-[2.5rem_1fr_auto] items-baseline gap-x-4 gap-y-1 px-1 py-[clamp(1.5rem,calc(0.976rem_+_2.151cqw),1.75rem)] transition-colors duration-300 group-hover/row:text-card @xl:grid-cols-[3rem_1.2fr_1fr_auto_2rem] @xl:px-3">
         <span className="col-start-1 row-start-1 text-[11px] font-medium tabular-nums tracking-[0.08em] text-muted-foreground transition-colors duration-300 group-hover/row:text-card/70">
           {String(index + 1).padStart(2, "0")}
         </span>
@@ -215,7 +215,7 @@ export function Marquee({ children, speed = 60 }: { children: ReactNode; speed?:
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="-mx-5 overflow-hidden border-0 border-y border-solid border-foreground/15 py-6 @xl:-ml-[calc(9cqw+max(0px,(100cqw-9cqw-max(9cqw,7.5rem)-1600px)/2))] @xl:-mr-[calc(max(9cqw,7.5rem)+max(0px,(100cqw-9cqw-max(9cqw,7.5rem)-1600px)/2))] @xl:py-8"
+      className="-mx-5 overflow-hidden border-0 border-y border-solid border-foreground/15 py-[clamp(1.5rem,calc(0.452rem_+_4.301cqw),2rem)] @xl:-ml-[calc(9cqw+max(0px,(100cqw-9cqw-max(9cqw,7.5rem)-1600px)/2))] @xl:-mr-[calc(max(9cqw,7.5rem)+max(0px,(100cqw-9cqw-max(9cqw,7.5rem)-1600px)/2))]"
     >
       {moving ? (
         <motion.div ref={trackRef} style={{ x }} className="flex w-max">
@@ -304,7 +304,7 @@ function Service({ card, index }: { card: ServiceCard; index: number }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.25 }}
       transition={{ duration: 0.9, ease, delay: (index % 2) * 0.12 }}
-      className={`group/card flex flex-col gap-5 bg-foreground/[0.04] p-3 @xl:p-4 ${SPANS[index % SPANS.length]}`}
+      className={`group/card flex flex-col gap-5 bg-foreground/[0.04] p-[clamp(0.75rem,calc(0.226rem_+_2.151cqw),1rem)] ${SPANS[index % SPANS.length]}`}
     >
       {/* The card's image box, gone with its image when that is deleted */}
       {!imageHidden && (
@@ -319,7 +319,7 @@ function Service({ card, index }: { card: ServiceCard; index: number }) {
         </span>
       </div>
       )}
-      <div className="flex flex-col gap-3 px-1 pb-2 @xl:px-2">
+      <div className="flex flex-col gap-3 px-[clamp(0.25rem,calc(-0.274rem_+_2.151cqw),0.5rem)] pb-2">
         <div className="flex items-center justify-between gap-4">
           <h3 className="m-0 font-display text-[length:clamp(1.4rem,2cqw,2.1rem)] font-bold uppercase leading-none tracking-[-0.03em]">
             {name.editing ? name.node : ended ? name.value : `${name.value}.`}

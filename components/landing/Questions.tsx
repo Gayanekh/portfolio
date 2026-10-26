@@ -23,8 +23,8 @@ export default function Questions({ className = "bg-neutral-50" }: { className?:
 
   return (
     <section id="faq" aria-label="Frequently asked questions" className={`${section} ${className} ${fit.sectionY}`}>
-      <div className="mx-auto grid w-content-width grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] lg:gap-16">
-        <Reveal className="flex max-w-[52rem] flex-col gap-5">
+      <div className="mx-auto grid w-content-width grid-cols-1 gap-[clamp(3rem,calc(0rem_+_6.25vw),4rem)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]">
+        <Reveal className="@container flex max-w-[52rem] flex-col gap-5 [--fit:12.14cqi]">
           <p className={kicker}>FAQ</p>
           <h2 className={displayTitle}>Questions, answered</h2>
         </Reveal>
@@ -76,7 +76,7 @@ export default function Questions({ className = "bg-neutral-50" }: { className?:
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 6 }}
                         transition={{ duration: 0.45, ease, delay: 0.08 }}
-                        className="m-0 max-w-[40rem] select-text pb-7 text-base leading-relaxed text-neutral-600 md:text-lg"
+                        className="m-0 max-w-[40rem] select-text pb-7 text-[length:clamp(1rem,calc(0.841rem_+_0.592vw),1.125rem)] leading-relaxed text-neutral-600"
                       >
                         {answer}
                       </motion.p>

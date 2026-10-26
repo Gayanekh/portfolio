@@ -30,7 +30,8 @@ export default function ClaimAddress() {
   const slug = toSlug(name);
 
   return (
-    <section aria-label={CLAIM.title} className={`${section} bg-foreground text-white ${fit.sectionY} [&_:focus-visible]:outline-white`}>
+    // FloatingCta watches this id to stay away from here on.
+    <section id="claim-address" aria-label={CLAIM.title} className={`${section} bg-foreground text-white ${fit.sectionY} [&_:focus-visible]:outline-white`}>
       <Reveal className="mx-auto flex w-content-width flex-col items-center gap-6 text-center">
         <p className={kickerOnDark}>{CLAIM.kicker}</p>
         <h2 className={`${displayTitle} text-white`}>{CLAIM.title}</h2>

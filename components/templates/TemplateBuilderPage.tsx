@@ -228,17 +228,17 @@ export default function TemplateBuilderPage({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.05 }}
-          className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 sm:px-8 lg:px-10 py-5 bg-background/80 backdrop-blur-xl"
+          className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-[clamp(1.5rem,calc(0.804rem_+_2.857vw),2.5rem)] py-5 bg-background/80 backdrop-blur-xl"
         >
           <Link
             href="/templates/demo/minimal"
-            className="text-[10px] sm:text-[11px] font-mono text-foreground/40 tracking-[0.15em] uppercase hover:text-foreground/70 transition-colors duration-300"
+            className="text-[length:clamp(0.625rem,calc(0.528rem_+_0.4vw),0.688rem)] font-mono text-foreground/40 tracking-[0.15em] uppercase hover:text-foreground/70 transition-colors duration-300"
           >
             Gayane Khachatryan
           </Link>
           <Link
             href="/templates/demo/minimal"
-            className="text-[10px] sm:text-[11px] font-mono tracking-[0.15em] uppercase text-foreground/30 hover:text-foreground/60 transition-colors duration-300"
+            className="text-[length:clamp(0.625rem,calc(0.528rem_+_0.4vw),0.688rem)] font-mono tracking-[0.15em] uppercase text-foreground/30 hover:text-foreground/60 transition-colors duration-300"
           >
             View Demo
           </Link>
@@ -248,8 +248,8 @@ export default function TemplateBuilderPage({
         <HeroSection />
 
         {/* Template Grid */}
-        <section className="px-6 sm:px-8 lg:px-10 pb-12">
-          <div className="max-w-[1120px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6">
+        <section className="px-[clamp(1.5rem,calc(0.804rem_+_2.857vw),2.5rem)] pb-12">
+          <div className="max-w-[1120px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-[clamp(1.25rem,calc(0.5rem_+_1.563vw),1.5rem)]">
             {templates.map((template, i) => (
               <TemplateCard
                 key={template.id}
@@ -275,7 +275,7 @@ export default function TemplateBuilderPage({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed bottom-0 left-0 right-0 z-50 p-4 sm:p-5"
+              className="fixed bottom-0 left-0 right-0 z-50 p-[clamp(1rem,calc(0.61rem_+_1.6vw),1.25rem)]"
             >
               <div className="max-w-[1120px] mx-auto">
                 <div className="bg-white/90 backdrop-blur-xl rounded-2xl border border-border/40 shadow-xl shadow-black/5 px-6 py-4 flex items-center justify-between gap-4">
@@ -305,7 +305,7 @@ export default function TemplateBuilderPage({
 
         {/* Footer */}
         <footer
-          className={`py-8 px-6 sm:px-8 lg:px-10 border-t border-border/40 ${
+          className={`py-8 px-[clamp(1.5rem,calc(0.804rem_+_2.857vw),2.5rem)] border-t border-border/40 ${
             selectedId ? "pb-28" : ""
           }`}
         >
@@ -363,7 +363,7 @@ export default function TemplateBuilderPage({
         <div
           className={`min-h-0 shrink-0 overflow-hidden bg-white lg:h-full lg:transition-[width,opacity] lg:duration-500 lg:ease-[cubic-bezier(0.22,1,0.36,1)] ${
             editorOpen
-              ? "lg:w-[420px] lg:opacity-100 xl:w-[460px]"
+              ? "lg:w-[clamp(26.25rem,calc(16.25rem_+_15.625vw),28.75rem)] lg:opacity-100"
               : "lg:w-0 lg:opacity-0"
           } ${mobileView === "editor" ? "flex flex-1 lg:flex-none" : "hidden lg:flex"}`}
           inert={!editorOpen ? true : undefined}
@@ -374,7 +374,7 @@ export default function TemplateBuilderPage({
             transition={{ duration: 0.45, delay: 0.1, ease: smooth }}
             className="flex h-full min-h-0 w-full flex-col lg:w-[420px] xl:w-[460px]"
           >
-            <div className="hidden shrink-0 px-6 pt-5 sm:px-7 lg:block">
+            <div className="hidden shrink-0 px-[clamp(1.5rem,calc(1.11rem_+_1.6vw),1.75rem)] pt-5 lg:block">
               <Link href="/templates" className={` group flex items-center gap-1.5 rounded text-xs font-semibold uppercase tracking-[0.08em] text-foreground no-underline`}>
               <ArrowLeft className="size-4 transition-transform duration-300 group-hover:-translate-x-0.5" />
               Templates
@@ -399,7 +399,7 @@ export default function TemplateBuilderPage({
               className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
               data-lenis-prevent
             >
-              <div className="p-6 pt-4 sm:p-7 sm:pt-4">
+              <div className="p-[clamp(1.5rem,calc(1.11rem_+_1.6vw),1.75rem)] pt-4 sm:pt-4">
                 <p className="mb-8 text-[13px] text-foreground/40 leading-relaxed">
                   Fill in your details. The preview updates live.
                 </p>
@@ -421,13 +421,13 @@ export default function TemplateBuilderPage({
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.15, ease: smooth }}
-          className={`order-first flex min-w-0 flex-col lg:order-none lg:h-full lg:flex-1 p-4 md:p-6 lg:transition-[padding] lg:duration-500 ${
+          className={`order-first flex min-w-0 flex-col lg:order-none lg:h-full lg:flex-1 p-[clamp(1rem,calc(0.364rem_+_2.367vw),1.5rem)] lg:transition-[padding] lg:duration-500 ${
             editorOpen ? "lg:pl-0" : "lg:pl-2"
           } ${mobileView === "preview" ? "min-h-0 flex-1" : "shrink-0"}`}
         >
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-white shadow-[0_0_25px_rgba(0,0,0,0.11)]">
             {/* Top bar */}
-            <div className="grid h-12 shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-border/40 px-3 sm:px-4">
+            <div className="grid h-12 shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-border/40 px-[clamp(0.75rem,calc(0.36rem_+_1.6vw),1rem)]">
               <div className="flex items-center gap-2">
                 <button
                   onClick={backToTemplates}
@@ -536,7 +536,7 @@ export default function TemplateBuilderPage({
             {loadState === "failed" && (
               <div
                 role="alert"
-                className="shrink-0 flex flex-wrap items-center justify-between gap-3 border-b border-red-200 bg-red-50 px-5 py-2 text-[11px] text-red-700 sm:px-6"
+                className="shrink-0 flex flex-wrap items-center justify-between gap-3 border-b border-red-200 bg-red-50 px-[clamp(1.25rem,calc(0.86rem_+_1.6vw),1.5rem)] py-2 text-[11px] text-red-700"
               >
                 <span>
                   Your saved portfolio could not be loaded. Saving and publishing
@@ -562,7 +562,7 @@ export default function TemplateBuilderPage({
                   transition={{ duration: 0.35, ease: smooth }}
                   className="shrink-0 overflow-hidden"
                 >
-                  <div className="flex flex-wrap items-center justify-end gap-3 border-b border-border/40 bg-white px-5 py-2 text-[10px] font-mono uppercase tracking-[0.1em] text-foreground/50 sm:px-6">
+                  <div className="flex flex-wrap items-center justify-end gap-3 border-b border-border/40 bg-white px-[clamp(1.25rem,calc(0.86rem_+_1.6vw),1.5rem)] py-2 text-[10px] font-mono uppercase tracking-[0.1em] text-foreground/50">
                     <span className="flex items-center gap-1.5">
                       <Check className="h-3 w-3 text-primary" /> Published successfully
                     </span>

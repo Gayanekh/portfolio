@@ -80,9 +80,9 @@ export default function TemplateCard({
         </div>
 
         {/* Info area */}
-        <div className="p-5 sm:p-6 bg-white">
+        <div className="p-[clamp(1.25rem,calc(0.86rem_+_1.6vw),1.5rem)] bg-white">
           <div className="flex items-center gap-3 mb-2">
-            <h3 className="text-base sm:text-lg font-normal text-foreground tracking-tight">
+            <h3 className="text-[length:clamp(1rem,calc(0.805rem_+_0.8vw),1.125rem)] font-normal text-foreground tracking-tight leading-[clamp(1.5rem,calc(1.11rem_+_1.6vw),1.75rem)]">
               {template.name}
             </h3>
             <span
@@ -148,7 +148,7 @@ export default function TemplateCard({
 
 function LightMockup({ images }: { images: string[] }) {
   return (
-    <div className="absolute inset-0 p-4 sm:p-6 flex gap-4 group-hover/card:scale-[1.02] transition-transform duration-700 ease-out">
+    <div className="absolute inset-0 p-[clamp(1rem,calc(0.22rem_+_3.2vw),1.5rem)] flex gap-4 group-hover/card:scale-[1.02] transition-transform duration-700 ease-out">
       {/* Sidebar skeleton */}
       <div className="hidden sm:flex flex-col gap-3 w-24 shrink-0 pt-1">
         <div className="w-10 h-10 rounded-full bg-black/[0.06]" />
@@ -194,7 +194,7 @@ function LightMockup({ images }: { images: string[] }) {
 
 function DarkMockup({ images }: { images: string[] }) {
   return (
-    <div className="absolute inset-0 p-4 sm:p-6 group-hover/card:scale-[1.02] transition-transform duration-700 ease-out">
+    <div className="absolute inset-0 p-[clamp(1rem,calc(0.22rem_+_3.2vw),1.5rem)] group-hover/card:scale-[1.02] transition-transform duration-700 ease-out">
       {/* Hero skeleton */}
       <div className="space-y-2 mb-4 pb-3 border-b border-white/[0.06]">
         <div className="h-1.5 bg-white/[0.05] rounded w-14" />

@@ -8,7 +8,7 @@ import { card, focusRing, primaryButton, section, sectionIntro, sectionTitle, ta
 // The reference FAQ section's skeleton, shared by every landing section:
 // section > content width > card, holding a centred header, the body, a
 // hairline divider and a footer row with a call to action.
-export const sectionCard = `${card} flex flex-col gap-6 rounded-2xl p-6 md:gap-10 md:p-10`;
+export const sectionCard = `${card} flex flex-col gap-[clamp(1.5rem,calc(0.228rem_+_4.734vw),2.5rem)] rounded-2xl p-[clamp(1.5rem,calc(0.228rem_+_4.734vw),2.5rem)]`;
 
 export function LandingSection({
   id,
@@ -75,7 +75,7 @@ export function SectionFooter({
   return (
     <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
       <div className="flex min-w-0 items-center gap-3">
-        <span aria-hidden="true" className="block size-10 shrink-0 overflow-hidden rounded-full md:size-11 2xl:size-12"><Art name={art} /></span>
+        <span aria-hidden="true" className="block size-[clamp(2.5rem,calc(2.344rem_+_0.734vw),3rem)] shrink-0 overflow-hidden rounded-full"><Art name={art} /></span>
         <div className="flex min-w-0 flex-col">
           <span className={`${text.base} font-semibold leading-snug text-foreground`}>{title}</span>
           <span className={`${text.base} leading-snug text-foreground/75`}>{detail}</span>

@@ -90,3 +90,13 @@ color-mix(in srgb, #fafafa 40%, transparent))}
 html:has([data-full-screen]) {
   scrollbar-gutter: auto;
 }
+
+/* Portory's own pages (marked data-site-scale) scale as one picture above
+   Full HD: the root size (1rem) is 16px up to 1920px wide and then 1/120 of
+   the screen's width, so text, spacing, photos and the page width (all in
+   rem or vw) grow together and a 2560px screen shows the 1920px design 4/3
+   larger. Below 1920px, sizes follow their own clamp()s (landing-ui.ts).
+   Portfolio templates and the editor keep the normal 16px. */
+html:has([data-site-scale]) {
+  font-size: max(100%, 0.8333vw);
+}

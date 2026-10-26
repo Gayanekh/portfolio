@@ -1,13 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { motion, useInView, useReducedMotionConfig } from "framer-motion";
-import { ArrowRight, Check, Copy, Link2, Plus } from "lucide-react";
+import { AnimatePresence, motion, useInView, useReducedMotionConfig } from "framer-motion";
+import { ArrowDown, ArrowUp, Check, Copy, Link2, MoveRight, Plus } from "lucide-react";
 import { Reveal } from "@/components/landing/Reveal";
 import { PEOPLE, TEMPLATES, TEMPLATE_IMAGE } from "@/components/landing/sample-portfolios";
-import { focusRing, kicker, section, fit, fluidText } from "@/components/landing/landing-ui";
+import { displayTitle, ease, focusRing, kicker, lead, section, fit, fluidText } from "@/components/landing/landing-ui";
 
-// How it works on the landing page: the three steps in an editorial grid.
+// How it works on the landing page: the three steps on one canvas.
 // (The scrolling HowItWorks section is kept for use in other layouts.)
 const INTRO = {
   kicker: "How it works",
@@ -16,9 +17,9 @@ const INTRO = {
 };
 
 const STEPS = [
-  { short: "Choose", title: "Choose a template", label: "Templates", text: "Pick a layout that suits how you like to present your work. Switch any time; your content stays put.", url: "portory.net/templates" },
-  { short: "Add your work", title: "Add your information and work", label: "Editor", text: "Fill in your details and work samples one section at a time. The live preview shows exactly how your page will look.", url: "portory.net/editor" },
-  { short: "Publish", title: "Publish and share", label: "Live", text: "Get a portory.net address to send to anyone. Edit any time and publish your changes when they're ready.", url: "portory.net/lena-fischer" },
+  { short: "Choose", title: "Choose a template", label: "Templates", text: "Pick a layout that suits how you like to present your work. Switch any time; your content stays put.", url: "portory.net/templates", cta: { href: "/templates", label: "See the templates" } },
+  { short: "Add your work", title: "Add your information and work", label: "Editor", text: "Fill in your details and work samples one section at a time. The live preview shows exactly how your page will look.", url: "portory.net/editor", cta: { href: "/register", label: "Start your portfolio" } },
+  { short: "Publish", title: "Publish and share", label: "Live", text: "Get a portory.net address to send to anyone. Edit any time and publish your changes when they're ready.", url: "portory.net/lena-fischer", cta: { href: "/register", label: "Get started" } },
 ];
 const COUNT = STEPS.length;
 // How long each step stays before the next while autoplaying.
@@ -109,117 +110,164 @@ function StepScreen({ step }: { step: number }) {
   );
 }
 
-// How it works as an editorial grid, columns divided by hairlines and nothing
-// boxed in: the intro in the first column (the heading set light and large,
-// pointing on to the steps), then one column per step with a large light
-// number, a short line naming the step, its title, a small label, the product
-// at that step in a little browser window and a short note. The steps move on
-// by themselves while on screen: the active one's number darkens and a line
-// fills along its top, while the others dim a little. Hovering, focusing or
-// clicking a column shows it and pauses; reduced motion stays still. On
-// phones the step columns scroll sideways.
+// The hatched square the reference sets beside the step and the picture.
+const hatch = "bg-[repeating-linear-gradient(135deg,currentColor_0_1px,transparent_1px_0.5rem)]";
+
+// How it works as one canvas, after the "The Story." reference: a light page
+// with a dark band down its right side, one step at a time. On the light side
+// a small vertical "Step 01" label with a hatched square, a large faded
+// number behind the step's bold title, its note and a link, and the three
+// steps named along the foot; the product at that step, in a small browser
+// window, sits across the edge of the dark band, and the band carries
+// up/down arrows with a dot per step. The steps move on by themselves while
+// on screen, pausing under the pointer or focus (still with reduced motion).
+// Below lg the same pieces stack: the step on light, then the window over the
+// start of the dark band, then the arrows and dots.
 export default function Steps() {
   const reduced = useReducedMotionConfig();
   const [step, setStep] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const gridRef = useRef<HTMLDivElement>(null);
-  const inView = useInView(gridRef, { amount: 0.4 });
-  const playing = !reduced && !paused && inView;
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(canvasRef, { amount: 0.4 });
+  const playing = !reduced && !hovered && !focused && inView;
 
-  // Autoplay; choosing a step restarts the interval because `step` changes.
+  // Autoplay; choosing a step restarts the wait because `step` changes.
   useEffect(() => {
     if (!playing) return;
     const timer = window.setTimeout(() => setStep((s) => (s + 1) % COUNT), AUTOPLAY_MS);
     return () => window.clearTimeout(timer);
   }, [step, playing]);
 
-  const show = (i: number) => {
-    setPaused(true);
-    setStep(i);
-  };
+  const go = (i: number) => setStep((i + COUNT) % COUNT);
+  const item = STEPS[step];
+  const fade = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -8 }, transition: { duration: 0.45, ease } };
+
+  const arrow = (dir: 1 | -1) => (
+    <button
+      type="button"
+      aria-label={dir < 0 ? "Previous step" : "Next step"}
+      onClick={() => go(step + dir)}
+      className={`${focusRing} grid size-10 cursor-pointer place-items-center rounded-full text-white/80 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-white`}
+    >
+      {dir < 0 ? (
+        <ArrowUp aria-hidden="true" strokeWidth={1.25} className="size-7 max-lg:-rotate-90" />
+      ) : (
+        <ArrowDown aria-hidden="true" strokeWidth={1.25} className="size-7 max-lg:-rotate-90" />
+      )}
+    </button>
+  );
 
   return (
     <section id="how-it-works" aria-label={INTRO.kicker} className={`${section} ${fit.sectionY}`}>
-      <Reveal>
-        <div
-          ref={gridRef}
-          onMouseLeave={() => setPaused(false)}
-          onBlur={(event) => !event.currentTarget.contains(event.relatedTarget) && setPaused(false)}
-          className="mx-auto grid w-content-width grid-cols-1 border-y border-foreground/10 lg:min-h-[40rem] lg:grid-cols-[minmax(0,1.6fr)_minmax(0,2.75fr)] 2xl:grid-cols-[minmax(0,1.25fr)_minmax(0,2.75fr)]"
-        >
-          {/* The intro column: the section's label in the accent colour (as on the
-              other sections), the heading, and the intro at the foot. */}
-          <div className="flex flex-col justify-between gap-12 py-10 lg:py-8 lg:pr-10">
+      <div className="mx-auto flex w-content-width flex-col gap-[clamp(2.5rem,calc(0.456rem_+_6.5vw),4rem)]">
+        <Reveal className="grid grid-cols-1 items-end gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,min(26rem,42%))] lg:gap-[min(4rem,6.5%)]">
+          <div className="@container flex flex-col gap-5 [--fit:8.47cqi]">
             <p className={kicker}>{INTRO.kicker}</p>
-            <div className="flex items-end justify-between gap-6">
-              <h2 className={`m-0 max-w-[14ch] text-balance ${fluidText.stepsTitle} font-light leading-[1.08] tracking-[-0.03em] text-foreground`}>{INTRO.title}.</h2>
-              <ArrowRight aria-hidden="true" strokeWidth={1} className="mb-3 hidden size-9 shrink-0 text-foreground/70 lg:block" />
+            <h2 className={displayTitle}>{INTRO.title}</h2>
+          </div>
+          <p className={lead}>{INTRO.text}</p>
+        </Reveal>
+
+        <Reveal>
+          {/* The canvas. Its sizes: --win the window, --rail the arrows'
+              column, --pad and --gap the spacing; the dark band covers the
+              rail and just under half the window. */}
+          <div
+            ref={canvasRef}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
+            onFocus={() => setFocused(true)}
+            onBlur={(event) => !event.currentTarget.contains(event.relatedTarget) && setFocused(false)}
+            className="relative isolate flex flex-col overflow-hidden rounded-2xl bg-white shadow-[0_1px_2px_rgb(0_0_0/0.04),0_40px_80px_-48px_rgb(0_0_0/0.35)] ring-1 ring-black/[0.04] [--gap:clamp(1.5rem,3vw,3.5rem)] [--pad:clamp(1.5rem,4.5vw,5rem)] [--rail:3.5rem] [--win:clamp(17.5rem,27vw,27rem)] lg:grid lg:min-h-[clamp(32rem,40vw,46rem)] lg:grid-cols-[minmax(0,1fr)_var(--win)_var(--rail)] lg:items-center lg:gap-x-[var(--gap)] lg:px-[var(--pad)] lg:py-[clamp(2.5rem,4vw,4.5rem)]"
+          >
+            <span aria-hidden="true" className="absolute inset-y-0 right-0 -z-10 hidden w-[calc(var(--pad)+var(--rail)+var(--gap)+var(--win)*0.45)] bg-foreground lg:block" />
+
+            {/* The step, on the light side. */}
+            <div className="flex h-full flex-col justify-between gap-10 px-[var(--pad)] pb-10 pt-8 lg:px-0 lg:py-0">
+              <p className="m-0 text-[0.8125rem] tabular-nums text-foreground/45">
+                {number(step)} <span className="text-foreground/25">/ {number(COUNT - 1)}</span>
+              </p>
+
+              <div className="relative pl-[clamp(2.25rem,3.5vw,3.75rem)] pt-[clamp(3.5rem,5vw,5rem)]">
+                {/* The vertical label and its hatched square. */}
+                <div aria-hidden="true" className="absolute left-0 top-0 flex flex-col items-center gap-3 text-foreground/20">
+                  <span className={`size-[clamp(2.75rem,4vw,3.75rem)] ${hatch}`} />
+                  <span className="rotate-180 text-[0.75rem] tracking-[0.12em] text-foreground/55 [writing-mode:vertical-rl]">Step {number(step)}</span>
+                </div>
+
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.div key={step} {...fade} className="relative">
+                    <span aria-hidden="true" className={`pointer-events-none absolute -left-[0.08em] -top-[0.42em] select-none ${fluidText.stepNumber} font-bold leading-none tracking-[-0.04em] text-foreground/[0.05]`}>
+                      {number(step)}
+                    </span>
+                    <h3 className={`relative m-0 ${fluidText.stepTitle} font-medium leading-[1.08] tracking-[-0.03em] text-foreground`}>{item.title}.</h3>
+                    <p className="relative m-0 mt-5 max-w-[28rem] text-pretty text-base leading-relaxed text-foreground/55">{item.text}</p>
+                    <Link href={item.cta.href} className={`${focusRing} group relative mt-7 inline-flex items-center gap-2 rounded text-[0.95rem] font-medium text-foreground no-underline`}>
+                      {item.cta.label}
+                      <MoveRight aria-hidden="true" className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+                    </Link>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+              {/* The steps named along the foot; each shows its step. */}
+              <div role="group" aria-label="Steps" className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[0.8125rem]">
+                {STEPS.map((s, i) => (
+                  <span key={s.short} className="flex items-center gap-3">
+                    {i > 0 && <span aria-hidden="true" className="size-1 rounded-full bg-foreground/25" />}
+                    <button
+                      type="button"
+                      aria-pressed={i === step}
+                      onClick={() => go(i)}
+                      className={`${focusRing} cursor-pointer rounded transition-colors duration-300 ${i === step ? "text-foreground" : "text-foreground/45 hover:text-foreground/75"}`}
+                    >
+                      {s.short}
+                    </button>
+                  </span>
+                ))}
+              </div>
             </div>
-            <p className="m-0 max-w-[19rem] text-sm leading-snug text-foreground/55">{INTRO.text}</p>
-          </div>
 
-          {/* The step columns: side by side from lg, a sideways scroll before that. */}
-          <div className="-mx-[7.5vw] flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain border-t border-foreground/10 px-[7.5vw] [scrollbar-width:none] lg:mx-0 lg:grid lg:grid-cols-3 lg:overflow-visible lg:border-t-0 lg:px-0 [&::-webkit-scrollbar]:hidden">
-            {STEPS.map((item, i) => {
-              const on = i === step;
-              return (
-                <article
-                  key={item.title}
-                  onMouseEnter={() => show(i)}
-                  onFocus={() => show(i)}
-                  className="relative flex w-[78vw] max-w-[22rem] shrink-0 snap-start flex-col border-l border-foreground/10 px-4 pb-8 pt-6 sm:w-[20rem] lg:w-auto lg:max-w-none lg:px-5"
-                >
-                  {/* The line along the column's top, filling while this step plays. */}
-                  <span aria-hidden="true" className="absolute inset-x-0 -top-px h-px overflow-hidden">
-                    {on && (
-                      <motion.span
-                        key={`${step}-${playing}`}
-                        initial={{ scaleX: playing ? 0 : 1 }}
-                        animate={{ scaleX: 1 }}
-                        transition={{ duration: playing ? AUTOPLAY_MS / 1000 : 0, ease: "linear" }}
-                        className="absolute inset-0 origin-left bg-primary"
-                      />
-                    )}
-                  </span>
-
-                  <span aria-hidden="true" className={`select-none ${fluidText.stepNumber} font-light leading-[0.85] tracking-[-0.04em] transition-colors duration-500 ${on ? "text-foreground/80" : "text-foreground/[0.12]"}`}>
-                    {number(i)}
-                  </span>
-
-                  <div className={`mt-12 flex flex-col gap-3 transition-opacity duration-500 lg:mt-20 ${on ? "opacity-100" : "opacity-55"}`}>
-                    <p className="m-0 text-[13px] text-foreground/60">
-                      Step {number(i)} — {item.short}
-                    </p>
-                    <h3 className="m-0">
-                      <button
-                        type="button"
-                        aria-pressed={on}
-                        onClick={() => setStep(i)}
-                        className={`${focusRing} cursor-pointer rounded text-left ${fluidText.stepTitle} font-light leading-[1.2] tracking-[-0.01em] text-foreground`}
-                      >
-                        {item.title}
-                      </button>
-                    </h3>
-
-                    <p className="m-0 mt-6 text-[13px] text-foreground/60">{item.label}</p>
-                    {/* The product at this step. */}
-                    <div aria-hidden="true" className="overflow-hidden rounded-lg bg-neutral-50 shadow-[0_1px_2px_rgb(0_0_0/0.05),0_18px_36px_-22px_rgb(0_0_0/0.35)] ring-1 ring-black/[0.05]">
-                      <div className="flex h-7 items-center gap-1 border-b border-foreground/5 bg-white px-2.5">
-                        <span className="size-1.5 rounded-full bg-foreground/15" />
-                        <span className="size-1.5 rounded-full bg-foreground/15" />
-                        <span className="size-1.5 rounded-full bg-foreground/15" />
-                        <span className="ml-1.5 min-w-0 flex-1 truncate rounded bg-foreground/[0.05] px-2 py-0.5 text-center text-[0.65rem] text-foreground/50">{item.url}</span>
-                      </div>
-                      <StepScreen step={i} />
-                    </div>
-                    <p className="m-0 text-[13px] leading-snug text-foreground/50">{item.text}</p>
+            {/* The product at this step, across the edge of the dark band (on
+                phones, over the start of it). */}
+            <div className="relative bg-[linear-gradient(180deg,transparent_42%,var(--foreground)_42%)] px-[var(--pad)] pb-6 lg:bg-none lg:p-0">
+              <span aria-hidden="true" className={`absolute bottom-0 right-[calc(var(--pad)-1.25rem)] size-[clamp(3.5rem,5vw,5rem)] text-white/25 lg:-bottom-[clamp(2rem,3vw,3rem)] lg:-right-[clamp(1.5rem,2.5vw,2.5rem)] ${hatch}`} />
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div key={step} {...fade} aria-hidden="true" className="relative mx-auto w-full max-w-[24rem] overflow-hidden rounded-xl bg-neutral-50 shadow-[0_2px_4px_rgb(0_0_0/0.08),0_40px_80px_-30px_rgb(0_0_0/0.55)] ring-1 ring-black/[0.06] lg:max-w-none">
+                  <div className="flex h-8 items-center gap-1 border-b border-foreground/5 bg-white px-3">
+                    <span className="size-1.5 rounded-full bg-foreground/15" />
+                    <span className="size-1.5 rounded-full bg-foreground/15" />
+                    <span className="size-1.5 rounded-full bg-foreground/15" />
+                    <span className="ml-1.5 min-w-0 flex-1 truncate rounded bg-foreground/[0.05] px-2 py-0.5 text-center text-[0.65rem] text-foreground/50">{item.url}</span>
                   </div>
-                </article>
-              );
-            })}
+                  <StepScreen step={step} />
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* The dark band's arrows and a dot per step (a row on phones). */}
+            <div className="flex items-center justify-center gap-5 bg-foreground pb-8 pt-4 lg:flex-col lg:bg-transparent lg:p-0">
+              {arrow(-1)}
+              <div className="flex items-center gap-2.5 lg:flex-col">
+                {STEPS.map((s, i) => (
+                  <button
+                    key={s.short}
+                    type="button"
+                    aria-label={`Step ${number(i)}: ${s.short}`}
+                    aria-current={i === step ? "step" : undefined}
+                    onClick={() => go(i)}
+                    className={`${focusRing} grid size-5 cursor-pointer place-items-center rounded-full focus-visible:outline-white`}
+                  >
+                    <span className={`block rounded-full transition-all duration-500 ${i === step ? "size-2 bg-white" : "size-1.5 bg-white/35"}`} />
+                  </button>
+                ))}
+              </div>
+              {arrow(1)}
+            </div>
           </div>
-        </div>
-      </Reveal>
+        </Reveal>
+      </div>
     </section>
   );
 }

@@ -49,13 +49,15 @@ const copy = {
 
 // Entrance animations (tailwindcss-animate); none with reduced motion.
 const enter = "animate-in fill-mode-both motion-reduce:animate-none";
-const note = "m-0 max-w-[26ch] text-[11.5px] leading-[1.5] text-foreground/75";
+const note = "m-0 max-w-[26ch] text-[0.7188rem] leading-[1.5] text-foreground/75";
 
 // The auth page as a quiet editorial spread: soft grey and gold glows on an
 // off-white page, a large light serif headline in staggered lines with small
 // notes beside it, the form on the right, a turning badge and long arrow at
 // the edge, and a thin labelled rule along the bottom. On desktop it fits one
-// screen; below 861px the parts stack and the page scrolls. Shared by the
+// screen; below 861px the parts stack and the page scrolls. On phones the
+// headline, its notes and the badge are left out, so the form (with its own
+// heading and switch link) comes first under the logo and Back. Shared by the
 // /login, /register, /forgot-password and /reset-password pages.
 export default function AuthShell({ header, children }: { header: React.ReactNode; children: React.ReactNode }) {
   const pathname = usePathname();
@@ -77,14 +79,14 @@ export default function AuthShell({ header, children }: { header: React.ReactNod
 
   return (
     <AuthBusyContext.Provider value={setBusy}>
-      <div className={`${authSans.className} relative isolate flex min-h-dvh flex-col overflow-hidden bg-[#f1f0ee] text-foreground antialiased min-[861px]:h-dvh`}>
+      <div data-site-scale className={`${authSans.className} relative isolate flex min-h-dvh flex-col overflow-hidden bg-[#f1f0ee] text-foreground antialiased min-[861px]:h-dvh`}>
         <AuthGlow />
 
-        <header className="flex min-h-11 items-center justify-between gap-3 px-4 pt-4 sm:px-6 min-[861px]:px-12 min-[861px]:pt-6">{header}</header>
+        <header className="flex min-h-11 items-center justify-between gap-3 px-[clamp(1rem,calc(-0.577rem_+_6.154vw),3rem)] pt-[clamp(1rem,calc(-0.448rem_+_3.62vw),1.5rem)]">{header}</header>
 
-        <div className="grid flex-1 gap-14 px-4 pb-10 pt-10 sm:px-6 min-[861px]:min-h-0 min-[861px]:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)] min-[861px]:items-center min-[861px]:gap-16 min-[861px]:px-12 min-[861px]:py-6 min-[1101px]:pl-[8vw] min-[1101px]:pr-[9vw]">
+        <div className="grid flex-1 gap-14 pl-[clamp(1rem,calc(-2.371rem_+_10.374vw),12.8rem)] pr-[clamp(1rem,calc(-3.187rem_+_12.182vw),14.4rem)] py-[clamp(1.5rem,calc(5.396rem_-_7.24vw),2.5rem)] min-[861px]:min-h-0 min-[861px]:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)] min-[861px]:items-center min-[861px]:gap-16">
           {/* Headline, its notes and the switch link */}
-          <section key={mode} className="grid gap-10">
+          <section key={mode} className="@container grid gap-10 max-sm:hidden">
             <div className={`${authSerif.className} ${fluidText.authTitle} font-light leading-[0.98] tracking-[-0.025em]`}>
               <div className="flex flex-wrap items-start gap-x-10 gap-y-4">
                 <p className={`${enter} fade-in slide-in-from-bottom-4 duration-700 m-0`}>{text.lines[0]}</p>
@@ -92,7 +94,7 @@ export default function AuthShell({ header, children }: { header: React.ReactNod
               </div>
               <p className={`${enter} fade-in slide-in-from-bottom-4 delay-100 duration-700 m-0`}>{text.lines[1]}</p>
               <div className="flex flex-wrap-reverse items-end gap-x-8 gap-y-4 min-[861px]:flex-nowrap">
-                <p className={`${enter} ${authSans.className} fade-in delay-700 duration-700 ${note} mb-[0.35em] max-w-[24ch] tracking-normal min-[861px]:w-[clamp(150px,13vw,210px)] min-[861px]:shrink-0`}>{text.noteSide}</p>
+                <p className={`${enter} ${authSans.className} fade-in delay-700 duration-700 ${note} mb-[0.35em] max-w-[24ch] tracking-normal min-[861px]:w-[min(13.125rem,25.7cqi)] min-[861px]:shrink-0`}>{text.noteSide}</p>
                 <p className={`${enter} fade-in slide-in-from-bottom-4 delay-200 duration-700 m-0`}>{text.lines[2]}</p>
               </div>
             </div>
@@ -100,12 +102,12 @@ export default function AuthShell({ header, children }: { header: React.ReactNod
             <div className={`${enter} fade-in delay-700 duration-700 flex items-center gap-5`}>
               <AuthBadge text="Portory · Portfolios · " />
               <p className="m-0 grid gap-1">
-                <span className="text-[11px] uppercase tracking-[0.2em] text-foreground/55">{text.switchLead}</span>
+                <span className="text-[0.6875rem] uppercase tracking-[0.2em] text-foreground/55">{text.switchLead}</span>
                 <Link
                   href={`/${text.target}`}
                   onClick={onSwitch}
                   aria-disabled={busy || undefined}
-                  className={`${authSerif.className} group inline-flex items-center gap-3 text-[22px] font-light text-foreground focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-foreground aria-disabled:pointer-events-none aria-disabled:opacity-50`}
+                  className={`${authSerif.className} group inline-flex items-center gap-3 text-[1.375rem] font-light text-foreground focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-foreground aria-disabled:pointer-events-none aria-disabled:opacity-50`}
                 >
                   {text.switchAction}
                   <svg aria-hidden="true" viewBox="0 0 48 12" className="w-10 transition-transform duration-500 group-hover:translate-x-1.5" fill="none" stroke="currentColor" strokeWidth="1">
@@ -117,7 +119,7 @@ export default function AuthShell({ header, children }: { header: React.ReactNod
           </section>
 
           {/* The form */}
-          <section className={`${enter} fade-in slide-in-from-bottom-6 delay-300 duration-700 w-full max-w-[380px] min-[861px]:max-h-full min-[861px]:justify-self-end min-[861px]:overflow-y-auto min-[861px]:py-2`}>
+          <section className={`@container ${enter} fade-in slide-in-from-bottom-6 delay-300 duration-700 w-full max-w-[23.75rem] min-[861px]:max-h-full min-[861px]:justify-self-end min-[861px]:overflow-y-auto min-[861px]:py-2`}>
             {children}
           </section>
         </div>
@@ -125,13 +127,13 @@ export default function AuthShell({ header, children }: { header: React.ReactNod
         {/* Turning badge and long arrow at the right edge */}
         <div aria-hidden="true" className="pointer-events-none absolute right-5 top-[24%] hidden flex-col items-center gap-3 min-[1101px]:flex">
           <AuthBadge text="Sign in · Portory · " />
-          <svg viewBox="0 0 24 180" className="h-[22vh] max-h-[180px] w-6 text-foreground" fill="none" stroke="currentColor" strokeWidth="1">
+          <svg viewBox="0 0 24 180" className="h-[22vh] max-h-[11.25rem] w-6 text-foreground" fill="none" stroke="currentColor" strokeWidth="1">
             <path d="M12 0v178M2 166c5 2 9 6 10 12 1-6 5-10 10-12" />
           </svg>
         </div>
 
         {/* Thin labelled rule along the bottom */}
-        <footer className="flex items-center gap-6 px-4 pb-5 text-[12px] font-semibold sm:px-6 min-[861px]:px-12 min-[1101px]:pl-[8vw] min-[1101px]:pr-[9vw]">
+        <footer className="flex items-center gap-6 pl-[clamp(1rem,calc(-2.371rem_+_10.374vw),12.8rem)] pr-[clamp(1rem,calc(-3.187rem_+_12.182vw),14.4rem)] pb-5 text-[0.75rem] font-semibold">
           <span>Portfolios that open doors</span>
           <span aria-hidden="true" className={`${enter} fade-in slide-in-from-left-8 duration-1000 h-px flex-1 bg-foreground/30`} />
           <span>Portory</span>

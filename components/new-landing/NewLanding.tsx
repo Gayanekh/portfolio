@@ -38,7 +38,7 @@ export default function NewLanding() {
           <FinalCTA />
         </main>
         <LandingFooter />
-        <BackToTop />
+        <BackToTop phone={false} />
       </div>
     </LandingProvider>
   );

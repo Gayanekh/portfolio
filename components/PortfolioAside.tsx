@@ -30,10 +30,10 @@ const PortfolioAside = ({ progress, content }: PortfolioAsideProps) => {
   const avatarFallback = content?.avatarFallback || "A";
 
   return (
-    <div className="w-full lg:max-w-[30%] lg:sticky lg:top-0 lg:h-screen flex flex-col justify-start lg:justify-end pt-4 sm:pt-6 lg:pt-0 pb-6 sm:pb-8 lg:pb-10 lg:pl-8 xl:pl-20 lg:pr-4 xl:pr-10 z-10 gap-10 sm:gap-12 lg:gap-32 xl:gap-30">
+    <div className="w-full lg:max-w-[30%] lg:sticky lg:top-0 lg:h-screen flex flex-col justify-start lg:justify-end pt-4 sm:pt-6 lg:pt-0 pb-[clamp(1.5rem,calc(0.804rem_+_2.857vw),2.5rem)] lg:pl-[clamp(2rem,calc(-10rem_+_18.75vw),5rem)] lg:pr-[clamp(1rem,calc(-5rem_+_9.375vw),2.5rem)] z-10 gap-10 sm:gap-12 lg:gap-32 xl:gap-30">
       <div className="space-y-8">
         <div className="flex flex-col gap-4">
-          <Avatar className="h-24 w-24 sm:h-30 sm:w-30 lg:h-32 lg:w-32 border border-border">
+          <Avatar className="h-[clamp(6rem,calc(4.227rem_+_7.273vw),8rem)] w-[clamp(6rem,calc(4.227rem_+_7.273vw),8rem)] border border-border">
             {avatarSrc && <AvatarImage src={avatarSrc} alt={name} />}
             <AvatarFallback className="text-sm font-mono text-foreground/70">
               {avatarFallback}

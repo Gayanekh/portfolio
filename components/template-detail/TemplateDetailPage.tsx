@@ -36,7 +36,7 @@ export default function TemplateDetailPage({ id }: { id: string }) {
     <div className={`${themeFontVariables} grid min-h-screen grid-cols-1 bg-background text-foreground lg:h-screen lg:grid-cols-[1fr_22rem] lg:overflow-hidden xl:grid-cols-[1fr_24rem]`}>
       {/* Preview */}
       <section aria-label={`${template.name} preview`} className="flex min-w-0 flex-col">
-        <div className="flex items-center gap-4 px-4 py-3 md:px-6">
+        <div className="flex items-center gap-4 px-[clamp(1rem,calc(0.364rem_+_2.367vw),1.5rem)] py-3">
           <Link href="/templates" className={`${focusRing} group flex items-center gap-1.5 rounded text-xs font-semibold uppercase tracking-[0.08em] text-foreground no-underline`}>
             <ArrowLeft className="size-4 transition-transform duration-300 group-hover:-translate-x-0.5" />
             Templates
@@ -56,13 +56,13 @@ export default function TemplateDetailPage({ id }: { id: string }) {
             ))}
           </div>
         </div>
-        <motion.div {...rise(0.1)} className="flex flex-1 items-center justify-center px-4 pb-8 pt-2 md:px-10 lg:pb-10">
+        <motion.div {...rise(0.1)} className="flex flex-1 items-center justify-center px-[clamp(1rem,calc(-0.908rem_+_7.101vw),2.5rem)] pb-[clamp(2rem,calc(0.5rem_+_3.125vw),2.5rem)] pt-2">
           <PreviewFrame template={template} device={device} palette={palette} font={font} />
         </motion.div>
       </section>
 
       {/* Sidebar */}
-      <aside className="border-t border-foreground/5 bg-white px-6 py-8 lg:overflow-y-auto lg:border-l lg:border-t-0 lg:px-8 lg:py-10" data-lenis-prevent>
+      <aside className="border-t border-foreground/5 bg-white px-[clamp(1.5rem,calc(0rem_+_3.125vw),2rem)] py-[clamp(2rem,calc(0.5rem_+_3.125vw),2.5rem)] lg:overflow-y-auto lg:border-l lg:border-t-0" data-lenis-prevent>
         <div className="mx-auto flex max-w-sm flex-col gap-8">
           <motion.div {...rise(0)} className="flex flex-col gap-3">
             <h1 className="m-0 text-[length:clamp(2rem,6vw,2.5rem)] font-medium leading-none tracking-[-0.03em]">{template.name}</h1>

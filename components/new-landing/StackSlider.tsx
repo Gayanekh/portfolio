@@ -72,7 +72,7 @@ export default function StackSlider({
 }) {
   const count = items.length;
   return (
-    <div aria-roledescription="carousel" aria-label="Templates" className="flex w-full min-w-0 items-center justify-center gap-4 md:justify-end md:gap-6">
+    <div aria-roledescription="carousel" aria-label="Templates" className="flex w-full min-w-0 items-center justify-center gap-[clamp(1rem,calc(0.364rem_+_2.367vw),1.5rem)] md:justify-end">
       {/* The stage clips everything: no card ever shows outside it. */}
       <div className="relative isolate aspect-square w-full min-w-0 max-w-[min(52svh,34rem)] flex-1 md:max-w-[min(80svh,46rem)] overflow-hidden rounded-3xl">
         {items.map((item, k) => (
@@ -88,7 +88,7 @@ export default function StackSlider({
             aria-current={k === active ? "true" : undefined}
             onClick={() => onSelect(k)}
             className={`${focusRing} w-1.5 cursor-pointer rounded border-0 p-0 transition-[height,background-color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
-              k === active ? "h-[22px] bg-foreground" : "h-1.5 bg-foreground/35 hover:bg-foreground/60"
+              k === active ? "h-[1.375rem] bg-foreground" : "h-1.5 bg-foreground/35 hover:bg-foreground/60"
             }`}
           />
         ))}

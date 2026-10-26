@@ -148,8 +148,8 @@ export default function AuthControls({ start = true, avatarOnly = false }: { sta
                     >
                       {/* Who is signed in */}
                       <motion.div variants={menuItem} className="px-5 pb-3 pt-2.5">
-                        <p className="m-0 truncate text-[15px] font-semibold text-foreground">{fullName}</p>
-                        {email && <p className="m-0 mt-1 truncate text-[13px] text-foreground/55">{email}</p>}
+                        <p className="m-0 truncate text-[0.9375rem] font-semibold text-foreground">{fullName}</p>
+                        {email && <p className="m-0 mt-1 truncate text-[0.8125rem] text-foreground/55">{email}</p>}
                       </motion.div>
     
                       {/* Profile: the account's settings page */}
@@ -158,7 +158,7 @@ export default function AuthControls({ start = true, avatarOnly = false }: { sta
                           href="/account"
                           role="menuitem"
                           onClick={() => setIsMenuOpen(false)}
-                          className="flex w-full items-center px-5 py-2.5 text-[15px] text-foreground no-underline transition-colors hover:bg-foreground/[0.04] focus-visible:bg-foreground/[0.04] focus-visible:outline-none"
+                          className="flex w-full items-center px-5 py-2.5 text-[0.9375rem] text-foreground no-underline transition-colors hover:bg-foreground/[0.04] focus-visible:bg-foreground/[0.04] focus-visible:outline-none"
                         >
                           Profile
                         </Link>
@@ -170,7 +170,7 @@ export default function AuthControls({ start = true, avatarOnly = false }: { sta
                         role="menuitem"
                         onClick={signOut}
                         disabled={leaving}
-                        className="flex w-full cursor-pointer items-center px-5 py-2.5 text-left text-[15px] text-foreground transition-colors hover:bg-foreground/[0.04] focus-visible:bg-foreground/[0.04] focus-visible:outline-none disabled:cursor-default disabled:opacity-50"
+                        className="flex w-full cursor-pointer items-center px-5 py-2.5 text-left text-[0.9375rem] text-foreground transition-colors hover:bg-foreground/[0.04] focus-visible:bg-foreground/[0.04] focus-visible:outline-none disabled:cursor-default disabled:opacity-50"
                       >
                         {leaving ? "Logging out..." : "Log out"}
                       </motion.button>

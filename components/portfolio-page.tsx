@@ -82,13 +82,13 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="bg-card min-h-screen px-4 sm:px-6 md:px-10 lg:px-16 xl:px-24 2xl:px-40">
+    <div className="bg-card min-h-screen px-[clamp(1rem,calc(-3.737rem_+_12.632vw),10rem)]">
       <PortfolioNav />
-      <div className="flex flex-col gap-8 sm:gap-10 md:gap-12 lg:flex-row lg:gap-16 xl:gap-20 pt-14 sm:pt-16 lg:pt-0">
+      <div className="flex flex-col gap-[clamp(2rem,calc(0.688rem_+_5vw),5rem)] lg:flex-row pt-14 sm:pt-16 lg:pt-0">
         <PortfolioAside progress={progress} />
         <div
           id="works"
-          className="grid gap-8 sm:gap-10 lg:gap-16 xl:gap-20 w-full pt-2 sm:pt-4 lg:pt-[320px] xl:pt-[350px] pb-8 sm:pb-10 lg:pb-20"
+          className="grid gap-[clamp(2rem,calc(0.688rem_+_5vw),5rem)] w-full pt-2 sm:pt-4 lg:pt-[320px] xl:pt-[350px] pb-[clamp(2rem,calc(-0.833rem_+_8.889vw),5rem)]"
         >
           {projects.map((project, i) => (
             <ProjectSection
@@ -101,7 +101,7 @@ const Index = () => {
 
           <section
             id="archive"
-            className="pt-8 lg:pt-12 border-t border-border"
+            className="pt-[clamp(2rem,calc(-1rem_+_6.25vw),3rem)] border-t border-border"
           >
             <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground mb-4">
               Archive
@@ -115,7 +115,7 @@ const Index = () => {
 
           <section
             id="about"
-            className="scroll-mt-24 pt-8 lg:pt-12 border-t border-border"
+            className="scroll-mt-24 pt-[clamp(2rem,calc(-1rem_+_6.25vw),3rem)] border-t border-border"
           >
             <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground mb-4">
               About
@@ -144,14 +144,14 @@ const Index = () => {
 
           <section
             id="contact"
-            className="pt-8 lg:pt-12 border-t border-border"
+            className="pt-[clamp(2rem,calc(-1rem_+_6.25vw),3rem)] border-t border-border"
           >
             <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground mb-4">
               Contact
             </p>
             <a
               href="mailto:hello@gayanekhachatryan.com"
-              className="text-lg sm:text-xl font-light text-foreground hover:text-primary transition-colors"
+              className="text-[length:clamp(1.125rem,calc(0.93rem_+_0.8vw),1.25rem)] font-light text-foreground hover:text-primary transition-colors leading-[28px]"
             >
               hello@gayanekhachatryan.com
             </a>

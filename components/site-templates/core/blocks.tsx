@@ -34,30 +34,30 @@ const section = cva("", {
     spacing: {
       none: "",
       // A header: tight under, more room over from the desktop layout up.
-      sm: "pb-3 pt-5 @xl:pt-8",
+      sm: "pb-3 pt-[clamp(1.25rem,calc(-0.323rem_+_6.452cqw),2rem)]",
       // A footer or a thin band.
-      xs: "py-6 @xl:py-8",
-      md: "py-14 @xl:py-20",
-      lg: "py-20 @xl:py-28",
+      xs: "py-[clamp(1.5rem,calc(0.452rem_+_4.301cqw),2rem)]",
+      md: "py-[clamp(3.5rem,calc(0.355rem_+_12.903cqw),5rem)]",
+      lg: "py-[clamp(5rem,calc(0.806rem_+_17.204cqw),7rem)]",
       // Right under the header, such as a hero.
-      hero: "pb-16 pt-2 @xl:pb-24 @xl:pt-0",
+      hero: "pb-[clamp(4rem,calc(-0.194rem_+_17.204cqw),6rem)] pt-2 @xl:pt-0",
       // A hero that fills the rest of the screen under a MenuHeader (6.75rem
       // tall), so the page opens on exactly one full view. Phones keep the
       // natural height.
       screen: "pb-16 pt-2 @xl:grid @xl:h-[calc(100svh-6.75rem)] @xl:min-h-[34rem] @xl:pb-0 @xl:pt-0",
       // A hero filling the whole screen, for a page whose header takes no
       // room (a SideRail). Phones keep the natural height, clear of the menu button.
-      viewport: "pb-16 pt-20 @xl:grid @xl:h-[100svh] @xl:min-h-[34rem] @xl:pb-0 @xl:pt-[6.75rem]",
+      viewport: "pb-16 pt-[clamp(5rem,calc(1.331rem_+_15.054cqw),6.75rem)] @xl:grid @xl:h-[100svh] @xl:min-h-[34rem] @xl:pb-0",
       // Room above only, for a section whose content fills the screens below.
-      start: "pt-20 @xl:pt-28",
+      start: "pt-[clamp(5rem,calc(0.806rem_+_17.204cqw),7rem)]",
       // Room below only, for a section that opens with a PinnedTitle.
-      end: "pb-20 @xl:pb-28",
+      end: "pb-[clamp(5rem,calc(0.806rem_+_17.204cqw),7rem)]",
       // At least one full screen, as on a stacking page.
-      full: "min-h-[100svh] py-20 @xl:py-28",
+      full: "min-h-[100svh] py-[clamp(5rem,calc(0.806rem_+_17.204cqw),7rem)]",
     },
     // The side margins: `wide` for airy, editorial pages.
     // `rail`: wide, with room on the right for a SideRail.
-    gutter: { normal: "px-5 @xl:px-8", wide: "px-5 @xl:px-[9cqw]", rail: "px-5 @xl:pl-[9cqw] @xl:pr-[max(9cqw,7.5rem)]" },
+    gutter: { normal: "px-[clamp(1.25rem,calc(-0.323rem_+_6.452cqw),2rem)]", wide: "px-5 @xl:px-[9cqw]", rail: "px-5 @xl:pl-[9cqw] @xl:pr-[max(9cqw,7.5rem)]" },
     divider: { true: "border-t border-foreground/15", false: "" },
     // Stays at the top of the screen while the page scrolls (a header).
     pinned: { true: "sticky top-0 z-40", false: "" },
@@ -97,7 +97,7 @@ const stack = cva("flex flex-col", {
   variants: {
     // `xl`: between the large blocks of a long section, such as an about page;
     // `loose`: the same blocks with a Rule between them.
-    gap: { none: "", xs: "gap-2", sm: "gap-4", md: "gap-6", lg: "gap-10", loose: "gap-12 @xl:gap-16", xl: "gap-20 @xl:gap-28" },
+    gap: { none: "", xs: "gap-2", sm: "gap-4", md: "gap-6", lg: "gap-10", loose: "gap-[clamp(3rem,calc(0.903rem_+_8.602cqw),4rem)]", xl: "gap-[clamp(5rem,calc(0.806rem_+_17.204cqw),7rem)]" },
     align: { start: "items-start", center: "items-center text-center", stretch: "" },
   },
   defaultVariants: { gap: "sm", align: "stretch" },
@@ -141,7 +141,7 @@ const grid = cva("grid grid-cols-1", {
     cols: { 2: "@xl:grid-cols-2", 3: "@xl:grid-cols-2 @3xl:grid-cols-3", 4: "@xl:grid-cols-2 @5xl:grid-cols-4" },
     // `wide`: more room between rows, for image-led cards.
     // `tight`: small items such as client names.
-    gap: { md: "gap-12 @xl:gap-8", wide: "gap-12 @xl:gap-x-8 @xl:gap-y-16", tight: "gap-x-6 gap-y-7" },
+    gap: { md: "gap-[clamp(2rem,calc(5.097rem_-_8.602cqw),3rem)]", wide: "gap-12 @xl:gap-x-8 @xl:gap-y-16", tight: "gap-x-6 gap-y-7" },
   },
   defaultVariants: { cols: 3, gap: "md" },
 });
@@ -294,7 +294,7 @@ export function Reveal({ effect = "rise", delay = 0, children }: { effect?: "ris
 // A section's title that stays at the top of the screen while the rest of
 // the section scrolls up under it. Put it first, in a section with `end` spacing.
 export function PinnedTitle({ children }: { children: ReactNode }) {
-  return <div className="sticky top-0 z-10 bg-card pb-12 pt-20 @xl:pb-16 @xl:pt-28">{children}</div>;
+  return <div className="sticky top-0 z-10 bg-card pb-[clamp(3rem,calc(0.903rem_+_8.602cqw),4rem)] pt-[clamp(5rem,calc(0.806rem_+_17.204cqw),7rem)]">{children}</div>;
 }
 
 // A row's label that stays in view, just under the PinnedTitle, while the
@@ -474,7 +474,7 @@ const bandInner = cva("px-5 @xl:pl-[9cqw] @xl:pr-[max(9cqw,7.5rem)]", {
   variants: {
     // `screen`: at least a full screen tall, its content centred in it.
     // `flush`: no room above and below, for content that sets its own.
-    height: { auto: "py-16 @xl:py-24", screen: "py-16 @xl:flex @xl:min-h-[100svh] @xl:items-center @xl:py-24", flush: "" },
+    height: { auto: "py-[clamp(4rem,calc(-0.194rem_+_17.204cqw),6rem)]", screen: "py-[clamp(4rem,calc(-0.194rem_+_17.204cqw),6rem)] @xl:flex @xl:min-h-[100svh] @xl:items-center", flush: "" },
   },
   defaultVariants: { height: "auto" },
 });
@@ -502,7 +502,7 @@ export function ArrowLead({ field, linkField, hrefField, href: toHref }: { field
   const target = useField(hrefField).value;
   const href = toHref ? toHref(target) : target;
   return (
-    <div className="flex w-full max-w-[46rem] items-center gap-5 text-[length:clamp(1.1rem,1.7cqw,1.7rem)] tracking-[-0.02em] @xl:gap-8">
+    <div className="flex w-full max-w-[46rem] items-center gap-[clamp(1.25rem,calc(-0.323rem_+_6.452cqw),2rem)] text-[length:clamp(1.1rem,1.7cqw,1.7rem)] tracking-[-0.02em]">
       <span className="shrink-0 opacity-80">{lead}</span>
       <span aria-hidden="true" className="relative h-px flex-1">
         <motion.span
@@ -626,7 +626,7 @@ const menuList = cva("m-0 flex list-none p-0", {
   variants: {
     size: {
       // A row of small links, as in a header.
-      inline: "justify-center gap-[18px] @xl:gap-11",
+      inline: "justify-center gap-[clamp(1.125rem,calc(-2.282rem_+_13.978cqw),2.75rem)]",
       // Plain small words in a row, as in a poster-like header.
       small: "gap-[2.5cqw]",
       // Large links one under another, as in a menu panel.

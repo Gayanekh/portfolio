@@ -117,7 +117,7 @@ function Title({ field }: { field: string }) {
 }
 
 const roundButton =
-  "grid size-12 cursor-pointer place-items-center rounded-full border border-solid border-foreground/20 bg-transparent text-foreground transition-colors duration-300 hover:border-foreground @xl:size-14";
+  "grid size-[clamp(3rem,calc(1.952rem_+_4.301cqw),3.5rem)] cursor-pointer place-items-center rounded-full border border-solid border-foreground/20 bg-transparent text-foreground transition-colors duration-300 hover:border-foreground";
 
 // Three thin lines, crossing into an X while open.
 function MenuIcon({ open }: { open: boolean }) {

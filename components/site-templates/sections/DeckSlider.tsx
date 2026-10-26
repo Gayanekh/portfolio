@@ -79,9 +79,9 @@ function Slide({
     >
       <motion.div
         style={{ opacity: frame }}
-        className="grid h-full grid-cols-1 gap-4 rounded-[2rem] bg-foreground/[0.04] p-3 ring-1 ring-foreground/[0.06] @3xl:grid-cols-2 @3xl:gap-8 @3xl:p-4"
+        className="grid h-full grid-cols-1 gap-[clamp(1rem,calc(-2rem_+_8.333cqw),2rem)] rounded-[2rem] bg-foreground/[0.04] p-[clamp(0.75rem,calc(0rem_+_2.083cqw),1rem)] ring-1 ring-foreground/[0.06] @3xl:grid-cols-2"
       >
-        <div className="flex min-w-0 flex-col justify-between gap-8 p-3 @3xl:p-6">
+        <div className="flex min-w-0 flex-col justify-between gap-8 p-[clamp(0.75rem,calc(-1.5rem_+_6.25cqw),1.5rem)]">
           <div className="flex flex-col items-start gap-4">
             <span className="rounded-full border border-solid border-foreground/10 bg-card px-3 py-1 text-xs font-medium">
               <FieldValue field={`${prefix}Category`} />
@@ -298,9 +298,9 @@ export default function DeckSlider({ projects, start = 0, arrival, editing = fal
           setHovered(true);
         }}
         onMouseLeave={() => setHovered(false)}
-        className={`relative mt-8 @xl:mt-10 ${landed ? "" : "pointer-events-none"}`}
+        className={`relative mt-[clamp(2rem,calc(0.952rem_+_4.301cqw),2.5rem)] ${landed ? "" : "pointer-events-none"}`}
       >
-        <div className="mx-auto w-full max-w-[1600px] px-5 @xl:px-8">
+        <div className="mx-auto w-full max-w-[1600px] px-[clamp(1.25rem,calc(-0.323rem_+_6.452cqw),2rem)]">
           <div ref={windowRef}>
             {/* Not clipped: the neighbouring cards run past the content width. */}
             <motion.div style={{ x }} aria-live={playing ? "off" : "polite"} className="flex">
@@ -344,7 +344,7 @@ export default function DeckSlider({ projects, start = 0, arrival, editing = fal
         </motion.div>
       </div>
 
-      <div className="mx-auto mt-6 flex w-full max-w-[1600px] items-center justify-center gap-4 px-5 @xl:px-8">
+      <div className="mx-auto mt-6 flex w-full max-w-[1600px] items-center justify-center gap-4 px-[clamp(1.25rem,calc(-0.323rem_+_6.452cqw),2rem)]">
         <div aria-hidden="true" className="ml-auto flex items-center gap-1.5">
           {projects.map((n, i) => (
             <span key={n} className={`h-1.5 rounded-full transition-all duration-500 ${i === index ? "w-6 bg-foreground" : "w-1.5 bg-foreground/25"}`} />

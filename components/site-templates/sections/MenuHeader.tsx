@@ -29,7 +29,7 @@ export default function MenuHeader({ gutter }: { gutter?: Gutter }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -16 }}
             transition={{ duration: 0.45, ease }}
-            className="absolute inset-x-0 top-0 bg-card px-5 pb-12 pt-24 shadow-[0_24px_48px_-24px_rgb(0_0_0/0.25)] @xl:px-[9cqw] @xl:pb-16"
+            className="absolute inset-x-0 top-0 bg-card px-5 pb-[clamp(3rem,calc(0.903rem_+_8.602cqw),4rem)] pt-24 shadow-[0_24px_48px_-24px_rgb(0_0_0/0.25)] @xl:px-[9cqw]"
           >
             <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-10">
               <div className="text-[13px] tracking-[0.03em] text-muted-foreground">{title}</div>

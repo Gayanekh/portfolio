@@ -32,7 +32,6 @@ const HEADLINE: Record<TemplateId, string> = {
   chapter: "Case studies with real outcomes",
 };
 
-const GAP = 20;
 const COUNT = TEMPLATES.length;
 // The four cards are rendered three times in a row. The slider always sits in
 // the middle copy, so there is a card on both sides; when it reaches the end
@@ -131,7 +130,7 @@ function PreviewPane({
     <motion.div
       ref={paneRef}
       style={flies ? { opacity } : undefined}
-      className="relative h-full min-h-[34rem] w-full overflow-hidden rounded-xl bg-white md:min-h-[32rem] lg:min-h-0"
+      className="relative h-full w-full overflow-hidden rounded-xl bg-white"
     >
       <ScaledPreview template={template.id} person={template.sample} base={1100} className="absolute inset-0 h-full w-full min-h-0 rounded-xl" />
       <AnimatePresence>
@@ -188,6 +187,7 @@ export default function TemplatesSlider() {
   const paneRefs = useRef<(HTMLDivElement | null)[]>([]);
   const posRef = useRef(HOME);
   const offsetRef = useRef(0);
+  const cardWidthRef = useRef(0);
   const lock = useRef(false);
   const landedRef = useRef(false);
   const inView = useInView(railRef, { amount: 0.25 });
@@ -214,7 +214,9 @@ export default function TemplatesSlider() {
     if (!element || !card) return;
     const observer = new ResizeObserver(() => {
       const width = element.offsetWidth;
-      const next = card.offsetWidth + GAP;
+      // The gap is the card's right margin, read here so it always matches it.
+      const next = card.offsetWidth + (parseFloat(getComputedStyle(card).marginRight) || 0);
+      cardWidthRef.current = card.offsetWidth;
       offsetRef.current = (width - card.offsetWidth) / 2;
       setStep(next);
       x.set(offsetRef.current - posRef.current * next);
@@ -343,7 +345,7 @@ export default function TemplatesSlider() {
     const element = windowRef.current;
     if (!element || !step) return null;
     const left = element.getBoundingClientRect().left + offsetRef.current;
-    const right = left + step - GAP;
+    const right = left + cardWidthRef.current;
     return clientX < left ? "prev" : clientX > right ? "next" : null;
   };
 
@@ -408,9 +410,9 @@ export default function TemplatesSlider() {
         </div>
 
         {/* The same opening as the other sections: label and title on the left, intro on the right. */}
-        <div className="w-content-width mx-auto flex flex-col gap-8 md:gap-10">
-          <Reveal className="grid grid-cols-1 items-end gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-16">
-            <div className="flex flex-col gap-5">
+        <div className="w-content-width mx-auto flex flex-col gap-[clamp(2rem,calc(1.364rem_+_2.367vw),2.5rem)]">
+          <Reveal className="grid grid-cols-1 items-end gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,min(26rem,42%))] lg:gap-[min(4rem,6.5%)]">
+            <div className="@container flex flex-col gap-5 [--fit:8.47cqi]">
               <p className={kicker}>Templates</p>
               <h2 className={displayTitle}>Templates for every kind of work</h2>
             </div>
@@ -446,7 +448,7 @@ export default function TemplatesSlider() {
           </Reveal>
         </div>
 
-        <div className="mt-8 md:mt-10">
+        <div className="mt-[clamp(2rem,calc(1.364rem_+_2.367vw),2.5rem)]">
           <div
             ref={railRef}
             role="group"
@@ -473,21 +475,21 @@ export default function TemplatesSlider() {
                       aria-roledescription="slide"
                       aria-label={`${slide % COUNT + 1} of ${COUNT}`}
                       aria-hidden={copy || undefined}
-                      className={`group/card relative mb-10 mr-5 w-full flex-none select-none md:w-[80%] lg:aspect-[1280/700] ${fit.slideWidth}`}
+                      className={`group/card relative mb-10 mr-10 w-full flex-none select-none ${fit.slideWidth}`}
                     >
                       <motion.div
                         style={{ opacity: shell }}
-                        className="card relative h-full rounded-[1.25rem] p-3 shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_18px_40px_-28px_rgb(0_0_0/0.35)] md:p-4"
+                        className="card relative h-full rounded-[1.25rem] p-[clamp(0.75rem,calc(0.432rem_+_1.183vw),1rem)] shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_18px_40px_-28px_rgb(0_0_0/0.35)]"
                       >
                         <PreviewPane slide={slide} flight={flight} position={position} ready={ready} paneRef={(element) => { paneRefs.current[slide] = element; }} />
 
                         {/* The template's panel over the image: its style, headline and
                             link always; on hover or focus it grows to show who it suits
                             and what to bring (always open where there is no hover). */}
-                        <div className="pointer-events-none absolute inset-x-6 bottom-6 z-[5] max-w-[28rem] rounded-xl bg-white/80 p-5 shadow-[0_0_0_1px_rgb(0_0_0/0.05),0_16px_40px_-20px_rgb(0_0_0/0.35)] backdrop-blur-xl backdrop-saturate-150 md:bottom-8 md:left-8 md:right-auto md:p-6">
+                        <div className="pointer-events-none absolute inset-x-6 bottom-[clamp(1.5rem,calc(0.864rem_+_2.367vw),2rem)] z-[5] max-w-[28rem] rounded-xl bg-white/80 p-[clamp(1.25rem,calc(0.932rem_+_1.183vw),1.5rem)] shadow-[0_0_0_1px_rgb(0_0_0/0.05),0_16px_40px_-20px_rgb(0_0_0/0.35)] backdrop-blur-xl backdrop-saturate-150 md:left-8 md:right-auto">
                           <div className="flex flex-col items-start gap-3">
                             <span className="rounded-full border border-foreground/10 bg-background px-3 py-1 text-xs font-medium">{STYLE_LABEL[template.style]}</span>
-                            <h3 className="m-0 text-[1.0625rem] font-medium leading-snug tracking-[-0.02em] sm:text-xl md:text-[1.375rem]">{HEADLINE[template.id]}</h3>
+                            <h3 className="m-0 text-[length:clamp(1.063rem,calc(0.452rem_+_2.381vw),1.375rem)] font-medium leading-snug tracking-[-0.02em]">{HEADLINE[template.id]}</h3>
                             <span aria-hidden="true" className="inline-flex items-center gap-2 text-sm font-semibold">
                               Use {template.name} <MoveRight className="size-5 transition-transform duration-300 group-hover/card:translate-x-1" />
                             </span>
@@ -495,11 +497,11 @@ export default function TemplatesSlider() {
                           <div className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-focus-within/card:grid-rows-[1fr] group-hover/card:grid-rows-[1fr] motion-reduce:transition-none [@media(hover:none)]:grid-rows-[1fr]">
                             <dl className="m-0 grid min-h-0 gap-4 overflow-hidden opacity-0 transition-opacity duration-500 group-focus-within/card:opacity-100 group-hover/card:opacity-100 [@media(hover:none)]:opacity-100">
                               <div className="mt-5 grid gap-1.5 border-t border-foreground/10 pt-4">
-                                <dt className="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/45">Made for</dt>
+                                <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-foreground/45">Made for</dt>
                                 <dd className={`${text.base} m-0 text-pretty leading-snug text-foreground/75`}>{template.bestFor}.</dd>
                               </div>
                               <div className="grid gap-2.5 border-t border-foreground/10 pt-4">
-                                <dt className="text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground/45">Works best with</dt>
+                                <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-foreground/45">Works best with</dt>
                                 <dd className="m-0 flex flex-wrap gap-1.5">
                                   {template.needs.map((need) => (
                                     <span key={need} className="rounded-full border border-foreground/10 bg-background px-3 py-1 text-xs font-medium text-foreground/80">{need}</span>
@@ -564,15 +566,15 @@ export default function TemplatesSlider() {
           <motion.div style={{ opacity: shell }}>
             {/* All the templates; where the slider is (the chosen one's bar fills
                 over the autoplay interval, full while paused); pause and play */}
-            <div className="w-content-width mx-auto mt-6 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+            <div className="w-content-width mx-auto mt-6 grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 sm:grid-cols-[1fr_auto_1fr]">
               <Link
                 href="/templates"
-                className={`${focusRing} group inline-flex h-11 items-center gap-2 justify-self-start rounded bg-foreground pl-5 pr-4 text-sm font-medium text-white no-underline transition-colors hover:bg-foreground/85`}
+                className={`${focusRing} group inline-flex h-11 items-center gap-2 justify-self-start whitespace-nowrap rounded bg-foreground pl-5 pr-4 text-sm font-medium text-white no-underline transition-colors hover:bg-foreground/85`}
               >
                 See all templates
                 <MoveRight aria-hidden="true" className="size-5 transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
-              <div aria-hidden="true" className="flex items-center gap-1.5">
+              <div aria-hidden="true" className="flex items-center gap-1.5 justify-self-center">
                 {TEMPLATES.map((template, i) => (
                   <motion.span
                     key={template.id}

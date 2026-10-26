@@ -103,7 +103,7 @@ export default function VerifyEmailForm({ email, next }: VerifyEmailFormProps) {
 
   return (
     <div className="w-full max-w-md">
-      <p className="mb-4 text-[10px] font-mono tracking-[0.25em] uppercase text-foreground/45">
+      <p className="mb-4 text-[0.625rem] font-mono tracking-[0.25em] uppercase text-foreground/45">
         Portory
       </p>
       <h1 className="text-4xl font-light tracking-tight text-foreground">

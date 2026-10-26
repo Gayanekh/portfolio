@@ -96,20 +96,20 @@ export default function HeroTemplates() {
 
   return (
     // The top padding keeps the content clear of the floating header.
-    <section ref={sectionRef} id="home" aria-label="Introduction" className="flex min-h-svh items-center pb-10 pt-[7.5rem] md:pt-28">
+    <section ref={sectionRef} id="home" aria-label="Introduction" className="flex min-h-svh items-center pb-10 pt-[clamp(7rem,calc(8.136rem_-_2.367vw),7.5rem)]">
       {/* Side by side: the text on the left, the card stack on the right (stacked on phones). */}
-      <div className="mx-auto grid w-content-width grid-cols-1 items-center gap-10 px-3 md:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] md:gap-10 lg:gap-12 xl:px-4 2xl:px-5">
+      <div className="mx-auto grid w-content-width grid-cols-1 items-center gap-[clamp(2.5rem,calc(0.96rem_+_3.2vw),3rem)] md:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)]">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease }}
-          className="flex max-w-[36rem] flex-col items-start gap-5"
+          className="@container flex max-w-[36rem] flex-col items-start gap-5"
         >
           {/* The page's largest heading: a step above the section titles at every width. */}
           <h1 className={`m-0 text-balance ${fluidText.heroTitle} font-semibold leading-[0.95] tracking-[-0.045em]`}>
             {HERO.title} <span className="text-foreground/40">{HERO.accent}</span>
           </h1>
-          <p className="m-0 max-w-[36rem] text-pretty text-base leading-relaxed text-foreground/65">{HERO.text}</p>
+          <p className={`m-0 max-w-[36rem] text-pretty ${fluidText.heroText} leading-relaxed text-foreground/65`}>{HERO.text}</p>
           <div className="flex flex-wrap gap-3">
             {/* FloatingCta watches this id to show the button again once it has scrolled away. */}
             <Link id="hero-cta" href={HERO.primary.href} className={`${heroButton} ${primaryButton}`}>

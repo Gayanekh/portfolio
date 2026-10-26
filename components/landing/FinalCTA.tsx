@@ -183,7 +183,7 @@ export default function FinalCTA() {
 
   // Pulled up into the address section's foot, so the wall's fade starts before any edge.
   return (
-    <section id="contact" aria-label={`${BROWSE.lead} ${BROWSE.name}`} className="relative -mt-16 scroll-mt-24 md:-mt-24">
+    <section id="contact" aria-label={`${BROWSE.lead} ${BROWSE.name}`} className="relative mt-[clamp(-6rem,calc(-1.456rem_-_9.467vw),-4rem)] scroll-mt-24">
       <div
         onPointerMove={lean}
         onPointerLeave={rest}
@@ -195,7 +195,7 @@ export default function FinalCTA() {
         <div aria-hidden="true" style={{ maskImage: WALL_MASK, WebkitMaskImage: WALL_MASK }} className="absolute inset-0 -z-10 [perspective:1400px]">
           <motion.div
             style={{ rotateX, rotateY, scale: wallScale }}
-            className="absolute -inset-x-[6%] -inset-y-[8%] grid grid-cols-4 grid-rows-3 gap-3 [transform-style:preserve-3d] md:gap-4"
+            className="absolute -inset-x-[6%] -inset-y-[8%] grid grid-cols-4 grid-rows-3 gap-[clamp(0.75rem,calc(0.432rem_+_1.183vw),1rem)] [transform-style:preserve-3d]"
           >
             {TILES.map((tile, i) => (
               <WallTile

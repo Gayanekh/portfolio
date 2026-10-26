@@ -236,7 +236,7 @@ export default function DeckShowcase({ projects }: { projects: number[] }) {
       {/* The intro stays in place for one view plus a step per project. */}
       <div ref={trackRef} style={still ? undefined : { height: `calc(100svh + ${((count - 2 + RISE) * STEP + HOLD) * 100}svh)` }}>
         <div className={`${still ? "" : "sticky top-0"} flex min-h-[100svh] items-center`}>
-          <div className="mx-auto grid w-full max-w-[1600px] grid-cols-1 items-center gap-8 px-5 py-20 @xl:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)] @xl:gap-[5cqw] @xl:px-8">
+          <div className="mx-auto grid w-full max-w-[1600px] grid-cols-1 items-center gap-8 px-[clamp(1.25rem,calc(-0.323rem_+_6.452cqw),2rem)] py-20 @xl:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)] @xl:gap-[5cqw]">
             <motion.div
               initial={still ? false : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -248,7 +248,7 @@ export default function DeckShowcase({ projects }: { projects: number[] }) {
                   <FieldValue field="accent" />
                 </span>
               </h1>
-              <p className="m-0 max-w-[34rem] text-pretty text-base leading-relaxed text-muted-foreground @xl:text-lg">
+              <p className="m-0 max-w-[34rem] text-pretty text-[length:clamp(1rem,calc(0.738rem_+_1.075cqw),1.125rem)] leading-relaxed text-muted-foreground">
                 <FieldValue field="text" />
               </p>
               <div className="flex flex-wrap gap-3">
@@ -271,8 +271,8 @@ export default function DeckShowcase({ projects }: { projects: number[] }) {
         </div>
       </div>
 
-      <div ref={sliderRef} className="pb-20 pt-12 @xl:pb-28">
-        <div className="mx-auto mb-8 flex w-full max-w-[1600px] flex-col items-center gap-2 px-5 text-center @xl:mb-10 @xl:px-8">
+      <div ref={sliderRef} className="pb-[clamp(5rem,calc(0.806rem_+_17.204cqw),7rem)] pt-12">
+        <div className="mx-auto mb-[clamp(2rem,calc(0.952rem_+_4.301cqw),2.5rem)] flex w-full max-w-[1600px] flex-col items-center gap-2 px-[clamp(1.25rem,calc(-0.323rem_+_6.452cqw),2rem)] text-center">
           <span className="mb-1 rounded-full border border-solid border-foreground/10 px-3 py-1 text-xs font-medium">
             <FieldValue field="workTag" />
           </span>

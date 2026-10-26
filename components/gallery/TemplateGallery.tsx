@@ -29,28 +29,28 @@ export default function TemplateGallery() {
   const styles = GALLERY_STYLES.filter((option) => option.id === "all" || SHOWN_TEMPLATES.some((t) => t.style === option.id));
 
   return (
-    <div className="relative min-h-screen bg-background text-foreground">
+    <div data-site-scale className="relative min-h-screen bg-background text-foreground">
       <LandingHeader links={false} />
 
-      <main className="mx-auto w-content-width pb-24 pt-28 md:pt-36">
+      <main className="mx-auto w-content-width pb-24 pt-[clamp(7rem,calc(4.456rem_+_9.467vw),9rem)]">
         <motion.div {...rise(0)}>
           <BackToHome className="mb-8" />
         </motion.div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-[1.15fr_1fr] md:gap-16">
+        <div className="@container grid grid-cols-1 gap-6 md:grid-cols-[1.15fr_1fr] md:gap-[min(4rem,6.5%)]">
           <motion.h1
             {...rise(0.05)}
             className={`m-0 text-balance ${fluidText.pageTitle} font-medium leading-[1.02] tracking-[-0.035em]`}
           >
             Find the template that fits your work.
           </motion.h1>
-          <motion.p {...rise(0.15)} className="m-0 max-w-[34rem] text-base leading-relaxed text-foreground/70 md:pt-3 md:text-lg">
+          <motion.p {...rise(0.15)} className="m-0 max-w-[34rem] text-[length:clamp(1rem,calc(0.841rem_+_0.592vw),1.125rem)] md:text-[length:clamp(0.9375rem,min(calc(0.841rem_+_0.592vw),1.818cqi),1.125rem)] leading-relaxed text-foreground/70 md:pt-3">
             Whether you teach, photograph, consult or build, there is a Portory template made for the way you work.
             Every one is responsive, easy to edit with a live preview, and ready to publish on your own portory.net link.
           </motion.p>
         </div>
 
-        <motion.div {...rise(0.25)} className="mt-14 flex flex-col gap-4 md:mt-20 md:flex-row md:items-center md:justify-between">
+        <motion.div {...rise(0.25)} className="mt-[clamp(3.5rem,calc(1.592rem_+_7.101vw),5rem)] flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <p aria-live="polite" className="m-0 text-sm font-medium">
             <motion.span key={shown.length} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, ease }} className={`${accentText} inline-block`}>
               {shown.length}
@@ -81,7 +81,7 @@ export default function TemplateGallery() {
           </div>
         </motion.div>
 
-        <motion.ul layout className="m-0 mt-8 grid grid-cols-1 gap-x-8 gap-y-10 p-0 sm:grid-cols-2 lg:grid-cols-3 md:mt-12">
+        <motion.ul layout className="m-0 mt-[clamp(2rem,calc(0.728rem_+_4.734vw),3rem)] grid grid-cols-1 gap-x-8 gap-y-10 p-0 sm:grid-cols-2 lg:grid-cols-3">
           <AnimatePresence mode="popLayout" initial={false}>
             {shown.map((template, i) => (
               <GalleryCard key={template.id} template={template} index={i} />

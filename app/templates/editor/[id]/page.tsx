@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import PhoneEditorGate from "@/components/template-editor/PhoneEditorGate";
 import TemplateBuilderPageEditor from "@/components/template-editor/TemplateBuilderPageEditor";
-import { getSiteTemplate } from "@/components/site-templates/registry";
+import { getSiteTemplate, siteTemplateDemoHref } from "@/components/site-templates/registry";
 import TemplateBuilderPage from "@/components/templates/TemplateBuilderPage";
 import { templates as earlierTemplates } from "@/components/templates/template-data";
 
@@ -9,7 +10,8 @@ import { templates as earlierTemplates } from "@/components/templates/template-d
 const earlierTemplate = (id: string) => earlierTemplates.find((template) => template.id === id);
 
 // The editor for a template: the page editor for a site template (see
-// components/site-templates), the earlier builder for Minimal and Bold.
+// components/site-templates), the earlier builder for Minimal and Bold. On a
+// phone a short page comes first (PhoneEditorGate).
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   const name = getSiteTemplate(id)?.name ?? earlierTemplate(id)?.name;
@@ -18,7 +20,19 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 export default async function TemplateEditorPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  if (earlierTemplate(id)) return <TemplateBuilderPage requestedTemplate={id} shouldEdit />;
-  if (!getSiteTemplate(id)) notFound();
-  return <TemplateBuilderPageEditor backHref="/templates" templateId={id} />;
+  const earlier = earlierTemplate(id);
+  if (earlier) {
+    return (
+      <PhoneEditorGate id={id} name={earlier.name} demoHref={id === "bold" ? "/demo/bold" : siteTemplateDemoHref(id)}>
+        <TemplateBuilderPage requestedTemplate={id} shouldEdit />
+      </PhoneEditorGate>
+    );
+  }
+  const template = getSiteTemplate(id);
+  if (!template) notFound();
+  return (
+    <PhoneEditorGate id={id} name={template.name} demoHref={siteTemplateDemoHref(id)}>
+      <TemplateBuilderPageEditor backHref="/templates" templateId={id} />
+    </PhoneEditorGate>
+  );
 }

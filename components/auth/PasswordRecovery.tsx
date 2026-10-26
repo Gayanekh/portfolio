@@ -7,6 +7,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { authSerif } from "@/components/auth/auth-fonts";
+import { fluidText } from "@/components/landing/landing-ui";
 import { useSetAuthBusy } from "@/components/auth/AuthShell";
 import {
   MIN_PASSWORD_LENGTH,
@@ -34,10 +35,10 @@ function Intro({ title, text }: { title: string; text: string }) {
   }, []);
   return (
     <div className="grid gap-2">
-      <h1 ref={heading} tabIndex={-1} className={`${authSerif.className} text-[38px] font-light leading-tight tracking-[-0.02em] outline-none`}>
+      <h1 ref={heading} tabIndex={-1} className={`${authSerif.className} ${fluidText.authFormTitle} font-light leading-tight tracking-[-0.02em] outline-none`}>
         {title}
       </h1>
-      <p className="text-[15px] leading-relaxed text-foreground/70">{text}</p>
+      <p className="text-[0.9375rem] leading-relaxed text-foreground/70">{text}</p>
     </div>
   );
 }
@@ -132,7 +133,7 @@ export function ForgotPasswordForm({ email: initialEmail = "", expired = false }
           />
         </div>
         {error && (
-          <p id="recover-error" role="alert" className="text-[13px] text-destructive">
+          <p id="recover-error" role="alert" className="text-[0.8125rem] text-destructive">
             {error}
           </p>
         )}
@@ -240,14 +241,14 @@ export function ResetPasswordForm({ signedIn }: { signedIn: boolean }) {
             {index === 0 && (
               <span className="absolute right-0 top-1/2 flex -translate-y-1/2 items-center">
                 <button type="button" aria-label={show ? "Hide passwords" : "Show passwords"} aria-pressed={show} onClick={() => setShow((value) => !value)} className={iconButtonClass}>
-                  {show ? <EyeOff aria-hidden="true" className="size-[18px]" /> : <Eye aria-hidden="true" className="size-[18px]" />}
+                  {show ? <EyeOff aria-hidden="true" className="size-[1.125rem]" /> : <Eye aria-hidden="true" className="size-[1.125rem]" />}
                 </button>
               </span>
             )}
           </div>
         ))}
         {error && (
-          <p id="reset-error" role="alert" className="text-[13px] text-destructive">
+          <p id="reset-error" role="alert" className="text-[0.8125rem] text-destructive">
             {error}
           </p>
         )}

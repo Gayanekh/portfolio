@@ -49,7 +49,7 @@ function Links({ active }: { active: string | null }) {
   const lit = hovered ?? active;
 
   return (
-    <ul onMouseLeave={() => setHovered(null)} className="m-0 ml-auto hidden list-none items-center gap-x-4 p-0 lg:flex xl:gap-x-6">
+    <ul onMouseLeave={() => setHovered(null)} className="m-0 ml-auto hidden list-none items-center gap-x-[clamp(0.25rem,calc(-4.75rem_+_7.8125vw),1.5rem)] p-0 lg:flex">
       {LINKS.map((link) => {
         const current = link.href === active;
         return (
@@ -60,7 +60,7 @@ function Links({ active }: { active: string | null }) {
               onMouseEnter={() => setHovered(link.href)}
               onFocus={() => setHovered(link.href)}
               onBlur={() => setHovered(null)}
-              className={`${focusRing} relative flex items-center whitespace-nowrap rounded px-2 py-2 text-[15px] no-underline transition-colors duration-200 ${
+              className={`${focusRing} relative flex items-center whitespace-nowrap rounded px-2 py-2 text-[0.9375rem] no-underline transition-colors duration-200 ${
                 lit === link.href ? "text-foreground" : "text-foreground/60"
               }`}
             >
@@ -102,17 +102,17 @@ function Bar({ compact, active, links }: { compact: boolean; active: string | nu
             menu, grouped on the right. Without links, the full bar drops its
             side padding so the logo and Log in line up with the page content. */}
         <div
-          className={`flex items-center gap-x-3 xl:gap-x-4 ${
-            compact ? "py-2 pl-4 pr-2 xl:pl-5" : links ? "p-3 xl:p-4 2xl:p-5" : "py-3 xl:py-4 2xl:py-5"
+          className={`flex items-center gap-x-[clamp(0.75rem,calc(-0.25rem_+_1.563vw),1rem)] ${
+            compact ? "py-4" : links ? "py-[clamp(0.75rem,calc(-0.311rem_+_1.633vw),1.25rem)]" : "py-[clamp(0.75rem,calc(-0.311rem_+_1.633vw),1.25rem)]"
           }`}
         >
           <Link href="/" aria-label="Portory home" className={`${focusRing} flex shrink-0 items-center rounded`}>
-            <Logo className={`${compact ? "h-8" : "h-9"} w-auto transition-[height] duration-300`} />
+            <Logo className="h-7 w-auto" />
           </Link>
 
           {links && <Links active={active} />}
 
-          <div className={`ml-auto flex shrink-0 items-center gap-2 [&_a]:no-underline ${links ? "lg:ml-6 xl:ml-10" : ""}`}>
+          <div className={`ml-auto flex shrink-0 items-center gap-2 [&_a]:no-underline ${links ? "lg:ml-[clamp(1.5rem,calc(-2.5rem_+_6.25vw),2.5rem)]" : ""}`}>
             <div className={links ? "hidden sm:block" : undefined}>
               <AuthControls start={links} avatarOnly />
             </div>
@@ -189,9 +189,9 @@ function Bar({ compact, active, links }: { compact: boolean; active: string | nu
 }
 
 // At the top of the page the full bar sits in the page and scrolls away with
-// it. Once it is gone, the compact bar slides down and floats just below the
-// top of the screen: frosted white glass, rounded to suit its buttons and softly
-// shadowed, the width of the page's content. Scrolling back to the top slides
+// it. Once it is gone, the compact bar slides down attached to the top of the
+// screen: frosted glass in the page's own background colour, with no frame
+// or shadow, across the screen with its contents at the page's width. Scrolling back to the top slides
 // it away and the full bar is there. Other pages pass `links={false}` for the
 // same header without the section links, the menu, Get started and the
 // floating button.
@@ -220,7 +220,10 @@ export default function LandingHeader({ links = true }: { links?: boolean }) {
           <Bar compact={false} active={active} links={links} />
         </nav>
       </motion.div>
-      <div className="pointer-events-none fixed inset-x-0 top-3 z-[1000] flex justify-center">
+      {/* Sticky in the page (not fixed to the window), so the bar is exactly
+          as wide as the page and its contents line up with every section's,
+          whatever space the scrollbar takes. It has no height of its own. */}
+      <div className="pointer-events-none sticky top-0 z-[1000] h-0">
         <AnimatePresence>
           {compact && (
             <motion.nav
@@ -230,9 +233,12 @@ export default function LandingHeader({ links = true }: { links?: boolean }) {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: "-130%", opacity: 0 }}
               transition={{ duration: 0.45, ease }}
-              className="pointer-events-auto w-[calc(100%-1.5rem)] rounded-xl bg-white/70 shadow-[0_0_0_1px_rgb(0_0_0/0.04),0_16px_40px_-20px_rgb(0_0_0/0.3)] backdrop-blur-2xl backdrop-saturate-150 sm:w-content-width"
+              className="pointer-events-auto absolute inset-x-0 top-0 bg-background/80 backdrop-blur-2xl backdrop-saturate-150"
             >
-              <Bar compact active={active} links={links} />
+              {/* The bar spans the screen; its contents line up with the page's. */}
+              <div className="mx-auto w-content-width">
+                <Bar compact active={active} links={links} />
+              </div>
             </motion.nav>
           )}
         </AnimatePresence>

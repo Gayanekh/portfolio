@@ -16,7 +16,7 @@ export default function MinimalPreview({
   const hasWork = data.projects.length > 0;
 
   return (
-    <div data-template-font className="min-h-full bg-card px-6 font-sans sm:px-10 lg:px-14 py-10">
+    <div data-template-font className="min-h-full bg-card px-[clamp(1.5rem,calc(0.107rem_+_5.714vw),3.5rem)] font-sans py-10">
       {data.navigation.enabled && (
         <nav
           className="sticky top-0 z-20 mb-10 grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-4 border-b border-border/40 bg-card/95 px-2 text-[9px] font-sans font-medium uppercase tracking-[0.1em] text-foreground/70 backdrop-blur-sm"
@@ -88,11 +88,11 @@ export default function MinimalPreview({
           </div>
         </nav>
       )}
-      <div className="flex flex-col gap-10 lg:flex-row lg:gap-14">
+      <div className="flex flex-col gap-[clamp(2.5rem,calc(-0.5rem_+_6.25vw),3.5rem)] lg:flex-row">
         {/* Sidebar */}
         <aside
           id="about"
-          className="lg:w-48 xl:w-56 shrink-0 lg:sticky lg:top-20 lg:self-start space-y-4"
+          className="lg:w-[clamp(12rem,calc(4rem_+_12.5vw),14rem)] shrink-0 lg:sticky lg:top-20 lg:self-start space-y-4"
         >
           <div className="w-14 h-14 rounded-full bg-black/5 border border-border/60 flex items-center justify-center text-xs font-mono text-muted-foreground uppercase overflow-hidden">
             {data.avatar ? (

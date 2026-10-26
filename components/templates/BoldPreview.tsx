@@ -13,7 +13,7 @@ export default function BoldPreview({ data }: BoldPreviewProps) {
     <div data-template-font className="min-h-full bg-foreground font-sans text-white">
       {data.navigation.enabled && (
         <nav
-          className="sticky top-0 z-20 grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-4 border-b border-white/10 bg-foreground/95 px-6 text-[9px] font-sans font-medium uppercase tracking-[0.1em] text-white/60 backdrop-blur-sm sm:px-10 lg:px-14"
+          className="sticky top-0 z-20 grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-4 border-b border-white/10 bg-foreground/95 px-[clamp(1.5rem,calc(0.107rem_+_5.714vw),3.5rem)] text-[9px] font-sans font-medium uppercase tracking-[0.1em] text-white/60 backdrop-blur-sm"
           aria-label="Portfolio navigation"
         >
           <span className="truncate text-white/80">
@@ -87,7 +87,7 @@ export default function BoldPreview({ data }: BoldPreviewProps) {
       {/* Hero */}
       <section
         id="about"
-        className="px-6 sm:px-10 lg:px-14 pt-14 pb-16 border-b border-white/10"
+        className="px-[clamp(1.5rem,calc(0.107rem_+_5.714vw),3.5rem)] pt-14 pb-16 border-b border-white/10"
       >
         <div className="flex items-start gap-5 mb-5">
           <div className="w-14 h-14 rounded-full bg-white/[0.06] border border-white/[0.08] flex items-center justify-center text-xs font-mono text-white/25 uppercase overflow-hidden shrink-0">
@@ -111,7 +111,7 @@ export default function BoldPreview({ data }: BoldPreviewProps) {
             <p className="text-[9px] font-mono tracking-[0.3em] uppercase text-white/30 mb-2">
               Portfolio
             </p>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extralight text-white leading-[1.1] tracking-tight">
+            <h1 className="text-[length:clamp(1.875rem,calc(1.172rem_+_2.813vw),3rem)] font-extralight text-white leading-[1.1] tracking-tight">
               {data.name || "Your Name"}
             </h1>
           </div>
@@ -138,7 +138,7 @@ export default function BoldPreview({ data }: BoldPreviewProps) {
       {hasServices && (
         <section
           id="services"
-          className="px-6 sm:px-10 lg:px-14 py-10 border-b border-white/10"
+          className="px-[clamp(1.5rem,calc(0.107rem_+_5.714vw),3.5rem)] py-10 border-b border-white/10"
         >
           <div className="flex flex-wrap gap-3">
             {data.services.filter(Boolean).map((service, i) => (
@@ -155,7 +155,7 @@ export default function BoldPreview({ data }: BoldPreviewProps) {
 
       {/* Skills */}
       {data.skills.filter(Boolean).length > 0 && (
-        <section className="px-6 sm:px-10 lg:px-14 py-8 border-b border-white/10">
+        <section className="px-[clamp(1.5rem,calc(0.107rem_+_5.714vw),3.5rem)] py-8 border-b border-white/10">
           <div className="flex flex-wrap gap-3">
             {data.skills.filter(Boolean).map((skill, i) => (
               <span
@@ -170,11 +170,11 @@ export default function BoldPreview({ data }: BoldPreviewProps) {
       )}
 
       {/* Projects Grid */}
-      <section id="work" className="px-6 sm:px-10 lg:px-14 py-10">
+      <section id="work" className="px-[clamp(1.5rem,calc(0.107rem_+_5.714vw),3.5rem)] py-10">
         <p className="text-[9px] font-mono tracking-[0.3em] uppercase text-white/25 mb-8">
           Selected Work
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-[clamp(1rem,calc(0.22rem_+_3.2vw),1.5rem)]">
           {data.projects.map((project, i) => (
             <article key={i} className="group">
               <div className="relative aspect-[4/3] bg-white/5 overflow-hidden mb-3">
@@ -233,7 +233,7 @@ export default function BoldPreview({ data }: BoldPreviewProps) {
       {/* Contact */}
       <section
         id="contact"
-        className="px-6 sm:px-10 lg:px-14 py-10 border-t border-white/10"
+        className="px-[clamp(1.5rem,calc(0.107rem_+_5.714vw),3.5rem)] py-10 border-t border-white/10"
       >
         <div className="flex items-center justify-between">
           <div>

@@ -4,6 +4,7 @@ import { ReactNode, useEffect } from "react";
 import Lenis from "lenis";
 import { usePathname } from "next/navigation";
 import { useReducedMotion } from "framer-motion";
+import { setPageScroller } from "@/lib/scroll";
 
 interface LenisProviderProps {
   children: ReactNode;
@@ -25,6 +26,8 @@ const LenisProvider = ({ children }: LenisProviderProps) => {
       // lands below the floating header rather than under it.
       anchors: { offset: -96 },
     });
+
+    setPageScroller(lenis);
 
     let animationFrameId = 0;
 
@@ -56,6 +59,7 @@ const LenisProvider = ({ children }: LenisProviderProps) => {
     return () => {
       observer.disconnect();
       cancelAnimationFrame(animationFrameId);
+      setPageScroller(null);
       lenis.destroy();
     };
   }, [isAuthPage, reducedMotion]);

@@ -6,6 +6,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { authSerif } from "@/components/auth/auth-fonts";
+import { fluidText } from "@/components/landing/landing-ui";
 
 // Set by the auth links so the next route's heading takes focus on mount.
 let focusHeadingOnMount = false;
@@ -21,17 +22,17 @@ export const labelClass = "sr-only";
 // Underlined fields on the open page: the shared Input supplies the
 // states; only the bottom border shows, brightening on hover and focus.
 export const inputClass =
-  "h-11 w-full min-w-0 rounded-none border-0 border-b border-foreground/25 bg-transparent px-0 text-[15px] font-normal text-foreground placeholder:text-foreground/45 hover:border-foreground/50 focus:border-foreground disabled:bg-transparent disabled:text-foreground/50 disabled:hover:border-foreground/25 read-only:bg-transparent";
+  "h-11 w-full min-w-0 rounded-none border-0 border-b border-foreground/25 bg-transparent px-0 text-[0.9375rem] font-normal text-foreground placeholder:text-foreground/45 hover:border-foreground/50 focus:border-foreground disabled:bg-transparent disabled:text-foreground/50 disabled:hover:border-foreground/25 read-only:bg-transparent";
 export const quietLinkClass = `${focusRing} rounded text-foreground/55 transition-colors hover:text-foreground`;
 export const textLinkClass = `${focusRing} rounded font-medium text-foreground underline decoration-foreground/30 decoration-1 underline-offset-[3px] transition-colors hover:decoration-foreground`;
 export const iconButtonClass = `${focusRing} grid size-8 place-items-center rounded text-foreground/55 transition-colors hover:text-foreground`;
 // The outline button, filling black on hover.
-export const buttonClass = `${focusRing} h-12 w-full gap-2.5 rounded border border-foreground bg-transparent px-5 text-[12px] font-semibold uppercase tracking-[0.18em] text-foreground shadow-none transition-[background-color,color,transform] duration-300 enabled:hover:bg-foreground enabled:hover:text-white focus-visible:ring-0 enabled:active:translate-y-px disabled:pointer-events-auto disabled:cursor-wait disabled:opacity-60`;
+export const buttonClass = `${focusRing} h-12 w-full gap-2.5 rounded border border-foreground bg-transparent px-5 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-foreground shadow-none transition-[background-color,color,transform] duration-300 enabled:hover:bg-foreground enabled:hover:text-white focus-visible:ring-0 enabled:active:translate-y-px disabled:pointer-events-auto disabled:cursor-wait disabled:opacity-60`;
 export const spinner = <span aria-hidden="true" className="h-4 w-4 animate-spin rounded-full border-2 border-foreground/30 border-t-foreground" />;
 
 function GoogleMark() {
   return (
-    <svg aria-hidden="true" viewBox="0 0 48 48" className="size-[18px]">
+    <svg aria-hidden="true" viewBox="0 0 48 48" className="size-[1.125rem]">
       <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5Z" />
       <path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7Z" />
       <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44Z" />
@@ -95,8 +96,8 @@ export default function LoginExperience(props: LoginExperienceProps) {
   return (
     <div data-mode={mode} className="group/auth grid w-full gap-6 [@media(max-height:720px)]:gap-4 animate-in fade-in slide-in-from-bottom-2 duration-500 motion-reduce:animate-none">
       <div className="grid gap-2">
-        <h1 ref={heading} tabIndex={-1} className={`${authSerif.className} text-[38px] font-light leading-tight tracking-[-0.02em] outline-none`}>{isRegister ? "Welcome to Portory" : "Welcome back"}</h1>
-        <p className="text-[15px] leading-relaxed text-foreground/70">{isRegister ? "Join Portory for free to build a portfolio worth sharing." : "Log in to keep editing your portfolio."}</p>
+        <h1 ref={heading} tabIndex={-1} className={`${authSerif.className} ${fluidText.authFormTitle} font-light leading-tight tracking-[-0.02em] outline-none`}>{isRegister ? "Welcome to Portory" : <>Welcome back<span className="sm:hidden"> to your portfolio</span></>}</h1>
+        <p className="text-[0.9375rem] leading-relaxed text-foreground/70">{isRegister ? "Join Portory for free to build a portfolio worth sharing." : "Log in to keep editing your portfolio."}</p>
       </div>
 
       {!isRegister && props.verified && <div data-status className="rounded bg-success/10 px-3.5 py-2.5 text-sm text-success-foreground" role="status">Email verified successfully. You can now sign in.</div>}
@@ -128,26 +129,26 @@ export default function LoginExperience(props: LoginExperienceProps) {
             />
             <span className="absolute right-0 top-1/2 flex -translate-y-1/2 items-center">
               <button type="button" aria-label={showPassword ? "Hide password" : "Show password"} aria-pressed={showPassword} onClick={props.onTogglePassword} className={iconButtonClass}>
-                {showPassword ? <EyeOff aria-hidden="true" className="size-[18px]" /> : <Eye aria-hidden="true" className="size-[18px]" />}
+                {showPassword ? <EyeOff aria-hidden="true" className="size-[1.125rem]" /> : <Eye aria-hidden="true" className="size-[1.125rem]" />}
               </button>
             </span>
           </div>
-          {isRegister && <p id="password-hint" className="text-[13px] text-foreground/50">{passwordHint}</p>}
-          {!isRegister && <p className="text-[13px]"><Link href={`/forgot-password${email ? `?${new URLSearchParams({ email })}` : ""}`} aria-disabled={busy || undefined} onClick={(event) => (busy ? event.preventDefault() : requestHeadingFocus())} className={`${quietLinkClass} font-medium aria-disabled:pointer-events-none aria-disabled:opacity-50`}>Forgot your password?</Link></p>}
+          {isRegister && <p id="password-hint" className="text-[0.8125rem] text-foreground/50">{passwordHint}</p>}
+          {!isRegister && <p className="text-[0.8125rem]"><Link href={`/forgot-password${email ? `?${new URLSearchParams({ email })}` : ""}`} aria-disabled={busy || undefined} onClick={(event) => (busy ? event.preventDefault() : requestHeadingFocus())} className={`${quietLinkClass} font-medium aria-disabled:pointer-events-none aria-disabled:opacity-50`}>Forgot your password?</Link></p>}
         </div>
         {message && <p role="status" className="text-sm text-foreground/70">{message}</p>}
-        {error && <p id="login-error" className="text-[13px] text-destructive" role="alert">{error}</p>}
+        {error && <p id="login-error" className="text-[0.8125rem] text-destructive" role="alert">{error}</p>}
         <Button type="submit" disabled={busy} className={`${buttonClass} mt-2`}>
           {isLoading && spinner}
           {isLoading ? (isRegister ? "Creating account..." : "Logging in...") : (isRegister ? "Create account" : "Log in")}
         </Button>
       </form>
 
-      <p aria-hidden="true" className="flex items-center gap-4 text-[12px] uppercase tracking-[0.2em] text-foreground/50">
+      <p aria-hidden="true" className="flex items-center gap-4 text-[0.75rem] uppercase tracking-[0.2em] text-foreground/50">
         <span className="h-px flex-1 bg-foreground/15" />or<span className="h-px flex-1 bg-foreground/15" />
       </p>
 
-      <Button type="button" onClick={props.onGoogle} disabled={busy} className={`${buttonClass} text-[14px] font-medium normal-case tracking-normal`}>
+      <Button type="button" onClick={props.onGoogle} disabled={busy} className={`${buttonClass} text-[0.875rem] font-medium normal-case tracking-normal`}>
         {isGoogleLoading ? spinner : <GoogleMark />}
         Continue with Google
       </Button>

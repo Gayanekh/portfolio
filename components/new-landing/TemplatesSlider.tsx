@@ -225,7 +225,7 @@ export default function TemplatesSlider({ start = 0, arrival }: { start?: number
           <Reveal className="mb-1 w-fit rounded-full border border-foreground/10 bg-background px-3 py-1 text-xs font-medium"><p className="m-0">{TEMPLATES_INTRO.tag}</p></Reveal>
           <SplitWords as="h2" text={TEMPLATES_INTRO.title} className={sectionTitle} />
           <SplitWords as="p" text={TEMPLATES_INTRO.text} className={sectionIntro} />
-          <Reveal className="mt-4 md:mt-5">
+          <Reveal className="mt-[clamp(1rem,calc(0.682rem_+_1.183vw),1.25rem)]">
             <div role="tablist" aria-label="Template" className="relative inline-flex max-w-full flex-wrap justify-center gap-1 rounded bg-foreground/[0.04] p-1">
               {TEMPLATES.map((template, i) => {
                 const active = i === index;
@@ -251,7 +251,7 @@ export default function TemplatesSlider({ start = 0, arrival }: { start?: number
           </Reveal>
         </div>
 
-        <div className="mt-8 md:mt-10">
+        <div className="mt-[clamp(2rem,calc(1.364rem_+_2.367vw),2.5rem)]">
           <div
             ref={railRef}
             role="group"
@@ -277,10 +277,10 @@ export default function TemplatesSlider({ start = 0, arrival }: { start?: number
                       aria-label={`${slide % COUNT + 1} of ${COUNT}`}
                       aria-hidden={copy || undefined}
                       data-template={template.id}
-                      className="relative mb-10 mr-5 w-full flex-none select-none md:w-[80%] lg:aspect-[1280/700] lg:w-[min(1280px,calc(100vw-9rem))]"
+                      className="relative mb-10 mr-5 w-full flex-none select-none md:w-[80%] lg:aspect-[1280/700] lg:w-[min(80rem,calc(100vw-9rem))]"
                     >
-                      <motion.div style={{ opacity: shell }} className="grid h-full grid-cols-1 gap-4 rounded-[2rem] p-3 card md:grid-cols-2 md:gap-8 md:p-4">
-                        <div className="flex min-w-0 flex-col justify-between gap-8 p-3 md:p-6">
+                      <motion.div style={{ opacity: shell }} className="grid h-full grid-cols-1 gap-[clamp(1rem,calc(-0.272rem_+_4.734vw),2rem)] rounded-[2rem] p-[clamp(0.75rem,calc(0.432rem_+_1.183vw),1rem)] card md:grid-cols-2">
+                        <div className="flex min-w-0 flex-col justify-between gap-8 p-[clamp(0.75rem,calc(-0.204rem_+_3.55vw),1.5rem)]">
                           <div className="flex flex-col items-start gap-4">
                             <span className="rounded-full border border-foreground/10 bg-background px-3 py-1 text-xs font-medium">{STYLE_LABEL[template.style]}</span>
                             <h3 className={`m-0 text-balance ${fluidText.cardTitle} font-medium leading-[1.05] tracking-[-0.03em]`}>{template.name}</h3>
@@ -290,7 +290,7 @@ export default function TemplatesSlider({ start = 0, arrival }: { start?: number
                             </span>
                           </div>
                           <div className="flex items-center gap-3">
-                            <span aria-hidden="true" className="grid size-10 shrink-0 place-items-center rounded-full bg-foreground/10 text-sm font-semibold md:size-11">{initials(template.name)}</span>
+                            <span aria-hidden="true" className="grid size-[clamp(2.5rem,calc(2.182rem_+_1.183vw),2.75rem)] shrink-0 place-items-center rounded-full bg-foreground/10 text-sm font-semibold">{initials(template.name)}</span>
                             <div className="flex min-w-0 flex-col">
                               <span className={`${text.base} truncate font-semibold leading-snug`}>Best for</span>
                               <span className={`${text.base} truncate leading-snug text-foreground/60`}>{template.bestFor}</span>

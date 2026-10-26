@@ -10,7 +10,7 @@ export default function AuthBadge({ text, className = "" }: { text: string; clas
   const circleId = useId();
 
   return (
-    <span aria-hidden="true" className={`relative grid size-[72px] shrink-0 place-items-center ${className}`}>
+    <span aria-hidden="true" className={`relative grid size-[4.5rem] shrink-0 place-items-center ${className}`}>
       <motion.svg
         viewBox="0 0 100 100"
         className="absolute inset-0 h-full w-full"
@@ -19,7 +19,7 @@ export default function AuthBadge({ text, className = "" }: { text: string; clas
         <defs>
           <path id={circleId} d="M50 50m-38 0a38 38 0 1 1 76 0a38 38 0 1 1-76 0" />
         </defs>
-        <text className="fill-foreground text-[11.5px] uppercase tracking-[0.18em]">
+        <text className="fill-foreground text-[0.7188rem] uppercase tracking-[0.18em]">
           <textPath href={`#${circleId}`}>{text}</textPath>
         </text>
       </motion.svg>

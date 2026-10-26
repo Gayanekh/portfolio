@@ -16,7 +16,7 @@ const ease = [0.22, 1, 0.36, 1] as const;
 
 export default function HeroSection() {
   return (
-    <section className="pt-32 sm:pt-40 lg:pt-48 pb-16 sm:pb-20 lg:pb-24 px-6 sm:px-8 lg:px-10">
+    <section className="pt-[clamp(8rem,calc(5.214rem_+_11.429vw),12rem)] pb-[clamp(4rem,calc(2.607rem_+_5.714vw),6rem)] px-[clamp(1.5rem,calc(0.804rem_+_2.857vw),2.5rem)]">
       <motion.div
         initial="hidden"
         animate="visible"

@@ -3,12 +3,12 @@ import PortoryLanding from "@/components/landing/PortoryLanding";
 export default function Page() {
   if (process.env.VERCEL_ENV === "production") {
     return (
-      <main className="flex min-h-screen items-center bg-background px-6 py-16 text-foreground sm:px-8 lg:px-10">
-        <div className="mx-auto w-full max-w-[1200px]">
-          <p className="mb-12 text-[10px] font-mono uppercase tracking-[0.25em] text-foreground/45">
+      <main data-site-scale className="flex min-h-screen items-center bg-background px-[clamp(1.5rem,calc(0.804rem_+_2.857vw),2.5rem)] py-16 text-foreground">
+        <div className="mx-auto w-full max-w-[75rem]">
+          <p className="mb-12 text-[0.625rem] font-mono uppercase tracking-[0.25em] text-foreground/45">
             Portory
           </p>
-          <h1 className="max-w-3xl text-5xl font-light leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl">
+          <h1 className="max-w-3xl text-[length:clamp(3rem,calc(1.955rem_+_4.286vw),4.5rem)] font-light leading-[1.05] tracking-tight">
             Build your portfolio.
             <br />
             <span className="text-foreground/35">Your way.</span>
@@ -16,7 +16,7 @@ export default function Page() {
           <p className="mt-7 max-w-md text-base leading-relaxed text-foreground/55">
             A simple way to create and publish a portfolio that feels like you.
           </p>
-          <p className="mt-12 text-[10px] font-mono uppercase tracking-[0.2em] text-foreground/45">
+          <p className="mt-12 text-[0.625rem] font-mono uppercase tracking-[0.2em] text-foreground/45">
             Coming soon.
           </p>
         </div>

@@ -18,7 +18,7 @@ import StartAtTop from "@/components/new-landing/StartAtTop";
 export default function PortoryLanding() {
   return (
     <LandingProvider>
-      <div className="relative isolate min-h-screen overflow-x-clip bg-background text-foreground antialiased">
+      <div data-site-scale className="relative isolate min-h-screen overflow-x-clip bg-background text-foreground antialiased">
         <StartAtTop />
         <LandingHeader />
         <main>
@@ -32,7 +32,7 @@ export default function PortoryLanding() {
           <FinalCTA />
         </main>
         <LandingFooter />
-        <BackToTop />
+        <BackToTop phone={false} />
       </div>
     </LandingProvider>
   );

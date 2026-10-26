@@ -19,14 +19,14 @@ const ease = [0.22, 1, 0.36, 1] as const;
 // Controls: 4px corners; outlined by default (the brand colour for the main
 // one), dark for saving a form, red only for deleting the account.
 // Fields focus quietly: a brand-colour border and a faint halo, no outline.
-const field = "h-11 w-full rounded border border-foreground/[0.14] bg-white px-3.5 text-[15px] text-foreground outline-none transition-[border-color,box-shadow] placeholder:text-foreground/40 hover:border-foreground/25 focus:border-primary/60 focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--primary),transparent_88%)]";
-const label = "mb-1.5 block text-[13px] text-foreground/55";
+const field = "h-11 w-full rounded border border-foreground/[0.14] bg-white px-3.5 text-[0.9375rem] text-foreground outline-none transition-[border-color,box-shadow] placeholder:text-foreground/40 hover:border-foreground/25 focus:border-primary/60 focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--primary),transparent_88%)]";
+const label = "mb-1.5 block text-[0.8125rem] text-foreground/55";
 const outline = `${focusRing} inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded border border-foreground/15 bg-white px-5 text-sm font-medium text-foreground shadow-[0_2px_6px_-3px_rgb(0_0_0/0.12)] transition-colors hover:border-foreground/40 disabled:cursor-default disabled:opacity-40`;
 const brandOutline = `${focusRing} inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded border border-primary/70 bg-white px-5 text-sm font-medium text-foreground shadow-[0_2px_6px_-3px_rgb(0_0_0/0.12)] transition-colors hover:bg-primary hover:text-white disabled:cursor-default disabled:opacity-40`;
 const solid = `${focusRing} inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded bg-neutral-900 px-4 text-sm font-medium text-white transition-colors hover:bg-neutral-700 disabled:cursor-default disabled:opacity-30 disabled:hover:bg-neutral-900`;
 const quiet = `${focusRing} inline-flex h-10 cursor-pointer items-center justify-center rounded px-4 text-sm font-medium text-foreground/60 transition-colors hover:bg-foreground/[0.05] hover:text-foreground disabled:opacity-40`;
-const small = `${focusRing} inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded border border-foreground/15 bg-white px-3.5 text-[13px] font-medium text-foreground transition-colors hover:border-primary hover:text-primary disabled:cursor-default disabled:opacity-40`;
-const smallDanger = `${focusRing} inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded border border-red-200 bg-white px-3.5 text-[13px] font-medium text-red-600 transition-colors hover:border-red-600 hover:bg-red-600 hover:text-white`;
+const small = `${focusRing} inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded border border-foreground/15 bg-white px-3.5 text-[0.8125rem] font-medium text-foreground transition-colors hover:border-primary hover:text-primary disabled:cursor-default disabled:opacity-40`;
+const smallDanger = `${focusRing} inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded border border-red-200 bg-white px-3.5 text-[0.8125rem] font-medium text-red-600 transition-colors hover:border-red-600 hover:bg-red-600 hover:text-white`;
 const danger = `${focusRing} inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded bg-red-600 px-5 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:cursor-default disabled:opacity-40 disabled:hover:bg-red-600`;
 const spinner = <span aria-hidden="true" className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />;
 
@@ -42,7 +42,7 @@ const ownFile = (url: string | null, userId: string) => {
 
 function ErrorText({ text }: { text: string }) {
   return text ? (
-    <p role="alert" className="m-0 text-[13px] text-destructive">
+    <p role="alert" className="m-0 text-[0.8125rem] text-destructive">
       {text}
     </p>
   ) : null;
@@ -54,11 +54,11 @@ function Section({ title, text, children }: { title: string; text: string; child
   return (
     <section className="grid gap-8">
       <div>
-        <h2 className="m-0 w-fit text-[22px] font-semibold tracking-[-0.015em]">
+        <h2 className="m-0 w-fit text-[1.375rem] font-semibold tracking-[-0.015em]">
           {title}
           <span aria-hidden="true" className="mt-2.5 block h-0.5 w-7 rounded-full bg-primary" />
         </h2>
-        <p className="m-0 mt-4 text-[15px] text-foreground/55">{text}</p>
+        <p className="m-0 mt-4 text-[0.9375rem] text-foreground/55">{text}</p>
       </div>
       <div className="divide-y divide-foreground/[0.08] border-y border-foreground/[0.08]">{children}</div>
     </section>
@@ -93,7 +93,7 @@ function Item({
           <Icon className={`size-5 ${red ? "text-red-500" : "text-primary"}`} strokeWidth={1.75} />
         </span>
         <div className="min-w-0">
-          <h3 className={`m-0 text-[16px] font-semibold tracking-[-0.01em] ${red ? "text-red-600" : "text-foreground"}`}>{title}</h3>
+          <h3 className={`m-0 text-[1rem] font-semibold tracking-[-0.01em] ${red ? "text-red-600" : "text-foreground"}`}>{title}</h3>
           {value && <div className="mt-1 break-words text-sm leading-relaxed text-foreground/60">{value}</div>}
         </div>
         {action && <div className="col-start-2 sm:col-start-auto sm:justify-self-end">{action}</div>}
@@ -340,18 +340,18 @@ export default function AccountPage(props: {
     <div className="relative min-h-screen bg-white text-foreground">
       <LandingHeader links={false} />
 
-      <main className="mx-auto w-content-width pb-28 pt-32 md:pt-40">
+      <main data-site-scale className="mx-auto w-content-width pb-28 pt-[clamp(8rem,calc(5.456rem_+_9.467vw),10rem)]">
         <input ref={fileRef} type="file" accept={ACCEPTED_IMAGE_TYPES} hidden onChange={(event) => pickPhoto(event.target.files?.[0])} />
 
         {/* The profile: photo in a ringed circle beside the name */}
-        <motion.header {...rise(0)} className="grid items-center gap-10 md:grid-cols-[auto_minmax(0,1fr)] md:gap-16">
+        <motion.header {...rise(0)} className="grid items-center gap-[clamp(2.5rem,calc(0.592rem_+_7.101vw),4rem)] md:grid-cols-[auto_minmax(0,1fr)]">
           <div className="mx-auto rounded-full bg-white p-3 shadow-[0_18px_50px_-18px_rgb(0_0_0/0.28)] ring-1 ring-black/[0.04] md:mx-0">
             <button
               type="button"
               onClick={choosePhoto}
               disabled={photoBusy}
               aria-label={photo ? "Change your photo" : "Add a photo"}
-              className={`${focusRing} group relative grid size-52 cursor-pointer place-items-center overflow-hidden rounded-full bg-primary text-white md:size-60`}
+              className={`${focusRing} group relative grid size-[clamp(13rem,calc(10.456rem_+_9.467vw),15rem)] cursor-pointer place-items-center overflow-hidden rounded-full bg-primary text-white`}
             >
               {photo ? (
                 // eslint-disable-next-line @next/next/no-img-element -- the user's photo from storage or Google
@@ -368,9 +368,9 @@ export default function AccountPage(props: {
           </div>
 
           <div className="text-center md:text-left">
-            <p className="m-0 text-[15px] font-light text-foreground/50">Your account</p>
+            <p className="m-0 text-[0.9375rem] font-light text-foreground/50">Your account</p>
             <h1 className={`m-0 mt-2 ${fluidText.profileName} font-semibold leading-[1.05] tracking-[-0.035em]`}>{fullName || "Welcome"}</h1>
-            <p className="m-0 mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-foreground/60 md:mx-0">
+            <p className="m-0 mx-auto mt-4 max-w-md text-[0.9375rem] leading-relaxed text-foreground/60 md:mx-0">
               {email}
               <br />
               Member of Portory since {since}.
@@ -432,7 +432,7 @@ export default function AccountPage(props: {
                 </div>
               </form>
             </Item>
-            <Item Icon={Mail} title="Email" value={email} action={<span className="inline-flex h-9 items-center rounded border border-dashed border-foreground/15 px-3.5 text-[13px] text-foreground/45">Changing email · coming soon</span>} />
+            <Item Icon={Mail} title="Email" value={email} action={<span className="inline-flex h-9 items-center rounded border border-dashed border-foreground/15 px-3.5 text-[0.8125rem] text-foreground/45">Changing email · coming soon</span>} />
             <Item
               Icon={KeyRound}
               title="Password"
@@ -470,8 +470,8 @@ export default function AccountPage(props: {
                   </div>
                 </div>
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="m-0 text-[13px] text-foreground/45">{MIN_PASSWORD_LENGTH} or more letters, numbers and symbols.</p>
-                  <button type="button" aria-pressed={showPasswords} onClick={() => setShowPasswords((value) => !value)} className={`${focusRing} inline-flex cursor-pointer items-center gap-1.5 rounded text-[13px] text-foreground/55 transition-colors hover:text-foreground`}>
+                  <p className="m-0 text-[0.8125rem] text-foreground/45">{MIN_PASSWORD_LENGTH} or more letters, numbers and symbols.</p>
+                  <button type="button" aria-pressed={showPasswords} onClick={() => setShowPasswords((value) => !value)} className={`${focusRing} inline-flex cursor-pointer items-center gap-1.5 rounded text-[0.8125rem] text-foreground/55 transition-colors hover:text-foreground`}>
                     {showPasswords ? <EyeOff aria-hidden="true" className="size-4" /> : <Eye aria-hidden="true" className="size-4" />}
                     {showPasswords ? "Hide" : "Show"}
                   </button>
@@ -494,8 +494,8 @@ export default function AccountPage(props: {
               value={hasPassword ? "You log in with your email and password." : "You log in with your Google account."}
               action={
                 <span className="flex flex-wrap gap-1.5">
-                  {hasPassword && <span className="rounded-md bg-white px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-foreground/70 ring-1 ring-black/[0.06]">Email</span>}
-                  {props.withGoogle && <span className="rounded-md bg-white px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-foreground/70 ring-1 ring-black/[0.06]">Google</span>}
+                  {hasPassword && <span className="rounded-md bg-white px-2.5 py-1 text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-foreground/70 ring-1 ring-black/[0.06]">Email</span>}
+                  {props.withGoogle && <span className="rounded-md bg-white px-2.5 py-1 text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-foreground/70 ring-1 ring-black/[0.06]">Google</span>}
                 </span>
               }
             />
@@ -550,7 +550,7 @@ export default function AccountPage(props: {
       {/* Deleting, confirmed by typing DELETE */}
       <Modal open={confirmOpen} onClose={closeConfirm} labelledBy="delete-confirm-title" describedBy="delete-confirm-text" alert>
         <form onSubmit={deleteAccount}>
-          <h2 id="delete-confirm-title" className="m-0 pr-8 text-[26px] font-medium leading-tight tracking-[-0.02em]">
+          <h2 id="delete-confirm-title" className="m-0 pr-8 text-[1.625rem] font-medium leading-tight tracking-[-0.02em]">
             Delete your account?
           </h2>
           <p id="delete-confirm-text" className="m-0 mt-3 text-sm leading-relaxed text-neutral-600">

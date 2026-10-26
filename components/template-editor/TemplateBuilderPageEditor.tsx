@@ -542,12 +542,12 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
   return (
     <div data-full-screen className={`${themeFontVariables} relative flex h-screen overflow-hidden bg-white text-neutral-900`}>
       {/* Sidebar: open, or collapsed to a rail of icons */}
-      <div className={`relative hidden shrink-0 overflow-hidden md:block ${slide} ${asideOpen ? "w-[22rem] xl:w-[24rem]" : "w-14"}`}>
+      <div className={`relative hidden shrink-0 overflow-hidden md:block ${slide} ${asideOpen ? "w-[clamp(22rem,calc(14rem_+_12.5vw),24rem)]" : "w-14"}`}>
         <aside
           inert={!asideOpen}
-          className={`absolute inset-y-0 left-0 flex w-[22rem] flex-col bg-white transition-opacity duration-300 xl:w-[24rem] ${asideOpen ? "opacity-100 delay-150" : "pointer-events-none opacity-0"}`}
+          className={`absolute inset-y-0 left-0 flex w-[clamp(22rem,calc(14rem_+_12.5vw),24rem)] flex-col bg-white transition-opacity duration-300 ${asideOpen ? "opacity-100 delay-150" : "pointer-events-none opacity-0"}`}
         >
-          <div className="min-h-0 flex-1 overflow-y-auto px-6 py-8 lg:px-8 lg:py-10" data-lenis-prevent>
+          <div className="min-h-0 flex-1 overflow-y-auto px-[clamp(1.5rem,calc(0rem_+_3.125vw),2rem)] py-[clamp(2rem,calc(0.5rem_+_3.125vw),2.5rem)]" data-lenis-prevent>
             <div className="mx-auto flex max-w-sm flex-col gap-10">
               {/* The Portory mark (home) left, All templates right */}
               <div className="flex items-center justify-between gap-3">
@@ -653,7 +653,7 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
           </div>
 
           {/* The account (Log out) */}
-          <div className="flex shrink-0 items-center border-t border-foreground/[0.07] px-4 py-3 lg:px-6">
+          <div className="flex shrink-0 items-center border-t border-foreground/[0.07] px-[clamp(1rem,calc(-0.5rem_+_3.125vw),1.5rem)] py-3">
             <div className="min-w-0 flex-1">
               <EditorAccount unsaved={dirty && stored.state === "loaded"} signInHref={signInHref} />
             </div>

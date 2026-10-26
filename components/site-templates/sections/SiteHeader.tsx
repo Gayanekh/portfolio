@@ -50,7 +50,7 @@ export default function SiteHeader({ start, end, layout }: { start?: ReactNode; 
     <Section as="header" spacing="sm">
       <div className={header({ layout })}>
         <div className="flex items-center gap-3.5">{start}</div>
-        <div className="order-3 col-span-full flex flex-col gap-3.5 @xl:order-none @xl:col-span-1 @xl:gap-[18px]">
+        <div className="order-3 col-span-full flex flex-col gap-[clamp(0.875rem,calc(0.351rem_+_2.151cqw),1.125rem)] @xl:order-none @xl:col-span-1">
           {siteTitle}
           <Menu />
         </div>
