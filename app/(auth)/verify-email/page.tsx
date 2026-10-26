@@ -5,16 +5,11 @@ interface VerifyEmailPageProps {
   searchParams: Promise<{ email?: string; next?: string }>;
 }
 
-export default async function VerifyEmailPage({
-  searchParams,
-}: VerifyEmailPageProps) {
+// The second step of signing up, in the same layout as /login and /register.
+export default async function VerifyEmailPage({ searchParams }: VerifyEmailPageProps) {
   const params = await searchParams;
   const email = typeof params.email === "string" ? params.email.trim() : "";
   const next = getSafeNext(params.next);
 
-  return (
-    <main data-site-scale className="flex min-h-screen items-center justify-center bg-background px-6 py-16">
-      <VerifyEmailForm email={email} next={next} />
-    </main>
-  );
+  return <VerifyEmailForm email={email} next={next} />;
 }

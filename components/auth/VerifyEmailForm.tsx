@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Input } from "@/components/ui/input";
+import { useEffect, useRef, useState } from "react";
+import { authSerif } from "@/components/auth/auth-fonts";
+import { fluidText } from "@/components/landing/landing-ui";
+import { requestHeadingFocus, textLinkClass } from "@/components/auth/LoginExperience";
 import { createClient } from "@/lib/supabase/client";
 
 interface VerifyEmailFormProps {
@@ -11,15 +12,24 @@ interface VerifyEmailFormProps {
   next: string;
 }
 
+const status = "rounded bg-foreground/[0.05] px-3.5 py-3 text-sm leading-relaxed text-foreground/80";
+
+// The second step of signing up, in the login form's design: the account
+// waits for its email to be confirmed. The email holds a link (Supabase's
+// "Confirm signup" email); it comes back through /auth/callback, which
+// confirms the account and leads on to log in. Here: where the link went, a
+// way to send it again, and a way back if the address was wrong.
 export default function VerifyEmailForm({ email, next }: VerifyEmailFormProps) {
-  const router = useRouter();
+  const heading = useRef<HTMLHeadingElement>(null);
   const [supabase] = useState(() => createClient());
-  const [code, setCode] = useState("");
-  const [isVerifying, setIsVerifying] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    heading.current?.focus({ preventScroll: true });
+  }, []);
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -27,52 +37,7 @@ export default function VerifyEmailForm({ email, next }: VerifyEmailFormProps) {
     return () => window.clearTimeout(timer);
   }, [cooldown]);
 
-  const verifyCode = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!email || isVerifying || code.length !== 6) return;
-    setIsVerifying(true);
-    setMessage("");
-    setError("");
-
-    const { data, error: verifyError } = await supabase.auth.verifyOtp({
-      email,
-      token: code,
-      type: "signup",
-    });
-
-    if (verifyError || !data.user) {
-      if (process.env.NODE_ENV !== "production") {
-        console.error("Email signup OTP verification failed", {
-          verificationType: "signup",
-          email,
-          tokenLength: code.length,
-          errorCode: verifyError?.code,
-          errorStatus: verifyError?.status,
-          errorMessage: verifyError?.message,
-          returnedUser: Boolean(data.user),
-        });
-      }
-      setError("Invalid or expired verification code.");
-      setIsVerifying(false);
-      return;
-    }
-
-    // The profile was created with the account (a database trigger, FIX 4).
-    if (data.session) {
-      const { error: signOutError } = await supabase.auth.signOut();
-      if (signOutError) {
-        console.error("Unable to clear session after email OTP verification", {
-          code: signOutError.code,
-        });
-      }
-    }
-
-    const loginParams = new URLSearchParams({ verified: "1", next });
-    router.replace(`/login?${loginParams.toString()}`);
-    router.refresh();
-  };
-
-  const resendVerification = async () => {
+  const resend = async () => {
     if (!email || isSending || cooldown > 0) return;
     setIsSending(true);
     setMessage("");
@@ -81,106 +46,69 @@ export default function VerifyEmailForm({ email, next }: VerifyEmailFormProps) {
     const { error: resendError } = await supabase.auth.resend({
       type: "signup",
       email,
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback?${new URLSearchParams({ next })}` },
     });
 
     if (resendError) {
       if (process.env.NODE_ENV !== "production") {
-        console.error("Signup verification code resend failed", {
-          verificationType: "signup",
+        console.error("Signup confirmation email resend failed", {
           email,
           errorCode: resendError.code,
           errorStatus: resendError.status,
           errorMessage: resendError.message,
         });
       }
-      setError("Unable to resend the verification code. Please try again.");
+      setError("Unable to send the email again. Please try again in a minute.");
     } else {
-      setMessage("Code sent.");
+      setMessage("A new email is on its way.");
       setCooldown(30);
     }
     setIsSending(false);
   };
 
   return (
-    <div className="w-full max-w-md">
-      <p className="mb-4 text-[0.625rem] font-mono tracking-[0.25em] uppercase text-foreground/45">
-        Portory
-      </p>
-      <h1 className="text-4xl font-light tracking-tight text-foreground">
-        Verify your email.
-      </h1>
-      <p className="mt-4 text-sm leading-relaxed text-foreground/50">
-        We sent a verification code to:
-      </p>
-      <p className="mt-2 break-all text-sm text-foreground">{email}</p>
-
-      <form onSubmit={verifyCode} className="mt-8 space-y-5">
-        <div>
-          <label
-            htmlFor="verification-code"
-            className="mb-1.5 block text-xs text-foreground/60"
-          >
-            Verification code
-          </label>
-          <Input
-            id="verification-code"
-            type="text"
-            inputMode="numeric"
-            autoComplete="one-time-code"
-            pattern="[0-9]{6}"
-            minLength={6}
-            maxLength={6}
-            required
-            value={code}
-            onChange={(event) =>
-              setCode(event.target.value.replace(/\D/g, "").slice(0, 6))
-            }
-            className="w-full px-3.5 py-3 text-center font-mono text-lg tracking-[0.35em] text-foreground"
-          />
-        </div>
-
-        <button
-          type="submit"
-          disabled={!email || code.length !== 6 || isVerifying}
-          className="w-full rounded bg-foreground px-4 py-3 text-sm text-primary-foreground transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {isVerifying ? "Verifying..." : "Verify"}
-        </button>
-      </form>
+    <div className="grid w-full gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500 motion-reduce:animate-none">
+      <div className="grid gap-2">
+        <h1 ref={heading} tabIndex={-1} className={`${authSerif.className} ${fluidText.authFormTitle} font-light leading-tight tracking-[-0.02em] outline-none`}>
+          Check your email
+        </h1>
+        <p className="text-[0.9375rem] leading-relaxed text-foreground/70">
+          We sent a confirmation link to <span className="block break-words font-medium text-foreground">{email || "your email"}</span>
+        </p>
+        <p className="text-[0.9375rem] leading-relaxed text-foreground/70">Open it to confirm your address and finish signing up, then log in.</p>
+      </div>
 
       {error && (
-        <p className="mt-6 text-sm text-red-600" role="alert">
+        <p className="text-sm text-red-600" role="alert">
           {error}
         </p>
       )}
       {message && (
-        <p className="mt-6 text-sm text-foreground/60" role="status">
+        <p className={status} role="status">
           {message}
         </p>
       )}
 
-      <button
-        type="button"
-        onClick={resendVerification}
-        disabled={!email || isSending || cooldown > 0}
-        className="mt-8 text-sm text-foreground underline underline-offset-4 transition-opacity hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {isSending
-          ? "Sending..."
-          : cooldown > 0
-            ? `Resend in ${cooldown}s`
-            : "Resend code"}
-      </button>
-
-      <p className="mt-8 text-sm text-foreground/50">
-        Wrong email?{" "}
-        <Link
-          href={`/register?next=${encodeURIComponent(next)}`}
-          className="text-foreground underline underline-offset-4"
-        >
-          Go back
-        </Link>
-      </p>
+      <div className="grid gap-3 text-sm text-foreground/60">
+        <p>
+          Didn&apos;t get it? Check your spam folder, or{" "}
+          <button type="button" onClick={resend} disabled={!email || isSending || cooldown > 0} className={`${textLinkClass} cursor-pointer disabled:cursor-not-allowed disabled:opacity-50`}>
+            {isSending ? "sending…" : cooldown > 0 ? `send again in ${cooldown}s` : "send it again"}
+          </button>
+        </p>
+        <p>
+          Already confirmed?{" "}
+          <Link href={`/login?${new URLSearchParams({ next })}`} onClick={requestHeadingFocus} className={textLinkClass}>
+            Log in
+          </Link>
+        </p>
+        <p>
+          Wrong email?{" "}
+          <Link href={`/register?${new URLSearchParams({ next })}`} onClick={requestHeadingFocus} className={textLinkClass}>
+            Go back
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

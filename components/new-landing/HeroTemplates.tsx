@@ -96,7 +96,7 @@ export default function HeroTemplates() {
 
   return (
     // The top padding keeps the content clear of the floating header.
-    <section ref={sectionRef} id="home" aria-label="Introduction" className="flex min-h-svh items-center pb-10 pt-[clamp(7rem,calc(8.136rem_-_2.367vw),7.5rem)]">
+    <section ref={sectionRef} id="home" aria-label="Introduction" className="flex min-h-svh items-center pb-[clamp(2.5rem,calc(1rem_+_3vw),4.5rem)] pt-[clamp(7.5rem,calc(6rem_+_3vw),9.5rem)] md:pb-[2.5rem] md:pt-[8.5rem]">
       {/* Side by side: the text on the left, the card stack on the right (stacked on phones). */}
       <div className="mx-auto grid w-content-width grid-cols-1 items-center gap-[clamp(2.5rem,calc(0.96rem_+_3.2vw),3rem)] md:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)]">
         <motion.div
