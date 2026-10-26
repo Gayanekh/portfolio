@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -28,12 +29,14 @@ import EditorAccount from "@/components/template-editor/EditorAccount";
 import PageNameField from "@/components/template-editor/PageNameField";
 import PageSettings from "@/components/template-editor/PageSettings";
 import SectionNavigator from "@/components/template-editor/SectionNavigator";
+import InProgressNotice from "@/components/template-editor/InProgressNotice";
+import { COMING_SOON_EVENT } from "@/components/template-editor/in-progress";
 import TemplateRenderer from "@/components/site-templates/core/TemplateRenderer";
 import { baseOf, mergePageContent, readLayout, type PageLayout } from "@/components/site-templates/core/layout";
 import { inMenu, menuName } from "@/components/site-templates/core/content";
 import { plainText } from "@/components/site-templates/core/rich-format";
 import type { TemplateContent, TemplateDefinition } from "@/components/site-templates/core/types";
-import { getSiteTemplate, siteTemplateEditorHref } from "@/components/site-templates/registry";
+import { getSiteTemplate, siteTemplateContinueHref, siteTemplateEditorHref } from "@/components/site-templates/registry";
 import { StylePickers } from "@/components/template-detail/StyleCards";
 import { themeFontVariables } from "@/components/template-detail/theme-options";
 import ContentPanel from "@/components/template-editor/ContentPanel";
@@ -97,18 +100,6 @@ const toDoc = (template: TemplateDefinition, saved: unknown): EditorDoc => {
   };
 };
 
-// Before Save went to the account, the editor kept the page in this browser;
-// that copy is the starting point while the account has no page for this
-// template.
-const readLocalCopy = (template: TemplateDefinition): EditorDoc => {
-  try {
-    const raw = localStorage.getItem(`portory-site-${template.id}`);
-    return raw ? toDoc(template, JSON.parse(raw)) : defaultDoc(template);
-  } catch {
-    return defaultDoc(template);
-  }
-};
-
 // A page kept in this browser while its editor signs in to save it ("Sign in
 // to save"): the editor opens on it again after signing in, unsaved, and
 // forgets it. Kept for a day at most.
@@ -144,10 +135,13 @@ const forgetDraft = (template: TemplateDefinition) => {
 type LoadState = "loaded" | "failed" | "signed-out";
 interface Stored {
   state: LoadState;
-  // The page as last saved, when the account's portfolio is this template.
+  // The page as last saved, when continuing the account's page (resume).
   doc: EditorDoc | null;
   slug: string | null;
   published: boolean;
+  // The account's saved page, whichever template it is: an account holds one
+  // page, so saving a fresh copy replaces it.
+  existing: { templateId: string; name: string } | null;
 }
 
 // The top bar is a strip of square cells, edge to edge, split by hairlines:
@@ -178,50 +172,78 @@ const markTile = "grid shrink-0 place-items-center rounded bg-foreground/[0.06] 
 //   section to outline it and open its menu, click any text to type into it.
 //   Save, Exit (asks before discarding changes), Undo and Redo.
 // - Preview: the page alone, full screen, with a close button.
-export default function TemplateBuilderPageEditor({ backHref, templateId }: { backHref: string; templateId: string }) {
+// A saved page's name (its own, or its template's).
+const savedName = (portfolio: { template_id: string; portfolio_data: unknown }) => {
+  const data = portfolio.portfolio_data as { name?: unknown } | null;
+  return typeof data?.name === "string" && data.name ? data.name : (getSiteTemplate(portfolio.template_id)?.name ?? "your page");
+};
+
+// `resume` opens the account's saved page to keep editing it ("Continue
+// editing", ?continue=1); otherwise the editor starts from a fresh copy of
+// the template, signed in or not, and the saved page is left as it is until
+// the fresh copy is saved over it.
+export default function TemplateBuilderPageEditor({ backHref, templateId, resume = false }: { backHref: string; templateId: string; resume?: boolean }) {
   const template = getSiteTemplate(templateId);
   const [stored, setStored] = useState<Stored | null>(null);
 
-  // The editor opens once the account's portfolio has been read, so it
-  // starts from the saved page.
+  // The editor opens once the account's portfolio has been read.
   useEffect(() => {
     if (!template) return;
     let live = true;
     loadPortfolio()
       .then((portfolio) => {
         if (!live) return;
-        const here = portfolio?.template_id === template.id;
+        const here = resume && portfolio?.template_id === template.id;
         setStored({
           state: "loaded",
           doc: here ? toDoc(template, portfolio.portfolio_data) : null,
           slug: portfolio?.slug ?? null,
           published: here && portfolio.status === "published",
+          existing: portfolio ? { templateId: portfolio.template_id, name: savedName(portfolio) } : null,
         });
       })
       .catch((error: unknown) => {
         if (!live) return;
         const signedOut = error instanceof Error && error.message === "HTTP 401";
-        setStored({ state: signedOut ? "signed-out" : "failed", doc: null, slug: null, published: false });
+        setStored({ state: signedOut ? "signed-out" : "failed", doc: null, slug: null, published: false, existing: null });
       });
     return () => {
       live = false;
     };
-  }, [template]);
+  }, [template, resume]);
 
   if (!template || !stored) return <div data-full-screen className="h-screen bg-white" />;
-  return <Editor key={template.id} backHref={backHref} template={template} stored={stored} />;
+  return <Editor key={`${template.id}-${resume}`} backHref={backHref} template={template} stored={stored} />;
 }
 
 function Editor({ backHref, template, stored }: { backHref: string; template: TemplateDefinition; stored: Stored }) {
-  // A draft kept while signing in to save comes first (then it is forgotten).
-  const [initial] = useState(() => readDraft(template) ?? stored.doc ?? readLocalCopy(template));
+  // A draft kept while signing in to save comes first (then it is forgotten);
+  // then the saved page when continuing it; otherwise the clean template.
+  const [initial] = useState(() => readDraft(template) ?? stored.doc ?? defaultDoc(template));
   useEffect(() => forgetDraft(template), [template]);
   const history = useEditHistory<EditorDoc>(initial);
   const doc = history.value;
-  // The page as last saved to the account; null while the account has no
-  // page for this template, so everything shown is unsaved.
+  // The page as last saved to the account; null for a fresh copy that has
+  // not been saved yet.
   const [saved, setSaved] = useState<EditorDoc | null>(stored.doc);
-  const [slug, setSlug] = useState(stored.slug);
+  // What "no changes" means: the saved page, or for a fresh copy the clean
+  // template. Save is on only when the page differs from it.
+  const [blank] = useState(() => defaultDoc(template));
+  const baseline = saved ?? blank;
+  // Saving a fresh copy replaces the account's saved page (an account holds
+  // one): asked once, before the first save or publish.
+  const [replaceAsk, setReplaceAsk] = useState<null | "save" | "publish">(null);
+  const replaces = !saved && stored.existing !== null;
+  // Opening a fresh copy while the account has a saved page: a window says so
+  // first, to start fresh or go back to the saved page (once per opening).
+  const [freshAsk, setFreshAsk] = useState(() => !stored.doc && stored.existing !== null);
+  // The saved page's template, named when it is another one and the page's
+  // own name does not already say it.
+  const existingTemplateName = stored.existing ? getSiteTemplate(stored.existing.templateId)?.name ?? "another template" : null;
+  const otherTemplateName = stored.existing && stored.existing.templateId !== template.id && existingTemplateName !== stored.existing.name ? existingTemplateName : null;
+  // The page's public address once it is this page's (a fresh copy has none
+  // until it is saved).
+  const [slug, setSlug] = useState(stored.doc ? stored.slug : null);
   const [saveState, setSaveState] = useState<"saved" | "saving" | "error">("saved");
   const [publishState, setPublishState] = useState<"idle" | "publishing" | "published" | "error">(stored.published ? "published" : "idle");
   const canPersist = stored.state === "loaded";
@@ -247,22 +269,47 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
   const signedOut = stored.state === "signed-out";
   const signInToSave = () => {
     keepDraft(template, history.value);
+    leavingOnPurpose.current = true;
     window.location.assign(signInHref);
   };
   const [device, setDevice] = useState<Device>("desktop");
   // The section whose content panel is open.
   const [contentSection, setContentSection] = useState<string | null>(null);
   const [confirmExit, setConfirmExit] = useState(false);
+  // Leaving the editor (Back, All templates, the Portory mark) with unsaved
+  // changes asks first; `leaveTo` is where it would go.
+  const router = useRouter();
+  const [leaveTo, setLeaveTo] = useState<string | null>(null);
+  // Set when the editor leaves on purpose (signing in to save keeps the page).
+  const leavingOnPurpose = useRef(false);
   const [focus, setFocus] = useState<Focus>("all");
   const pageRef = useRef<HTMLDivElement>(null);
   const [feedback, setFeedback] = useState("");
-  const [copied, setCopied] = useState(false);  const dirty = !saved || JSON.stringify(doc) !== JSON.stringify(saved);
+  // A short notice at the foot of the editor: a coming-soon tool was clicked,
+  // or the template opened is still in progress.
+  const [notice, setNotice] = useState<string | null>(() => (template.inProgress ? `Work in progress. ${template.inProgress.note} The sidebar lists what does not work yet.` : null));
+  useEffect(() => {
+    const onSoon = (event: Event) => setNotice(`${(event as CustomEvent<string>).detail} is coming soon. It does not work yet.`);
+    window.addEventListener(COMING_SOON_EVENT, onSoon);
+    return () => window.removeEventListener(COMING_SOON_EVENT, onSoon);
+  }, []);
+  useEffect(() => {
+    if (!notice) return;
+    const timer = window.setTimeout(() => setNotice(null), 6000);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
+  const [copied, setCopied] = useState(false);
+  // Something differs from the saved page (or, before the first save, from
+  // the clean template).
+  const dirty = JSON.stringify(doc) !== JSON.stringify(baseline);
   // Published, and nothing has changed since.
   const published = publishState === "published" && !dirty;
   const canSave = dirty && saveState !== "saving" && canPersist;
   const canPublish = publishState !== "publishing" && canPersist;
   const editing = mode === "edit";
   const publicPath = slug ? `/p/${slug}` : null;
+  // The open section is not designed yet (its note), for the canvas banner.
+  const focusedInProgress = focus !== "all" ? template.sections.find((section) => section.id === baseOf(focus))?.inProgress : undefined;
   const contentDefinition = contentSection ? template.sections.find((section) => section.id === baseOf(contentSection)) : undefined;
   // The same statuses as TemplateBuilderPage.
   const statusText =
@@ -279,7 +326,9 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
                 ? "Unsaved changes"
                 : published
                   ? "Published"
-                  : "Saved");
+                  : saved
+                    ? "Saved"
+                    : "Not saved yet");
   // The status as a colour (the rail's dot): red for a problem, amber for
   // unsaved changes, green for published, grey otherwise.
   const statusDot =
@@ -292,6 +341,23 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
           : published
             ? "bg-emerald-500"
             : "bg-neutral-300";
+
+  // Unsaved changes would be lost by leaving: links out of the editor ask
+  // first, and closing or reloading the tab gets the browser's own warning.
+  const guardLeave = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (!dirty || stored.state === "failed") return;
+    event.preventDefault();
+    history.commit();
+    setLeaveTo(href);
+  };
+  useEffect(() => {
+    if (!dirty || stored.state === "failed") return;
+    const warn = (event: BeforeUnloadEvent) => {
+      if (!leavingOnPurpose.current) event.preventDefault();
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty, stored.state]);
 
   // Each device keeps its own scroll position inside its frame: switching
   // saves the one being left and restores the one chosen (its top the first
@@ -426,10 +492,11 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
 
   // Save and Publish, as in TemplateBuilderPage: both store the page with the
   // account (lib/portfolio-client); Publish also makes it the live page.
-  const save = async (page: EditorDoc = doc) => {
+  const save = async (page: EditorDoc = doc, confirmed = false) => {
     history.commit();
     const unchanged = saved && JSON.stringify(page) === JSON.stringify(saved);
     if (unchanged || saveState === "saving" || !canPersist) return;
+    if (replaces && !confirmed) return setReplaceAsk("save");
     setSaveState("saving");
     setFeedback("");
     try {
@@ -445,9 +512,10 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
     }
   };
 
-  const publish = async () => {
+  const publish = async (confirmed = false) => {
     history.commit();
     if (publishState === "publishing" || !canPersist) return;
+    if (replaces && !confirmed) return setReplaceAsk("publish");
     setPublishState("publishing");
     setFeedback("");
     try {
@@ -552,17 +620,19 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
               {/* The Portory mark (home) left, All templates right */}
               <div className="flex items-center justify-between gap-3">
                 <Tooltip label="Portory home">
-                  <Link href="/" aria-label="Portory home" className={`${focusRing} ${markTile} size-10`}>
+                  <Link href="/" onClick={(event) => guardLeave(event, "/")} aria-label="Portory home" className={`${focusRing} ${markTile} size-10`}>
                     <LogoMark className="size-6" title={null} />
                   </Link>
                 </Tooltip>
-                <BackToHome href={backHref} label="All templates" />
+                <BackToHome href={backHref} label="All templates" onClick={(event) => guardLeave(event, backHref)} />
               </div>
 
               <motion.div {...rise(0)} className="flex flex-col gap-2.5">
                 <h1 className={`m-0 ${fluidText.editorTitle} font-medium leading-none tracking-[-0.035em]`}>{template.name}</h1>
                 <p className="m-0 text-sm leading-relaxed text-foreground/55">{template.description}</p>
 
+                {/* What is not finished: the template, and the editor tools to come */}
+                <InProgressNotice template={template} />
                 {/* Saving is off: the saved page could not be read, or no one is signed in */}
                 {stored.state === "failed" && (
                   <div role="alert" className="mt-2 flex flex-col items-start gap-2 border-l-2 border-red-500 bg-red-50 py-3 pl-3.5 pr-3 text-[13px] leading-relaxed text-red-800">
@@ -575,7 +645,7 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
                 {stored.state === "signed-out" && (
                   <div className="mt-2 flex items-center justify-between gap-3 border-l-2 border-foreground bg-foreground/[0.03] py-3 pl-3.5 pr-3 text-[13px] leading-snug text-foreground/70">
                     Sign in to save and publish your page.
-                    <Link href={signInHref} className="shrink-0 font-semibold text-foreground underline underline-offset-2">
+                    <Link href={signInHref} onClick={() => keepDraft(template, history.value)} className="shrink-0 font-semibold text-foreground underline underline-offset-2">
                       Sign in
                     </Link>
                   </div>
@@ -631,9 +701,10 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
                       <SectionNavigator
                         value={focus}
                         home={{ ...HOME_PAGE, detail: "All sections together" }}
-                        sections={template.sections.map(({ id, label, menu, fields }) => ({
+                        sections={template.sections.map(({ id, label, menu, fields, inProgress }) => ({
                           id,
                           label,
+                          inProgress,
                           detail: menu ? (inMenu(doc.content, { id, menu }) ? `In the menu as “${menuName(doc.content, { id, menu })}”` : "Not in the menu") : fields?.length ? `${fields.length} ${fields.length === 1 ? "field" : "fields"} to edit` : undefined,
                         }))}
                         onChange={chooseSection}
@@ -655,7 +726,7 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
           {/* The account (Log out) */}
           <div className="flex shrink-0 items-center border-t border-foreground/[0.07] px-[clamp(1rem,calc(-0.5rem_+_3.125vw),1.5rem)] py-3">
             <div className="min-w-0 flex-1">
-              <EditorAccount unsaved={dirty && stored.state === "loaded"} signInHref={signInHref} />
+              <EditorAccount unsaved={dirty && stored.state === "loaded"} signInHref={signInHref} onSignIn={() => keepDraft(template, history.value)} />
             </div>
           </div>
         </aside>
@@ -668,12 +739,12 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
           className={`absolute inset-y-0 left-0 flex w-14 flex-col items-center gap-2 bg-white py-5 transition-opacity duration-300 ${asideOpen ? "pointer-events-none opacity-0" : "opacity-100 delay-150"}`}
         >
           <Tooltip label="Portory home" side="right">
-            <Link href="/" aria-label="Portory home" className={`${focusRing} ${markTile} mb-3 size-8`}>
+            <Link href="/" onClick={(event) => guardLeave(event, "/")} aria-label="Portory home" className={`${focusRing} ${markTile} mb-3 size-8`}>
               <LogoMark className="size-5" title={null} />
             </Link>
           </Tooltip>
           <Tooltip label="Back to templates" side="right">
-            <Link href={backHref} aria-label="Back to templates" className={`${focusRing} ${iconButton} mb-2 no-underline`}>
+            <Link href={backHref} onClick={(event) => guardLeave(event, backHref)} aria-label="Back to templates" className={`${focusRing} ${iconButton} mb-2 no-underline`}>
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Tooltip>
@@ -700,7 +771,7 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
           </Tooltip>
           {/* At the bottom: the account (opens the sidebar, where Log out is) */}
           <div className="mt-auto">
-            <EditorAccount compact unsaved={dirty && stored.state === "loaded"} signInHref={signInHref} onExpand={() => setAsideOpen(true)} />
+            <EditorAccount compact unsaved={dirty && stored.state === "loaded"} signInHref={signInHref} onSignIn={() => keepDraft(template, history.value)} onExpand={() => setAsideOpen(true)} />
           </div>
         </nav>
       </div>
@@ -865,7 +936,7 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
                   )}
               <button
                 type="button"
-                onClick={publish}
+                onClick={() => publish()}
                 disabled={!canPublish}
                 className={`${solidCell} min-w-36 bg-primary hover:bg-[color:color-mix(in_srgb,var(--primary),black_14%)] disabled:cursor-not-allowed disabled:text-white/60 disabled:hover:bg-primary`}
               >
@@ -899,7 +970,16 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
             {/* The device's frame (rounded, raised, clipping its corners) and
                 inside it the page, scrolling, so the scrollbar keeps within
                 the rounded shape */}
-            <div className={`mx-auto overflow-hidden bg-white ${frameMotion} ${DEVICE_FRAME[device]}`}>
+            <div className={`relative mx-auto overflow-hidden bg-white ${frameMotion} ${DEVICE_FRAME[device]}`}>
+              {/* The section open on the canvas is not designed yet */}
+              {focusedInProgress && (
+                <div role="note" className="pointer-events-none absolute inset-x-0 top-3 z-30 flex justify-center px-3">
+                  <span className="flex max-w-full items-center gap-2 rounded-full bg-amber-100 px-3.5 py-1.5 text-xs font-medium text-amber-900 shadow-[0_4px_16px_-6px_rgb(0_0_0/0.25)] ring-1 ring-amber-300/60">
+                    <span className="font-semibold uppercase tracking-[0.06em]">In progress</span>
+                    <span className="truncate">{focusedInProgress}</span>
+                  </span>
+                </div>
+              )}
               <div ref={pageRef} className="h-full overflow-y-auto overflow-x-hidden overscroll-contain" data-lenis-prevent>
                 <motion.div
                   key={focus}
@@ -972,7 +1052,119 @@ function Editor({ backHref, template, stored }: { backHref: string; template: Te
             </div>
           </div>
         </Modal>
+
+        {/* Leaving the editor with unsaved changes (Back, All templates, the
+            Portory mark): stay, or leave and lose them. */}
+        <Modal open={leaveTo !== null} onClose={() => setLeaveTo(null)} labelledBy="leave-title" describedBy="leave-text" alert>
+          <h2 id="leave-title" className="m-0 pr-8 text-[26px] font-medium leading-tight tracking-[-0.02em]">
+            Leave without saving?
+          </h2>
+          <p id="leave-text" className="m-0 mt-3 text-sm leading-relaxed text-neutral-600">
+            {signedOut
+              ? "You're not signed in, so these changes can't be saved yet. Sign in to keep them, or leave and lose them."
+              : "You have changes that are not saved yet. If you leave now, they will be lost."}
+          </p>
+          <div className="mt-8 flex justify-end gap-2">
+            <button type="button" autoFocus onClick={signedOut ? signInToSave : () => setLeaveTo(null)} className="h-11 cursor-pointer rounded px-5 text-sm font-medium text-neutral-950 transition-colors hover:bg-neutral-100">
+              {signedOut ? "Sign in to save" : "Stay"}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const href = leaveTo;
+                leavingOnPurpose.current = true;
+                setLeaveTo(null);
+                if (href) router.push(href);
+              }}
+              className="h-11 cursor-pointer rounded bg-primary px-5 text-sm font-medium text-white transition-colors hover:bg-[color:color-mix(in_srgb,var(--primary),black_14%)]"
+            >
+              Leave
+            </button>
+          </div>
+        </Modal>
+
+        {/* A fresh copy while the account has a saved page: start fresh, or
+            continue editing the saved page. */}
+        <Modal open={freshAsk} onClose={() => setFreshAsk(false)} labelledBy="fresh-title" describedBy="fresh-text" dismissible={false}>
+          <h2 id="fresh-title" className="m-0 pr-8 text-[26px] font-medium leading-tight tracking-[-0.02em]">
+            You already have a saved page
+          </h2>
+          <p id="fresh-text" className="m-0 mt-3 text-sm leading-relaxed text-neutral-600">
+            {stored.existing?.templateId === template.id ? (
+              <>
+                You&apos;re starting a fresh copy of {template.name}, without your changes. Your saved {template.name} page stays as it is until you save this one over it.
+              </>
+            ) : (
+              <>
+                This is a fresh copy of {template.name}. Your saved page, {stored.existing?.name}
+                {otherTemplateName ? ` (${otherTemplateName})` : ""}, stays as it is until you save this one over it.
+              </>
+            )}
+          </p>
+          <div className="mt-8 flex justify-end gap-2">
+            <button type="button" onClick={() => setFreshAsk(false)} className="h-11 cursor-pointer rounded px-5 text-sm font-medium text-neutral-950 transition-colors hover:bg-neutral-100">
+              Start fresh
+            </button>
+            {stored.existing && (
+              <Link
+                href={siteTemplateContinueHref(stored.existing.templateId)}
+                autoFocus
+                className="inline-flex h-11 cursor-pointer items-center whitespace-nowrap rounded bg-primary px-5 text-sm font-medium text-white no-underline transition-colors hover:bg-[color:color-mix(in_srgb,var(--primary),black_14%)]"
+              >
+                Continue editing
+              </Link>
+            )}
+          </div>
+        </Modal>
+
+        {/* Saving a fresh copy replaces the account's saved page (an account
+            holds one): asked before its first save or publish. */}
+        <Modal open={replaceAsk !== null} onClose={() => setReplaceAsk(null)} labelledBy="replace-title" describedBy="replace-text" alert>
+          <h2 id="replace-title" className="m-0 pr-8 text-[26px] font-medium leading-tight tracking-[-0.02em]">
+            Replace your saved page?
+          </h2>
+          <p id="replace-text" className="m-0 mt-3 text-sm leading-relaxed text-neutral-600">
+            Your account holds one page. {replaceAsk === "publish" ? "Publishing" : "Saving"} this copy of {template.name} replaces your saved page, {stored.existing?.name}
+            {otherTemplateName ? ` (${otherTemplateName})` : ""}. Its address stays the same.
+          </p>
+          <div className="mt-8 flex justify-end gap-2">
+            <button type="button" autoFocus onClick={() => setReplaceAsk(null)} className="h-11 cursor-pointer rounded px-5 text-sm font-medium text-neutral-950 transition-colors hover:bg-neutral-100">
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const action = replaceAsk;
+                setReplaceAsk(null);
+                if (action === "publish") publish(true);
+                else save(doc, true);
+              }}
+              className="h-11 cursor-pointer rounded bg-primary px-5 text-sm font-medium text-white transition-colors hover:bg-[color:color-mix(in_srgb,var(--primary),black_14%)]"
+            >
+              {replaceAsk === "publish" ? "Replace and publish" : "Replace and save"}
+            </button>
+          </div>
+        </Modal>
       </div>
+
+      {/* The notice at the foot (coming-soon tools, a template in progress) */}
+      <AnimatePresence>
+        {notice && (
+          <motion.div
+            role="status"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 12 }}
+            transition={{ duration: 0.3, ease: smooth }}
+            className="fixed bottom-6 left-1/2 z-[80] flex w-[min(34rem,calc(100vw-2rem))] -translate-x-1/2 items-start gap-3 rounded-xl bg-neutral-900 px-4 py-3 text-sm leading-snug text-white shadow-[0_16px_40px_-12px_rgb(0_0_0/0.45)]"
+          >
+            <span className="min-w-0 flex-1">{notice}</span>
+            <button type="button" onClick={() => setNotice(null)} aria-label="Close notice" className="-mr-1 grid size-6 shrink-0 cursor-pointer place-items-center rounded text-white/70 transition-colors hover:bg-white/10 hover:text-white">
+              <X aria-hidden="true" className="size-4" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Preview: the page alone, full screen */}
       <AnimatePresence>

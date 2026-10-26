@@ -14,6 +14,10 @@ export const productTemplate = defineTemplate({
   siteTitle: { section: "header", field: "siteTitle" },
   theme: "[--font-display:var(--tf-playfair)]",
   Provider: CartProvider,
+  inProgress: {
+    note: "The shop is for show: it looks and counts like a real one, but nothing can be bought yet.",
+    notWorking: ["Add to cart and the cart (no checkout or payments yet)", "The Login link in the header", "The Instagram link in the header"],
+  },
   sections: [
     { id: "header", label: "Header", Component: Header, defaults: siteHeaderDefaults },
     {

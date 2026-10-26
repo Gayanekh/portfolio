@@ -14,6 +14,9 @@ export const starterTemplate = defineTemplate({
   name: "Starter",
   description: "The base for new templates: a header with the menu, a hero, work, about, contact and a footer.",
   siteTitle: { section: "header", field: "siteTitle" },
+  inProgress: {
+    note: "Starter is the plain base new templates are built from, not a finished design.",
+  },
   sections: [
     { id: "header", label: "Header", Component: SiteHeader, defaults: siteHeaderDefaults },
     {

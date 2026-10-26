@@ -10,6 +10,8 @@ export interface SectionNavItem {
   label: string;
   // A short line about the section, shown under it when it is chosen.
   detail?: string;
+  // Not designed yet: a small "In progress" badge, its note as the detail.
+  inProgress?: string;
 }
 
 // The page's sections as a numbered outline in the editor's sidebar: the
@@ -69,11 +71,14 @@ export default function SectionNavigator({
                   {String(index).padStart(2, "0")}
                 </span>
                 <span className="flex min-w-0 flex-col">
-                  <span className={`truncate text-[15px] tracking-[-0.01em] transition-colors ${active ? "font-semibold text-foreground" : "text-foreground/70 group-hover:text-foreground"}`}>
-                    {entry.label}
+                  <span className="flex min-w-0 items-center gap-2">
+                    <span className={`truncate text-[15px] tracking-[-0.01em] transition-colors ${active ? "font-semibold text-foreground" : "text-foreground/70 group-hover:text-foreground"}`}>
+                      {entry.label}
+                    </span>
+                    {entry.inProgress && <span className="shrink-0 rounded bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-amber-800">In progress</span>}
                   </span>
                   <AnimatePresence initial={false}>
-                    {active && entry.detail && (
+                    {active && (entry.inProgress ?? entry.detail) && (
                       <motion.span
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
@@ -81,7 +86,7 @@ export default function SectionNavigator({
                         transition={{ duration: 0.25, ease: smooth }}
                         className="block overflow-hidden"
                       >
-                        <span className="block pt-0.5 text-xs leading-snug text-foreground/55">{entry.detail}</span>
+                        <span className={`block pt-0.5 text-xs leading-snug ${entry.inProgress ? "text-amber-800" : "text-foreground/55"}`}>{entry.inProgress ?? entry.detail}</span>
                       </motion.span>
                     )}
                   </AnimatePresence>

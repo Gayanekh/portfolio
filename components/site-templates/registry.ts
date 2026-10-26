@@ -13,4 +13,7 @@ export const SITE_TEMPLATES: TemplateDefinition[] = [showcaseTemplate, personaTe
 export const getSiteTemplate = (id: string) => SITE_TEMPLATES.find((template) => template.id === id);
 
 export const siteTemplateDemoHref = (id: string) => `/templates/demo/${id}`;
+// A fresh copy of the template ("Use this template").
 export const siteTemplateEditorHref = (id: string) => `/templates/editor/${id}`;
+// The account's saved page, opened to keep editing it ("Continue editing").
+export const siteTemplateContinueHref = (id: string) => `/templates/editor/${id}?continue=1`;

@@ -32,6 +32,9 @@ export interface SectionDefinition {
   fields?: FieldDefinition[];
   // On a stacking page, false keeps this section out of the stack (a header).
   stack?: boolean;
+  // Not designed yet: what is missing, shown in the editor (its sections list
+  // and a note while the section is open).
+  inProgress?: string;
 }
 
 export interface TemplateDefinition {
@@ -49,6 +52,9 @@ export interface TemplateDefinition {
   scroll?: "normal" | "stack";
   // State shared by several sections, such as a cart.
   Provider?: ComponentType<{ children: ReactNode }>;
+  // Still being built: a short note and what does not work yet, shown in the
+  // editor so nobody mistakes a gap for a bug.
+  inProgress?: { note: string; notWorking?: string[] };
 }
 
 // How the editor makes a page editable. Without them the page is read-only.

@@ -1,5 +1,6 @@
 "use client";
 
+import { announceComingSoon } from "../in-progress";
 import type { LucideIcon } from "lucide-react";
 import Tooltip from "@/components/ui/tooltip";
 import { editorUi } from "./canvas";
@@ -55,7 +56,8 @@ export function ToolButton({
       // Coming soon: not disabled (so its tooltip still shows), just inert.
       aria-disabled={soon || undefined}
       disabled={disabled}
-      onClick={soon ? undefined : onClick}
+      // A click on it says it is coming (the editor shows a notice).
+      onClick={soon ? () => announceComingSoon(label) : onClick}
       className={`flex h-9 min-w-9 cursor-pointer items-center justify-center gap-1.5 rounded-lg px-1.5 transition-colors disabled:cursor-default disabled:text-neutral-300 disabled:hover:bg-transparent aria-disabled:cursor-default aria-disabled:text-neutral-300 aria-disabled:hover:bg-transparent ${
         danger ? "text-red-600 hover:bg-red-50" : `text-neutral-950 hover:bg-neutral-100 ${active ? "bg-neutral-100" : ""}`
       } ${wide ? "px-2.5" : ""}`}

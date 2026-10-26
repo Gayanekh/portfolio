@@ -31,7 +31,8 @@ function Avatar({ account, size }: { account: Account; size: "sm" | "md" }) {
 // lost. Signed out, a Sign in link that comes back to this editor. `compact`
 // is the sidebar's rail: the avatar alone, which opens the sidebar (`onExpand`),
 // where the menu is (the rail is too narrow, and clips, for a menu).
-export default function EditorAccount({ compact = false, unsaved, signInHref, onExpand }: { compact?: boolean; unsaved: boolean; signInHref: string; onExpand?: () => void }) {
+// `onSignIn` runs as a Sign in link is followed (the editor keeps its page).
+export default function EditorAccount({ compact = false, unsaved, signInHref, onExpand, onSignIn }: { compact?: boolean; unsaved: boolean; signInHref: string; onExpand?: () => void; onSignIn?: () => void }) {
   const { account, loading, signOut } = useAccount();
   const [open, setOpen] = useState(false);
   const [leaving, setLeaving] = useState(false);
@@ -62,7 +63,7 @@ export default function EditorAccount({ compact = false, unsaved, signInHref, on
     if (compact) {
       return (
         <Tooltip label="Sign in" side="right">
-          <Link href={signInHref} aria-label="Sign in" className={`${signIn} size-10`}>
+          <Link href={signInHref} onClick={onSignIn} aria-label="Sign in" className={`${signIn} size-10`}>
             <LogIn aria-hidden="true" className="h-4 w-4" />
           </Link>
         </Tooltip>
@@ -71,7 +72,7 @@ export default function EditorAccount({ compact = false, unsaved, signInHref, on
     return (
       <div className="flex items-center justify-between gap-3">
         <span className="min-w-0 text-[13px] leading-snug text-foreground/60">Sign in to save your work</span>
-        <Link href={signInHref} className={`${signIn} group h-10 px-4`}>
+        <Link href={signInHref} onClick={onSignIn} className={`${signIn} group h-10 px-4`}>
           <LogIn aria-hidden="true" className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
           Sign in
         </Link>

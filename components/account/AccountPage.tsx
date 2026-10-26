@@ -3,7 +3,8 @@
 import { type FormEvent, type ReactNode, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Camera, Check, Eye, EyeOff, ImageUp, KeyRound, type LucideIcon, LogOut, Mail, ShieldCheck, Trash2, UserRound } from "lucide-react";
+import { Camera, Check, Eye, EyeOff, ImageUp, KeyRound, LayoutTemplate, type LucideIcon, LogOut, Mail, ShieldCheck, Trash2, UserRound } from "lucide-react";
+import Link from "next/link";
 import { announceProfileChange } from "@/components/auth/useAccount";
 import { MIN_PASSWORD_LENGTH } from "@/components/auth/LoginExperience";
 import LandingHeader from "@/components/landing/LandingHeader";
@@ -12,6 +13,8 @@ import Modal from "@/components/ui/modal";
 import { getInitials } from "@/lib/auth-routing";
 import { ACCEPTED_IMAGE_TYPES, uploadPortfolioImage, validatePortfolioImage } from "@/lib/portfolio-images";
 import { createClient } from "@/lib/supabase/client";
+import { loadPortfolio, type SavedPortfolio } from "@/lib/portfolio-client";
+import { getSiteTemplate, siteTemplateContinueHref } from "@/components/site-templates/registry";
 
 const IMAGES_BUCKET = "portfolio-images";
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -46,6 +49,69 @@ function ErrorText({ text }: { text: string }) {
       {text}
     </p>
   ) : null;
+}
+
+// The account's saved page (an account holds one): its name and template,
+// whether it is live, and Continue editing, the way back to it in the editor
+// ("Use this template" always starts a fresh copy). Nothing shows until it
+// has loaded; with no page yet, a link to the templates.
+function YourPage() {
+  const [portfolio, setPortfolio] = useState<SavedPortfolio | null | undefined>(undefined);
+  useEffect(() => {
+    let live = true;
+    loadPortfolio()
+      .then((result) => live && setPortfolio(result))
+      .catch(() => live && setPortfolio(null));
+    return () => {
+      live = false;
+    };
+  }, []);
+  if (portfolio === undefined) return null;
+  const template = portfolio ? getSiteTemplate(portfolio.template_id) : undefined;
+  const data = portfolio?.portfolio_data as { name?: unknown } | null | undefined;
+  // Minimal and Bold, the earlier templates, open their saved page in their own builder.
+  const templateName = template?.name ?? (portfolio ? portfolio.template_id.charAt(0).toUpperCase() + portfolio.template_id.slice(1) : "");
+  const continueHref = portfolio ? (template ? siteTemplateContinueHref(template.id) : `/templates/editor/${portfolio.template_id}`) : "/templates";
+  const name = typeof data?.name === "string" && data.name ? data.name : templateName;
+  return (
+    <Section title="Your page" text="The page you saved, to keep editing or share.">
+      {portfolio ? (
+        <Item
+          Icon={LayoutTemplate}
+          title={name ?? "Your page"}
+          value={
+            <>
+              {templateName} template · {portfolio.status === "published" ? "Published" : "Draft"}
+              {portfolio.status === "published" && (
+                <>
+                  {" · "}
+                  <a href={`/p/${portfolio.slug}`} target="_blank" rel="noreferrer" className="underline underline-offset-2">
+                    View live page
+                  </a>
+                </>
+              )}
+            </>
+          }
+          action={
+            <Link href={continueHref} className={small}>
+              Continue editing
+            </Link>
+          }
+        />
+      ) : (
+        <Item
+          Icon={LayoutTemplate}
+          title="No page yet"
+          value="Choose a template, make it yours and save it to see it here."
+          action={
+            <Link href="/templates" className={small}>
+              Browse templates
+            </Link>
+          }
+        />
+      )}
+    </Section>
+  );
 }
 
 // The settings: a small heading with a short brand-colour rule and a line
@@ -389,6 +455,10 @@ export default function AccountPage(props: {
             {photoError && <div className="mt-3"><ErrorText text={photoError} /></div>}
           </div>
         </motion.header>
+
+        <motion.div {...rise(0.1)} className="mt-20">
+          <YourPage />
+        </motion.div>
 
         <motion.div {...rise(0.12)} className="mt-20">
           <Section title="Account settings" text="Your name, how you sign in, and your account, all in one place.">

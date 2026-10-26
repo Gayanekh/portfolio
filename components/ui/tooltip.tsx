@@ -25,13 +25,15 @@ const shift: Record<Side, string> = {
 // pause on hover or when the control gets keyboard focus, gone on leaving it
 // or pressing it. Drawn on the page body, so no sidebar, rail or toolbar
 // clips it. `keys` shows a shortcut ("Ctrl", "D"). It wraps one control
-// without changing its layout (the wrapper is display: contents).
+// without changing its layout (the wrapper is display: contents). `wide`
+// lets a longer note wrap over a few lines.
 export default function Tooltip({
   label,
   keys,
   side = "bottom",
   delay = 300,
   disabled = false,
+  wide = false,
   children,
 }: {
   label: ReactNode;
@@ -39,6 +41,7 @@ export default function Tooltip({
   side?: Side;
   delay?: number;
   disabled?: boolean;
+  wide?: boolean;
   children: ReactNode;
 }) {
   const wrapRef = useRef<HTMLSpanElement>(null);
@@ -81,7 +84,7 @@ export default function Tooltip({
       {spot &&
         createPortal(
           <span role="tooltip" style={{ left: spot.left, top: spot.top }} className={`pointer-events-none fixed z-[200] ${shift[side]}`}>
-            <span className="flex items-center gap-1.5 whitespace-nowrap rounded bg-neutral-900 px-2 py-1 font-[family-name:var(--font-ui),ui-sans-serif,system-ui,sans-serif] text-[11px] font-medium normal-case leading-normal tracking-normal text-white shadow-[0_4px_12px_-4px_rgb(0_0_0/0.3)] animate-in fade-in duration-150">
+            <span className={`flex gap-1.5 rounded bg-neutral-900 ${wide ? "w-max max-w-[18rem] flex-col items-start whitespace-normal px-3 py-2.5 text-left" : "items-center whitespace-nowrap px-2 py-1"} font-[family-name:var(--font-ui),ui-sans-serif,system-ui,sans-serif] text-[11px] font-medium normal-case leading-normal tracking-normal text-white shadow-[0_4px_12px_-4px_rgb(0_0_0/0.3)] animate-in fade-in duration-150`}>
               {label}
               {keys?.map((key) => (
                 <kbd key={key} className="rounded bg-white/15 px-1 font-[inherit] text-[9px] font-semibold">
