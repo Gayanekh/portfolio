@@ -1,13 +1,14 @@
 "use client";
 
-import { useId } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 
 // A small round badge: text set around a circle, turning slowly, with a dot
 // at its centre. With reduced motion it stays still.
 export default function AuthBadge({ text, className = "" }: { text: string; className?: string }) {
   const reducedMotion = useReducedMotion();
-  const circleId = useId();
+  // The circle's id, made from the text (not useId), so it is the same in the
+  // server's HTML and the browser, and differs between badges on a page.
+  const circleId = `auth-badge-${text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
 
   return (
     <span aria-hidden="true" className={`relative grid size-[4.5rem] shrink-0 place-items-center ${className}`}>

@@ -85,7 +85,9 @@ function Links({ active }: { active: string | null }) {
 // only the logo and the account buttons, on every screen size.
 function Bar({ compact, active, links }: { compact: boolean; active: string | null; links: boolean }) {
   const [open, setOpen] = useState(false);
-  const menuId = useId();
+  // A fixed id per bar (not useId), so the server's HTML and the browser
+  // always agree on it.
+  const menuId = compact ? "landing-menu-compact" : "landing-menu";
   const close = () => setOpen(false);
 
   return (
