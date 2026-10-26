@@ -18,8 +18,11 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   return { title: name ? `Editing ${name} | Portory` : "Portory" };
 }
 
-export default async function TemplateEditorPage({ params }: { params: Promise<{ id: string }> }) {
+// `?continue=1` opens the account's saved page; without it the editor starts
+// from a fresh copy of the template.
+export default async function TemplateEditorPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ continue?: string }> }) {
   const { id } = await params;
+  const resume = (await searchParams).continue === "1";
   const earlier = earlierTemplate(id);
   if (earlier) {
     return (
@@ -32,7 +35,9 @@ export default async function TemplateEditorPage({ params }: { params: Promise<{
   if (!template) notFound();
   return (
     <PhoneEditorGate id={id} name={template.name} demoHref={siteTemplateDemoHref(id)}>
-      <TemplateBuilderPageEditor backHref="/templates" templateId={id} />
+      {/* Keyed by the mode, so switching between a fresh copy and the saved page
+          (the same address, ?continue=1) loads the editor again from scratch */}
+      <TemplateBuilderPageEditor key={`${id}-${resume}`} backHref="/templates" templateId={id} resume={resume} />
     </PhoneEditorGate>
   );
 }

@@ -40,6 +40,10 @@ export const galleryTemplate = defineTemplate({
   siteTitle: { section: "hero", field: "siteTitle" },
   theme:
     "[--card:#ffffff] [--foreground:#1d1d1f] [--muted-foreground:#8e8e8e] [--border:#e4e4e4] [--primary:#ff4747] [--font-1:var(--tf-inter-tight)] [--font-display:var(--tf-inter-tight)]",
+  inProgress: {
+    note: "Gallery is still being designed: only its opening slider is finished.",
+    notWorking: ["The About, Artists and Magazine pages are empty for now", "The menu leads to those empty pages"],
+  },
   sections: [
     {
       id: "hero",
@@ -60,8 +64,8 @@ export const galleryTemplate = defineTemplate({
       fields: SLIDES.map((n) => ({ name: `slide${n}Image`, label: `Series ${n} image address` })),
     },
     // Empty until their designs arrive.
-    { id: "about", label: "About", menu: "About", Component: Placeholder, defaults: { title: "About" } },
-    { id: "artists", label: "Artists", menu: "Artists", Component: Placeholder, defaults: { title: "Artists" } },
-    { id: "magazine", label: "Magazine", menu: "Magazine", Component: Placeholder, defaults: { title: "Magazine" } },
+    { id: "about", label: "About", menu: "About", Component: Placeholder, defaults: { title: "About" }, inProgress: "Not designed yet: only its title shows." },
+    { id: "artists", label: "Artists", menu: "Artists", Component: Placeholder, defaults: { title: "Artists" }, inProgress: "Not designed yet: only its title shows." },
+    { id: "magazine", label: "Magazine", menu: "Magazine", Component: Placeholder, defaults: { title: "Magazine" }, inProgress: "Not designed yet: only its title shows." },
   ],
 });

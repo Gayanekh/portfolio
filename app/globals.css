@@ -100,3 +100,45 @@ html:has([data-full-screen]) {
 html:has([data-site-scale]) {
   font-size: max(100%, 0.8333vw);
 }
+
+/* Scrollbars, site-wide: thin, rounded, a soft thumb on no visible track,
+   darker while hovered. Their colours are variables, so a dark area can set
+   a light thumb (e.g. [--scrollbar-thumb:rgb(255_255_255/0.25)]).
+   Firefox and current Chrome/Edge use scrollbar-width/-color; Safari the
+   ::-webkit-scrollbar rules. */
+:root {
+  --scrollbar-thumb: rgb(0 0 0 / 0.22);
+  --scrollbar-thumb-hover: rgb(0 0 0 / 0.4);
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+*:hover {
+  scrollbar-color: var(--scrollbar-thumb-hover) transparent;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background: var(--scrollbar-thumb) padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover) padding-box;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+/* A dark page (marked data-dark-page): a light thumb, and the page behind
+   the scrollbar dark too. */
+html:has([data-dark-page]) {
+  --scrollbar-thumb: rgb(255 255 255 / 0.22);
+  --scrollbar-thumb-hover: rgb(255 255 255 / 0.45);
+  background: #000;
+}

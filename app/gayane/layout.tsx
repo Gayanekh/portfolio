@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 // anigasparyan.framer.website reference, its content from her CV (_site/data.ts).
 export default function GayaneLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-black text-[#e6e6e6] antialiased selection:bg-white selection:text-black">
+    <div data-dark-page className="min-h-screen bg-black text-[#e6e6e6] antialiased selection:bg-white selection:text-black">
       <Header />
       <main>{children}</main>
       <Footer />
