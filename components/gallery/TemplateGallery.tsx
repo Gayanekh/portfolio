@@ -42,12 +42,10 @@ export default function TemplateGallery() {
             {...rise(0.05)}
             className={`m-0 text-balance ${fluidText.pageTitle} font-medium leading-[1.02] tracking-[-0.035em]`}
           >
-            Find the template that fits your work.
+           Templates
           </motion.h1>
           <motion.p {...rise(0.15)} className="m-0 max-w-[34rem] text-[length:clamp(1rem,calc(0.841rem_+_0.592vw),1.125rem)] md:text-[length:clamp(0.9375rem,min(calc(0.841rem_+_0.592vw),1.818cqi),1.125rem)] leading-relaxed text-foreground/70 md:pt-3">
-            Whether you teach, photograph, consult or build, there is a Portory template made for the way you work.
-            Every one is responsive, easy to edit with a live preview, and ready to publish on your own portory.net link.
-          </motion.p>
+Find the perfect Portory template for your style, showcase your work, and make it your own.          </motion.p>
         </div>
 
         <motion.div {...rise(0.25)} className="mt-[clamp(3.5rem,calc(1.592rem_+_7.101vw),5rem)] flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -71,7 +69,7 @@ export default function TemplateGallery() {
                   aria-pressed={active}
                   onClick={() => setStyle(option.id)}
                   onMouseEnter={() => setHovered(option.id)}
-                  className={`${focusRing} relative cursor-pointer rounded px-4 py-2.5 text-sm font-medium transition-colors duration-200 ${lit ? "text-white" : "text-foreground"}`}
+                  className={`${focusRing} relative cursor-pointer rounded px-3 py-1.5 text-[0.8125rem] font-medium transition-colors duration-200 ${lit ? "text-white" : "text-foreground"}`}
                 >
                   {lit && <motion.span layoutId="gallery-filter" transition={{ type: "spring", stiffness: 420, damping: 36 }} aria-hidden="true" className="absolute inset-0 rounded bg-foreground" />}
                   <span className="relative">{option.label}</span>
@@ -81,13 +79,14 @@ export default function TemplateGallery() {
           </div>
         </motion.div>
 
-        <motion.ul layout className="m-0 mt-[clamp(2rem,calc(0.728rem_+_4.734vw),3rem)] grid grid-cols-1 gap-x-8 gap-y-10 p-0 sm:grid-cols-2 lg:grid-cols-3">
+        <motion.ul layout style={{ rowGap: "clamp(1.75rem, calc(1.432rem + 1.183vw), 2.25rem)" }} className="m-0 mt-[clamp(1.5rem,calc(0.864rem_+_2.367vw),2.25rem)] grid grid-cols-1 gap-x-8 p-0 sm:grid-cols-2 lg:grid-cols-3">
           <AnimatePresence mode="popLayout" initial={false}>
             {shown.map((template, i) => (
               <GalleryCard key={template.id} template={template} index={i} />
             ))}
           </AnimatePresence>
         </motion.ul>
+
       </main>
 
       <BackToTop />

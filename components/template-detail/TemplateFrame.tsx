@@ -32,7 +32,7 @@ export default function TemplateFrame({ id }: { id: string }) {
   const Preview = getTemplateDetail(id)?.Preview;
   if (!Preview) return null;
   return (
-    <div data-template-font className={`${themeFontVariables} ${findPalette(theme.palette).className} ${findFontPack(theme.font).className} min-h-screen bg-card font-sans text-foreground`}>
+    <div data-template-font data-preview-frame className={`${themeFontVariables} ${findPalette(theme.palette).className} ${findFontPack(theme.font).className} min-h-screen bg-card font-sans text-foreground`}>
       <Preview palette={theme.palette} font={theme.font} />
     </div>
   );

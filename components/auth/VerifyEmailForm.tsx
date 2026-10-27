@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { authSerif } from "@/components/auth/auth-fonts";
+import { authDisplay } from "@/components/auth/auth-fonts";
 import { fluidText } from "@/components/landing/landing-ui";
 import { requestHeadingFocus, textLinkClass } from "@/components/auth/LoginExperience";
 import { createClient } from "@/lib/supabase/client";
@@ -69,7 +69,7 @@ export default function VerifyEmailForm({ email, next }: VerifyEmailFormProps) {
   return (
     <div className="grid w-full gap-6 animate-in fade-in slide-in-from-bottom-2 duration-500 motion-reduce:animate-none">
       <div className="grid gap-2">
-        <h1 ref={heading} tabIndex={-1} className={`${authSerif.className} ${fluidText.authFormTitle} font-light leading-tight tracking-[-0.02em] outline-none`}>
+        <h1 ref={heading} tabIndex={-1} className={`${authDisplay.className} ${fluidText.authFormTitle} font-light leading-tight tracking-[-0.035em] outline-none`}>
           Check your email
         </h1>
         <p className="text-[0.9375rem] leading-relaxed text-foreground/70">

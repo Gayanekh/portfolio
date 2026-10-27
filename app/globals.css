@@ -142,3 +142,12 @@ html:has([data-dark-page]) {
   --scrollbar-thumb-hover: rgb(255 255 255 / 0.45);
   background: #000;
 }
+/* A template shown inside a preview (a card's thumbnail, the "Make it yours"
+   window): no scrollbar or its strip; it still scrolls. */
+html:has([data-preview-frame]) {
+  scrollbar-width: none;
+  scrollbar-gutter: auto;
+}
+html:has([data-preview-frame])::-webkit-scrollbar {
+  display: none;
+}

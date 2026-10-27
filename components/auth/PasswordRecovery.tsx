@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { authSerif } from "@/components/auth/auth-fonts";
+import { authDisplay } from "@/components/auth/auth-fonts";
 import { fluidText } from "@/components/landing/landing-ui";
 import { useSetAuthBusy } from "@/components/auth/AuthShell";
 import {
@@ -35,7 +35,7 @@ function Intro({ title, text }: { title: string; text: string }) {
   }, []);
   return (
     <div className="grid gap-2">
-      <h1 ref={heading} tabIndex={-1} className={`${authSerif.className} ${fluidText.authFormTitle} font-light leading-tight tracking-[-0.02em] outline-none`}>
+      <h1 ref={heading} tabIndex={-1} className={`${authDisplay.className} ${fluidText.authFormTitle} font-light leading-tight tracking-[-0.035em] outline-none`}>
         {title}
       </h1>
       <p className="text-[0.9375rem] leading-relaxed text-foreground/70">{text}</p>

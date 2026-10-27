@@ -3,14 +3,17 @@
 import { motion, useReducedMotion } from "framer-motion";
 
 // Two large blurred glows behind the auth page, one cool grey and one warm
-// gold, drifting slowly; with reduced motion they sit still.
+// gold, drifting slowly and kept soft (GLOW, the layer's strength); with
+// reduced motion they sit still.
+const GLOW = 0.5;
+
 export default function AuthGlow() {
   const reducedMotion = useReducedMotion();
   const drift = (x: number[], y: number[], duration: number) =>
     reducedMotion ? {} : { animate: { x, y }, transition: { duration, ease: "easeInOut" as const, repeat: Infinity, repeatType: "mirror" as const } };
 
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+    <div aria-hidden="true" style={{ opacity: GLOW }} className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
       <motion.span
         className="absolute left-[2%] top-[4%] aspect-square w-[clamp(15rem,30vw,27.5rem)] rounded-full bg-[radial-gradient(closest-side,rgb(120_120_124/0.55),rgb(120_120_124/0))] blur-2xl"
         {...drift([0, 40, -10], [0, 30, 10], 18)}
