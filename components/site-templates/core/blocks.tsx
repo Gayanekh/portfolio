@@ -648,6 +648,8 @@ const menuLink = cva("text-foreground no-underline transition-colors duration-30
   compoundVariants: [
     { size: "inline", current: true, className: "border-foreground" },
     { size: "inline", current: false, className: "border-transparent hover:border-foreground/40" },
+    // The section in view, underlined in the accent.
+    { size: "small", current: true, className: "!border-primary" },
     { size: "large", current: false, className: "text-foreground/45 hover:text-foreground" },
   ],
   defaultVariants: { size: "inline", current: false },
