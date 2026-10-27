@@ -16,7 +16,7 @@ const STYLER = {
   kicker: "Design",
   title: "Make it yours in a click",
   text: "Pick a colour palette and a font pairing, and the whole template changes with you. Try it on a real template.",
-  template: "persona",
+  template: "gallery",
   start: { href: "/templates", label: "Get started" },
 };
 

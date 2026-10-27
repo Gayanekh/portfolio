@@ -16,22 +16,15 @@ import {
   type MotionValue,
 } from "framer-motion";
 import { MoveRight, Pause, Play } from "lucide-react";
-import { useLanding } from "@/components/landing/LandingProvider";
+import Image from "next/image";
 import { Reveal } from "@/components/landing/Reveal";
-import ScaledPreview from "@/components/landing/ScaledPreview";
-import { STYLE_LABEL, TEMPLATES, type TemplateId } from "@/components/landing/sample-portfolios";
-import { displayTitle, ease, focusRing, glassPill, kicker, lead, text, fit } from "@/components/landing/landing-ui";
+import { STYLE_LABEL } from "@/components/landing/sample-portfolios";
+import { TEMPLATES, TEMPLATE_PITCH } from "@/components/new-landing/content";
+import { displayTitle, ease, focusRing, kicker, lead, text, fit } from "@/components/landing/landing-ui";
 
-// One headline per template; everything else comes from the template data.
-const HEADLINE: Record<TemplateId, string> = {
-  atelier: "Projects first, words second",
-  ledger: "A clear record of what you do",
-  gallery: "Big images and room to breathe",
-  chapter: "Case studies with real outcomes",
-};
 
 const COUNT = TEMPLATES.length;
-// The four cards are rendered three times in a row. The slider always sits in
+// The cards are rendered three times in a row. The slider always sits in
 // the middle copy, so there is a card on both sides; when it reaches the end
 // of that copy the track is moved back by one copy, which looks identical.
 const SLIDES = Array.from({ length: COUNT * 3 }, (_, k) => k);
@@ -59,52 +52,6 @@ function usePose() {
   return { x: useMotionValue(0), y: useMotionValue(0), rotate: useMotionValue(0), w: useMotionValue(0), h: useMotionValue(0) };
 }
 
-// One hero template. It is the same preview the slider card shows; it only
-// differs by a white frame, tilt and shadow that fade out as it lands.
-function FanCard({
-  index,
-  pose,
-  flight,
-  position,
-}: {
-  index: number;
-  pose: ReturnType<typeof usePose>;
-  flight: MotionValue<number>;
-  position: MotionValue<number>;
-}) {
-  const { openPreview } = useLanding();
-  const template = TEMPLATES[index];
-  const frame = useTransform(flight, (f) => 1 - f);
-  const inner = useTransform(flight, [0, 1], [0.94, 1]);
-  const radius = useTransform(flight, [0, 1], [18, 16]);
-  // The card for the active template lands and hands over to the real preview;
-  // the others merge into it and fade out on the way.
-  const opacity = useTransform([flight, position] as const, ([f, p]: number[]) => (index === wrap(p) ? (f >= 1 ? 0 : 1) : 1 - clamp((f - 0.45) / 0.45)));
-  const pointerEvents = useTransform(opacity, (o) => (o < 0.5 ? "none" : "auto"));
-  const z = useTransform(position, (p) => (wrap(p) === index ? 35 : 30 - index * 10));
-  return (
-    <motion.button
-      type="button"
-      onClick={() => openPreview(template.id, template.sample)}
-      aria-label={`Preview the ${template.name} template`}
-      style={{ x: pose.x, y: pose.y, rotate: pose.rotate, opacity, pointerEvents, zIndex: z, width: pose.w, height: pose.h }}
-      className={`${focusRing} absolute left-0 top-0 block cursor-pointer rounded-[1.5rem] will-change-transform`}
-    >
-      <motion.span
-        aria-hidden="true"
-        style={{ opacity: frame }}
-        className="absolute inset-0 rounded-[inherit] bg-white shadow-[0_1px_2px_rgb(0_0_0/0.04),0_22px_44px_-18px_rgb(0_0_0/0.3)] ring-1 ring-foreground/5"
-      />
-      <motion.span style={{ scale: inner, borderRadius: radius }} className="absolute inset-0 block overflow-hidden bg-white">
-        <ScaledPreview template={template.id} person={template.sample} base={1100} className="absolute inset-0" />
-        <motion.span style={{ opacity: frame }} className={`${glassPill} ${text.xs} absolute bottom-3 left-3 px-3 py-1.5`}>
-          {STYLE_LABEL[template.style]}
-        </motion.span>
-      </motion.span>
-    </motion.button>
-  );
-}
-
 // A slider card's preview. The active one stays hidden until its fan card has
 // landed on it; the others simply appear with the card shells. A placeholder
 // shows until fonts are ready, so there is never an empty frame.
@@ -128,9 +75,9 @@ function PreviewPane({
     <motion.div
       ref={paneRef}
       style={flies ? { opacity } : undefined}
-      className="relative h-full w-full overflow-hidden rounded-xl bg-white"
+      className="relative h-full w-full overflow-hidden rounded-[1.25rem] bg-white"
     >
-      <ScaledPreview template={template.id} person={template.sample} base={1100} className="absolute inset-0 h-full w-full min-h-0 rounded-xl" />
+      <Image src={template.image} alt={`The ${template.name} template`} fill quality={90} sizes="(min-width: 1024px) 62vw, 100vw" className="object-cover object-top" />
       <AnimatePresence>
         {!ready && (
           <motion.span
@@ -402,10 +349,6 @@ export default function TemplatesSlider() {
   return (
     <div id="templates">
       <section ref={sectionRef} aria-label="Templates for every kind of work" className="relative overflow-x-clip py-20">
-        {/* The hero's templates, travelling down onto the slider card. */}
-        <div inert={landed} className="pointer-events-none absolute left-0 top-0 z-30">
-          {size.w > 0 && poses.map((pose, i) => <FanCard key={TEMPLATES[i].id} index={i} pose={pose} flight={flight} position={position} />)}
-        </div>
 
         {/* The same opening as the other sections: label and title on the left, intro on the right. */}
         <div className="w-content-width mx-auto flex flex-col gap-[clamp(2rem,calc(1.364rem_+_2.367vw),2.5rem)]">
@@ -414,7 +357,7 @@ export default function TemplatesSlider() {
               <p className={kicker}>Templates</p>
               <h2 className={displayTitle}>Templates for every kind of work</h2>
             </div>
-            <p className={lead}>Four layouts, each shown with an example person. Select a card to open the templates.</p>
+            <p className={lead}>Real, editable templates, each with its own sample content. Select a card to open its demo.</p>
           </Reveal>
           <Reveal>
             {/* Plain tabs; a light grey pill marks the chosen one and slides to
@@ -477,19 +420,21 @@ export default function TemplatesSlider() {
                     >
                       <motion.div
                         style={{ opacity: shell }}
-                        className="card relative h-full rounded-[1.25rem] p-[clamp(0.75rem,calc(0.432rem_+_1.183vw),1rem)] shadow-[0_0_0_1px_rgb(0_0_0/0.06),0_18px_40px_-28px_rgb(0_0_0/0.35)]"
+                        // No frame: the screenshot itself, lifted by soft shadows in layers
+                        // (a close contact shadow, then wider, fainter ones that fade out).
+                        className="relative h-full rounded-[1.25rem] shadow-[0_1px_2px_rgb(15_15_20/0.04),0_4px_10px_-2px_rgb(15_15_20/0.05),0_16px_32px_-8px_rgb(15_15_20/0.08),0_40px_80px_-20px_rgb(15_15_20/0.12)]"
                       >
                         <PreviewPane slide={slide} flight={flight} position={position} ready={ready} paneRef={(element) => { paneRefs.current[slide] = element; }} />
 
                         {/* The template's panel over the image: its style, headline and
                             link always; on hover or focus it grows to show who it suits
                             and what to bring (always open where there is no hover). */}
-                        <div className="pointer-events-none absolute inset-x-6 bottom-[clamp(1.5rem,calc(0.864rem_+_2.367vw),2rem)] z-[5] max-w-[28rem] rounded-xl bg-white/80 p-[clamp(1.25rem,calc(0.932rem_+_1.183vw),1.5rem)] shadow-[0_0_0_1px_rgb(0_0_0/0.05),0_16px_40px_-20px_rgb(0_0_0/0.35)] backdrop-blur-xl backdrop-saturate-150 md:left-8 md:right-auto">
+                        <div className="pointer-events-none absolute inset-x-6 bottom-[clamp(1.5rem,calc(0.864rem_+_2.367vw),2rem)] z-[5] max-w-[28rem] rounded-xl bg-white/80 p-[clamp(1.25rem,calc(0.932rem_+_1.183vw),1.5rem)] shadow-[0_2px_6px_rgb(15_15_20/0.05),0_12px_28px_-8px_rgb(15_15_20/0.12),0_32px_64px_-24px_rgb(15_15_20/0.18)] backdrop-blur-xl backdrop-saturate-150 md:left-8 md:right-auto">
                           <div className="flex flex-col items-start gap-3">
                             <span className="rounded-full border border-foreground/10 bg-background px-3 py-1 text-xs font-medium">{STYLE_LABEL[template.style]}</span>
-                            <h3 className="m-0 text-[length:clamp(1.063rem,calc(0.452rem_+_2.381vw),1.375rem)] font-medium leading-snug tracking-[-0.02em]">{HEADLINE[template.id]}</h3>
+                            <h3 className="m-0 text-[length:clamp(1.063rem,calc(0.452rem_+_2.381vw),1.375rem)] font-medium leading-snug tracking-[-0.02em]">{TEMPLATE_PITCH[template.id]?.headline}</h3>
                             <span aria-hidden="true" className="inline-flex items-center gap-2 text-sm font-semibold">
-                              Use {template.name} <MoveRight className="size-5 transition-transform duration-300 group-hover/card:translate-x-1" />
+                              Preview {template.name} <MoveRight className="size-5 transition-transform duration-300 group-hover/card:translate-x-1" />
                             </span>
                           </div>
                           <div className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-focus-within/card:grid-rows-[1fr] group-hover/card:grid-rows-[1fr] motion-reduce:transition-none [@media(hover:none)]:grid-rows-[1fr]">
@@ -501,7 +446,7 @@ export default function TemplatesSlider() {
                               <div className="grid gap-2.5 border-t border-foreground/10 pt-4">
                                 <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.18em] text-foreground/45">Works best with</dt>
                                 <dd className="m-0 flex flex-wrap gap-1.5">
-                                  {template.needs.map((need) => (
+                                  {(TEMPLATE_PITCH[template.id]?.needs ?? []).map((need) => (
                                     <span key={need} className="rounded-full border border-foreground/10 bg-background px-3 py-1 text-xs font-medium text-foreground/80">{need}</span>
                                   ))}
                                 </dd>
@@ -510,13 +455,15 @@ export default function TemplatesSlider() {
                           </div>
                         </div>
                       </motion.div>
-                      {/* The active card opens the templates page; its neighbours move the carousel. */}
+                      {/* The active card opens its demo in a new tab; its neighbours move the carousel. */}
                       {slide === pos && (
                         <Link
-                          href="/templates"
+                          href={template.href}
+                          target="_blank"
+                          rel="noopener"
                           tabIndex={copy ? -1 : undefined}
                           aria-hidden={copy || undefined}
-                          aria-label={`Open ${template.name} in the templates`}
+                          aria-label={`Preview the ${template.name} template (opens in a new tab)`}
                           className={`${focusRing} absolute inset-0 z-10 rounded-[1.25rem]`}
                         />
                       )}

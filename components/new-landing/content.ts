@@ -14,45 +14,53 @@ export interface LinkItem {
 export const HERO = {
   title: "Your work has a story.",
   accent: "Show it with Portory.",
-  text: "Choose a template, add your details and work samples, and publish your portfolio at your own portory.net address. Keep editing whenever you like, even after it's live.",
+  text: "Choose a template, add your content, and publish your portfolio. Edit anytime, even after publishing.",
   primary: { href: "/templates", label: "Get started" } satisfies LinkItem,};
 
 /* ---------- Templates ---------- */
 
+// When the screenshots were taken. It is part of their file names, so a
+// browser never keeps showing an old copy: retake them all, rename them with
+// the new date, and change it here.
+const SHOTS = "2026-10";
+
 // The real templates, in the gallery's order. (Product is a test template.)
 // Each has a 2560×1600 (double resolution) screenshot of its opening screen in
-// public/images/templates/<id>.jpg; retake it when the template changes.
-export const TEMPLATES = SHOWN_TEMPLATES.filter((template) => template.id !== "product").map((template) => ({
+// public/images/templates/<id>-<SHOTS>.jpg; retake it when the template changes.
+// Gallery comes second on the landing (after the first template).
+const LANDING_ORDER = (() => {
+  const shown = SHOWN_TEMPLATES.filter((template) => template.id !== "product");
+  const gallery = shown.filter((template) => template.id === "gallery");
+  const rest = shown.filter((template) => template.id !== "gallery");
+  return [...rest.slice(0, 1), ...gallery, ...rest.slice(1)];
+})();
+
+export const TEMPLATES = LANDING_ORDER.map((template) => ({
   id: template.id,
   name: template.name,
   style: template.style,
   bestFor: template.bestFor,
   description: getTemplateDetail(template.id)?.description ?? "",
   href: template.href,
-  image: `/images/templates/${template.id}.jpg`,
+  image: `/images/templates/${template.id}-${SHOTS}.jpg`,
 }));
 
-// The hero's card stack shows a photo per template, in
-// public/images/stack/<template id>.jpg (1600×1600). A template not listed
-// here shows its screenshot instead. To use another photo (such as one from
-// Freepik), replace the file; free Freepik photos need a credit on the page
-// ("Designed by Freepik").
-// The current photos are from Unsplash (free to use, no credit needed):
-// showcase photo-1452587925148-ce544e77e70d, persona photo-1499951360447-b19be8fe80f5,
-// gallery photo-1516035069371-29a1b244cc32, deck photo-1522202176988-66273c2fd55f,
-// minimal photo-1498050108023-c5249f4df085 (unsplash.com/photos/<id>).
-const STACK_PHOTOS: Partial<Record<string, string>> = {
-  showcase: "/images/stack/showcase.jpg",
-  persona: "/images/stack/persona.jpg",
-  gallery: "/images/stack/gallery.jpg",
-  deck: "/images/stack/deck.jpg",
-  minimal: "/images/stack/minimal.jpg",
+// The templates slider's panel for each template: a headline, and what the
+// template works best with.
+export const TEMPLATE_PITCH: Record<string, { headline: string; needs: string[] }> = {
+  nocturne: { headline: "Design, code, photos and graphics in one dark story", needs: ["Case studies", "Photography", "Graphic work"] },
+  showcase: { headline: "Images and interfaces, given room", needs: ["Visual projects", "Short descriptions"] },
+  persona: { headline: "A bold poster with your name on it", needs: ["A portrait", "Services", "Experience"] },
+  gallery: { headline: "Big images and room to breathe", needs: ["Photo series", "Services", "Testimonials"] },
+  deck: { headline: "Projects that stack up as you scroll", needs: ["Project images", "A short intro"] },
+  signature: { headline: "A living profile beside your work", needs: ["A portrait", "Projects", "Experience"] },
 };
 
-export const STACK = TEMPLATES.map((template) => {
-  const photo = STACK_PHOTOS[template.id];
-  return { ...template, image: photo ?? template.image, photo: Boolean(photo) };
-});
+// The hero's card stack shows each template itself: a square 2200×2200
+// (double resolution) screenshot of its opening screen at 1100×1100, in
+// public/images/stack/<template id>-<SHOTS>.jpg; retake it when the template changes.
+// It is centred in its card (`photo`), as the slider's are cropped from the top.
+export const STACK = TEMPLATES.map((template) => ({ ...template, image: `/images/stack/${template.id}-${SHOTS}.jpg`, photo: true }));
 
 // The page reads as one sentence after the hero: each step's title is the
 // next one ("Pick a layout. Make it say what you do. ..."), and its tag says
