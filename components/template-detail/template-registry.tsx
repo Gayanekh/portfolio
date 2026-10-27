@@ -1,13 +1,13 @@
 import type { ComponentType } from "react";
-import MinimalPreview from "@/components/templates/MinimalPreview";
 import TemplateRenderer from "@/components/site-templates/core/TemplateRenderer";
 import { productTemplate } from "@/components/site-templates/product";
 import { showcaseTemplate } from "@/components/site-templates/showcase";
 import { personaTemplate } from "@/components/site-templates/persona";
 import { deckTemplate } from "@/components/site-templates/deck";
 import { galleryTemplate } from "@/components/site-templates/gallery";
+import { nocturneTemplate } from "@/components/site-templates/nocturne";
+import { signatureTemplate } from "@/components/site-templates/signature";
 import { siteTemplateDemoHref, siteTemplateEditorHref } from "@/components/site-templates/registry";
-import { demoPortfolioData } from "@/components/templates/demo-data";
 import { GALLERY_TEMPLATES } from "@/components/gallery/gallery-templates";
 
 // Every template that has a detail page. To add a real template, add one entry
@@ -35,8 +35,8 @@ export interface TemplateDetail {
   image?: string;
 }
 
-function MinimalSample() {
-  return <MinimalPreview data={demoPortfolioData} />;
+function SignatureSample({ palette, font }: PreviewProps) {
+  return <TemplateRenderer template={signatureTemplate} palette={palette} font={font} />;
 }
 
 // Site templates apply the palette and font pack themselves, over their own look.
@@ -56,11 +56,24 @@ function GallerySample({ palette, font }: PreviewProps) {
   return <TemplateRenderer template={galleryTemplate} palette={palette} font={font} />;
 }
 
+function NocturneSample({ palette, font }: PreviewProps) {
+  return <TemplateRenderer template={nocturneTemplate} palette={palette} font={font} />;
+}
+
 function DeckSample({ palette, font }: PreviewProps) {
   return <TemplateRenderer template={deckTemplate} palette={palette} font={font} />;
 }
 
 const LIVE_TEMPLATES: TemplateDetail[] = [
+  {
+    id: nocturneTemplate.id,
+    name: nocturneTemplate.name,
+    description: nocturneTemplate.description,
+    bestFor: "UI/UX designers, developers, photographers and graphic designers",
+    useHref: siteTemplateEditorHref(nocturneTemplate.id),
+    demoHref: siteTemplateDemoHref(nocturneTemplate.id),
+    Preview: NocturneSample,
+  },
   {
     id: showcaseTemplate.id,
     name: showcaseTemplate.name,
@@ -98,14 +111,13 @@ const LIVE_TEMPLATES: TemplateDetail[] = [
     Preview: DeckSample,
   },
   {
-    id: "minimal",
-    name: "Minimal",
-    description:
-      "A light, editorial layout with a sticky profile column and stacked project cards. Pick a palette and a font pack below, then make it yours in the editor.",
-    bestFor: "Designers and creatives",
-    useHref: "/templates/editor/minimal",
+    id: signatureTemplate.id,
+    name: signatureTemplate.name,
+    description: signatureTemplate.description,
+    bestFor: "Web, brand and graphic designers",
+    useHref: siteTemplateEditorHref(signatureTemplate.id),
     demoHref: "/templates/demo/minimal",
-    Preview: MinimalSample,
+    Preview: SignatureSample,
   },
   // TEST TEMPLATE — delete with components/site-templates/product after testing.
   {

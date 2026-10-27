@@ -29,15 +29,15 @@ export const GALLERY_STYLES: { id: GalleryStyle | "all"; label: string }[] = [
 export const GALLERY_TEMPLATES: GalleryTemplate[] = [
   // Site templates (components/site-templates) open their demo: the real
   // template, with Use This Template to open it in the editor.
+  { id: "nocturne", name: "Nocturne", style: "image", bestFor: "UI/UX designers, developers, photographers and graphic designers", live: true, href: "/templates/demo/nocturne" },
   { id: "showcase", name: "Showcase", style: "image", bestFor: "Photographers, UI/UX and graphic designers", live: true, href: "/templates/demo/showcase" },
   // IN PROGRESS — built step by step from a design reference.
   { id: "persona", name: "Persona", style: "image", bestFor: "Brand and product designers", live: true, href: "/templates/demo/persona" },
-  // IN PROGRESS — built step by step from a design reference.
   { id: "gallery", name: "Gallery", style: "image", bestFor: "Photographers and artists", live: true, href: "/templates/demo/gallery" },
   { id: "deck", name: "Deck", style: "image", bestFor: "Product and brand designers, studios", live: true, href: "/templates/demo/deck" },
-  // An earlier template with its own demo (components/templates/MinimalDemo), which opens
-  // its editor (/templates/editor/minimal).
-  { id: "minimal", name: "Minimal", style: "case", bestFor: "Designers and creatives", live: true, href: "/templates/demo/minimal" },
+  // Minimal: the Signature site template, its demo still at /templates/demo/minimal.
+  // The earlier Minimal (components/templates) only renders pages published with it.
+  { id: "signature", name: "Minimal", style: "image", bestFor: "Web, brand and graphic designers", live: true, href: "/templates/demo/minimal" },
   // TEST TEMPLATE — delete after testing (see components/site-templates/product).
   { id: "product", name: "Product", style: "image", bestFor: "Makers and small shops", live: true, href: "/templates/demo/product" },
   { id: "atelier", name: "Atelier", style: "image", bestFor: "Designers and makers", image: photo("photo-1487014679447-9f8336841d58") },
