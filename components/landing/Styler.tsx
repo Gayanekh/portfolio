@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { MoveRight, Shuffle } from "lucide-react";
 import { Reveal } from "@/components/landing/Reveal";
+import { MaskWords, useScrollValue } from "@/components/landing/scroll-fx";
 import PreviewFrame from "@/components/template-detail/PreviewFrame";
 import { getTemplateDetail } from "@/components/template-detail/template-registry";
 import { FontCard, PaletteCard, glowOf, signature } from "@/components/template-detail/StyleCards";
@@ -136,6 +137,8 @@ export default function Styler() {
   const [font, setFont] = useState(FONT_PACKS[0].id);
   const wide = useWide();
   const stageRef = useStageScale();
+  // The stage grows to full size as it scrolls up the screen.
+  const [growRef, grow] = useScrollValue<HTMLDivElement>([0.86, 1], ["start end", "start 0.3"]);
   const template = getTemplateDetail(STYLER.template);
   if (!template) return null;
 
@@ -152,7 +155,9 @@ export default function Styler() {
         <Reveal className="grid grid-cols-1 items-end gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,min(26rem,42%))] lg:gap-[min(4rem,6.5%)]">
           <div className="@container flex flex-col gap-5 [--fit:8.47cqi]">
             <p className={kicker}>{STYLER.kicker}</p>
-            <h2 className={displayTitle}>{STYLER.title}</h2>
+            <h2 className={displayTitle}>
+              <MaskWords text={STYLER.title} />
+            </h2>
           </div>
           <p className={lead}>{STYLER.text}</p>
         </Reveal>
@@ -161,6 +166,7 @@ export default function Styler() {
             them. The palette's colours glow behind the preview and fade out into
             the page, so the section has no edges. */}
         <Reveal className="relative isolate">
+          <motion.div ref={growRef} style={{ scale: grow }} className="relative origin-top">
           <AnimatePresence initial={false}>
             <motion.div
               key={activePalette.id}
@@ -232,6 +238,7 @@ export default function Styler() {
               </button>
             </div>
           </div>
+          </motion.div>
         </Reveal>
       </div>
     </section>

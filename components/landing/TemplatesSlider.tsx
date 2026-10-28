@@ -18,6 +18,7 @@ import {
 import { MoveRight, Pause, Play } from "lucide-react";
 import Image from "next/image";
 import { Reveal } from "@/components/landing/Reveal";
+import { MaskWords } from "@/components/landing/scroll-fx";
 import { STYLE_LABEL } from "@/components/landing/sample-portfolios";
 import { TEMPLATES, TEMPLATE_PITCH } from "@/components/new-landing/content";
 import { displayTitle, ease, focusRing, kicker, lead, text, fit } from "@/components/landing/landing-ui";
@@ -355,7 +356,9 @@ export default function TemplatesSlider() {
           <Reveal className="grid grid-cols-1 items-end gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,min(26rem,42%))] lg:gap-[min(4rem,6.5%)]">
             <div className="@container flex flex-col gap-5 [--fit:8.47cqi]">
               <p className={kicker}>Templates</p>
-              <h2 className={displayTitle}>Templates for every kind of work</h2>
+              <h2 className={displayTitle}>
+                <MaskWords text="Templates for every kind of work" />
+              </h2>
             </div>
             <p className={lead}>Real, editable templates, each with its own sample content. Select a card to open its demo.</p>
           </Reveal>

@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion, useInView, useMotionValue, useReducedMotion, useSpring, type MotionValue } from "framer-motion";
 import { useField, useSectionId, useTemplate } from "../../core/context";
-import { scrollParent, viewOf } from "../../core/scroll";
 import { FieldValue, number, pageSections } from "../panel-kit";
 
 // The shared look of the Nocturne sections: a near-black page with a fine
@@ -145,53 +144,7 @@ export function In({ delay = 0, y = 24, className, children }: { delay?: number;
 
 /* ---------- Scroll ---------- */
 
-// How far `ref` has travelled through the view: 0 as its top meets the
-// view's bottom, 1 as its bottom leaves the top (or, with `pinned`, 0 as its
-// top reaches the view's top and 1 as its bottom reaches the view's bottom).
-// It follows the page's scroll or the editor canvas's.
-export function useScrollProgress(ref: RefObject<HTMLElement | null>, pinned = false) {
-  const progress = useMotionValue(0);
-  useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-    const parent = scrollParent(element);
-    const scroller: HTMLElement | Window = parent ?? window;
-    let frame = 0;
-    const update = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const view = viewOf(parent);
-        const box = element.getBoundingClientRect();
-        const top = box.top - view.top;
-        const value = pinned ? -top / Math.max(1, box.height - view.height) : (view.height - top) / (view.height + box.height);
-        progress.set(Math.min(1, Math.max(0, value)));
-      });
-    };
-    update();
-    scroller.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    return () => {
-      cancelAnimationFrame(frame);
-      scroller.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-    };
-  }, [ref, pinned, progress]);
-  return progress;
-}
-
-// Whether the page is at the desktop layout (the kit's @xl, 36rem of the
-// template's own width), so pinned and parallax effects only run there.
-export function useWide(ref: RefObject<HTMLElement | null>) {
-  const [wide, setWide] = useState(false);
-  useEffect(() => {
-    const root = ref.current?.closest("[data-site-template]");
-    if (!root) return;
-    const observer = new ResizeObserver(() => setWide(root.clientWidth >= 768));
-    observer.observe(root);
-    return () => observer.disconnect();
-  }, [ref]);
-  return wide;
-}
+export { useScrollProgress, useWide } from "../../core/viewport";
 
 /* ---------- Pointer ---------- */
 

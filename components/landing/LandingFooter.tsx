@@ -5,6 +5,7 @@ import { ArrowUp } from "lucide-react";
 import LogoMark from "@/components/brand/LogoMark";
 import { useLanding } from "@/components/landing/LandingProvider";
 import { Reveal } from "@/components/landing/Reveal";
+import { MaskWords } from "@/components/landing/scroll-fx";
 import { focusRing, fluidText } from "@/components/landing/landing-ui";
 import { scrollPageTo } from "@/lib/scroll";
 
@@ -38,7 +39,9 @@ export default function LandingFooter() {
             <Link href="/" aria-label="Portory home" className={`${focusRing} grid size-10 place-items-center rounded-xl bg-white transition-transform duration-300 hover:-translate-y-0.5`}>
               <LogoMark className="size-7" />
             </Link>
-            <p className={`m-0 max-w-[26rem] text-balance ${fluidText.footerLead} font-light leading-[1.3] tracking-[-0.02em] text-white/85`}>{TAGLINE}</p>
+            <p className={`m-0 max-w-[26rem] text-balance ${fluidText.footerLead} font-light leading-[1.3] tracking-[-0.02em] text-white/85`}>
+              <MaskWords text={TAGLINE} delay={0.1} />
+            </p>
           </Reveal>
 
           {/* The page's links. */}

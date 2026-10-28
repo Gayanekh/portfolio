@@ -1,9 +1,10 @@
 "use client";
 
 import { useRef, useState, useSyncExternalStore } from "react";
-import { AnimatePresence, motion, useMotionValueEvent, useReducedMotionConfig, useScroll, type Variants } from "framer-motion";
+import { AnimatePresence, motion, useMotionValueEvent, useReducedMotionConfig, useScroll, useTransform, type Variants } from "framer-motion";
 import { ArrowLeftRight, Check, Lock } from "lucide-react";
 import { Reveal } from "@/components/landing/Reveal";
+import { MaskWords, riseItem, stagger, useStill } from "@/components/landing/scroll-fx";
 import { PEOPLE, TEMPLATES, TEMPLATE_IMAGE } from "@/components/landing/sample-portfolios";
 import { displayTitle, ease, focusRing, kicker, lead, section, fluidText } from "@/components/landing/landing-ui";
 import { scrollPageTo } from "@/lib/scroll";
@@ -196,6 +197,14 @@ export default function Features() {
 
   const active = FEATURES[index];
 
+  // Arriving: as the section rises to the top of the screen, the picture card
+  // straightens and grows from a smaller, tilted card to its place.
+  const still = useStill();
+  const { scrollYProgress: arrive } = useScroll({ target: trackRef, offset: ["start end", "start start"] });
+  const cardScale = useTransform(arrive, [0, 1], still ? [1, 1] : [0.72, 1]);
+  const cardTilt = useTransform(arrive, [0, 1], still ? [0, 0] : [-7, 0]);
+  const cardLift = useTransform(arrive, [0, 1], still ? [0, 0] : [120, 0]);
+
   return (
     <section id="features" aria-label={INTRO.title} className={`${section} md:py-0`}>
       {/* The track: from md up the heading and slider are pinned together, filling
@@ -205,7 +214,9 @@ export default function Features() {
         <div className="contents md:sticky md:top-0 md:flex md:h-svh md:flex-col md:justify-center md:gap-[clamp(2rem,calc(0.5rem_+_3.125vw),2.5rem)] md:pb-6 md:pt-20">
           <Reveal className="mx-auto flex w-content-width flex-col gap-5">
             <p className={kicker}>{INTRO.kicker}</p>
-            <h2 className={displayTitle}>{INTRO.title}</h2>
+            <h2 className={displayTitle}>
+              <MaskWords text={INTRO.title} />
+            </h2>
             <p className={`${lead} max-w-[36rem]`}>{INTRO.text}</p>
           </Reveal>
 
@@ -214,9 +225,10 @@ export default function Features() {
             className="sticky top-0 mx-auto grid h-svh w-content-width grid-cols-[auto_minmax(0,1fr)] content-center items-center gap-x-[clamp(1rem,calc(-1.08rem_+_6.4vw),3rem)] gap-y-[clamp(1.75rem,calc(0.796rem_+_3.55vw),2.5rem)] pb-4 pt-[4.5rem] md:static md:h-auto md:grid-cols-[auto_minmax(0,0.85fr)_minmax(0,1.15fr)] md:content-normal md:pb-0 md:pt-0"
           >
             {/* The dot rail: the same feature as the titles, for the pointer. */}
-            <div aria-hidden="true" className="flex flex-col items-center gap-2">
+            <motion.div aria-hidden="true" initial="hidden" whileInView="shown" viewport={{ once: true, amount: 0.5 }} variants={stagger} className="flex flex-col items-center gap-2">
               {FEATURES.map((feature, k) => (
-                <button
+                <motion.button
+                  variants={{ hidden: { opacity: 0, scale: 0 }, shown: { opacity: 1, scale: 1, transition: { duration: 0.5, ease } } }}
                   key={feature.title}
                   type="button"
                   tabIndex={-1}
@@ -226,10 +238,11 @@ export default function Features() {
                   }`}
                 />
               ))}
-            </div>
+            </motion.div>
 
             {/* The picture card. */}
-            <div
+            <motion.div
+              style={{ scale: cardScale, rotate: cardTilt, y: cardLift }}
               id="features-panel"
               role="tabpanel"
               aria-labelledby={`features-tab-${index}`}
@@ -253,17 +266,17 @@ export default function Features() {
               <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center p-6">
                 <span className="whitespace-nowrap rounded-full bg-foreground/80 px-3 py-2 text-xs font-bold leading-none text-white backdrop-blur-md">{active.title}</span>
               </div>
-            </div>
+            </motion.div>
 
             {/* The titles; the active one opens its line. Each line keeps room for
                 three rows, so the centred list doesn't shift as features change.
                 On phones the line moves over at once and the titles slide into
                 place, so the list's height never changes and nothing jumps. */}
-            <div role="tablist" aria-label="Features" aria-orientation="vertical" className="col-span-2 flex flex-col items-center gap-[clamp(0.625rem,calc(0.148rem_+_1.775vw),1rem)] text-center md:col-span-1 md:items-stretch md:text-left">
+            <motion.div role="tablist" aria-label="Features" aria-orientation="vertical" initial="hidden" whileInView="shown" viewport={{ once: true, amount: 0.3 }} variants={stagger} className="col-span-2 flex flex-col items-center gap-[clamp(0.625rem,calc(0.148rem_+_1.775vw),1rem)] text-center md:col-span-1 md:items-stretch md:text-left">
               {FEATURES.map((feature, k) => {
                 const selected = k === index;
                 return (
-                  <motion.div key={feature.title} layout={phone ? "position" : false} transition={{ duration: 0.5, ease }} className="w-full">
+                  <motion.div key={feature.title} variants={riseItem} layout={phone ? "position" : false} transition={{ duration: 0.5, ease }} className="w-full">
                     <button
                       ref={(element) => {
                         tabRefs.current[k] = element;
@@ -319,7 +332,7 @@ export default function Features() {
                   </motion.div>
                 );
               })}
-            </div>
+            </motion.div>
           </div>
         </div>
         {Array.from({ length: COUNT - 1 }, (_, k) => (
