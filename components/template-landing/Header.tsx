@@ -34,6 +34,28 @@ function Account({ menu = false, hidden = false, onPick }: { menu?: boolean; hid
   );
 }
 
+// The section in view (the last whose top has passed a third of the way
+// down the screen), for the top bar's highlight; null above the first.
+function useActiveSection() {
+  const [active, setActive] = useState<string | null>(null);
+  useEffect(() => {
+    const update = () => {
+      let current: string | null = null;
+      for (const link of NAV) {
+        const section = document.querySelector(link.href);
+        // A section that starts under the one before (the templates) marks where it shows with a child caption marker.
+        const where = section?.querySelector(":scope > [data-caption]") ?? section;
+        if (where && where.getBoundingClientRect().top < window.innerHeight / 3) current = link.href;
+      }
+      setActive((previous) => (previous === current ? previous : current));
+    };
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, []);
+  return active;
+}
+
 // The scroll position after which the top bar hands over to the pill.
 const SWAP_AT = 140;
 
@@ -45,6 +67,7 @@ const SWAP_AT = 140;
 // link closes it. On phones only the pill shows.
 export default function Header() {
   const [compact, setCompact] = useState(false);
+  const active = useActiveSection();
   const [open, setOpen] = useState(false);
   const { scrollY } = useScroll();
   // Only crossing the line changes anything, so scrolling re-renders nothing.
@@ -68,10 +91,16 @@ export default function Header() {
             <Logo className="h-[1.4rem] w-auto !text-[var(--fg)]" title={null} />
           </Link>
           <nav aria-label="Sections" className="hidden lg:col-span-2 lg:flex lg:justify-center">
-            <ul className="m-0 flex list-none gap-[clamp(1rem,2vw,2rem)] p-0">
+            <ul className="m-0 flex list-none gap-1 p-0">
               {NAV.map((link) => (
                 <li key={link.href}>
-                  <a href={link.href} tabIndex={compact ? -1 : undefined} className={`${focusRing} rounded-[4px] ${type.body} text-[var(--dim)] no-underline transition-colors duration-300 hover:text-[var(--fg)]`}>
+                  {/* Small, as in the Moire reference: the section in view dark on a soft box, the others quiet, the box on hover. */}
+                  <a
+                    href={link.href}
+                    tabIndex={compact ? -1 : undefined}
+                    aria-current={active === link.href ? "true" : undefined}
+                    className={`${focusRing} block rounded-[4px] px-2.5 py-1 text-[0.8125rem] leading-[1.4] no-underline transition-colors duration-300 hover:bg-[var(--card)] hover:text-[var(--fg)] ${active === link.href ? "bg-[var(--card)] text-[var(--fg)]" : "text-[var(--dim)]"}`}
+                  >
                     {link.label}
                   </a>
                 </li>

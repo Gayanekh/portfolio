@@ -24,12 +24,12 @@ export const HERO = {
 // the new date, and change it here.
 const SHOTS = "2026-10";
 
-// The real templates, in the gallery's order. (Product is a test template.)
+// The real templates, in the gallery's order.
 // Each has a 2560×1600 (double resolution) screenshot of its opening screen in
 // public/images/templates/<id>-<SHOTS>.jpg; retake it when the template changes.
 // Gallery comes second on the landing (after the first template).
 const LANDING_ORDER = (() => {
-  const shown = SHOWN_TEMPLATES.filter((template) => template.id !== "product");
+  const shown = SHOWN_TEMPLATES;
   const gallery = shown.filter((template) => template.id === "gallery");
   const rest = shown.filter((template) => template.id !== "gallery");
   return [...rest.slice(0, 1), ...gallery, ...rest.slice(1)];
@@ -52,8 +52,8 @@ export const TEMPLATE_PITCH: Record<string, { headline: string; needs: string[] 
   showcase: { headline: "Images and interfaces, given room", needs: ["Visual projects", "Short descriptions"] },
   persona: { headline: "A bold poster with your name on it", needs: ["A portrait", "Services", "Experience"] },
   gallery: { headline: "Big images and room to breathe", needs: ["Photo series", "Services", "Testimonials"] },
-  deck: { headline: "Projects that stack up as you scroll", needs: ["Project images", "A short intro"] },
   signature: { headline: "A living profile beside your work", needs: ["A portrait", "Projects", "Experience"] },
+  exhibition: { headline: "One artist's show, from the first room to the last", needs: ["Paintings", "A short story", "Visit details"] },
 };
 
 // The hero's card stack shows each template itself: a square 2200×2200

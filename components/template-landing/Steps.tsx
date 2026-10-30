@@ -1,131 +1,106 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useInView, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useInView } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { StepScreen } from "@/components/landing/Steps";
 import { STEPS } from "@/components/template-landing/content";
-import { Words, useScrollValue } from "@/components/template-landing/scroll-fx";
+import { useStill } from "@/components/template-landing/scroll-fx";
 import { corner, cornerLink, ease, focusRing, frame, grid, pad, type } from "@/components/template-landing/ui";
 
 const COUNT = STEPS.items.length;
-const AUTOPLAY_MS = 5200;
+const AUTOPLAY_MS = 6000;
 
-// How it works, the home page's three steps: the label, title and intro
-// across the top; then, in the grid's columns, the step's number huge and faint in
-// the first column, its picture in the second (wiping up as the step
-// changes), its words in the third, and every step listed in the fourth (the
-// one on show dark, the others grey; pointing at or focusing one shows it).
-// Each step names its address and has its own link, as on the home page.
-// A hairline under the list fills while a step is on show. It moves on by
-// itself while on screen and not pointed at.
+const arrow = `${focusRing} grid size-8 cursor-pointer place-items-center rounded-full border-0 bg-transparent p-0 text-[var(--fg)] transition-colors duration-300 hover:bg-[var(--card)]`;
+
+// How it works, laid out like the Moire reference's testimonials, with no
+// heading of its own (named for screen readers); then, on the page's columns, the home
+// page's picture of the step (its small browser window) on a grey panel
+// filling the first column, the step's line set large across the second and
+// third, and in the fourth previous and next at the top and, at the foot, the
+// step's title, its number and its link. It moves on by itself while on
+// screen and not pointed at.
 export default function Steps() {
-  const still = useReducedMotion();
+  const still = useStill();
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { amount: 0.4 });
   const [index, setIndex] = useState(0);
   const [held, setHeld] = useState(false);
   const step = STEPS.items[index];
-  const running = !still && !held && inView;
-  // The big number drifts up against the scroll.
-  const [numberRef, drift] = useScrollValue<HTMLDivElement>([120, -120], undefined, 0);
+  const go = (by: number) => setIndex((i) => (i + by + COUNT) % COUNT);
 
   useEffect(() => {
-    if (!running) return;
-    const timer = window.setTimeout(() => setIndex((i) => (i + 1) % COUNT), AUTOPLAY_MS);
+    if (still || held || !inView) return;
+    const timer = window.setTimeout(() => go(1), AUTOPLAY_MS);
     return () => window.clearTimeout(timer);
-  }, [index, running]);
+  }, [index, held, inView, still]);
+
+  const change = { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -8 }, transition: { duration: still ? 0 : 0.45, ease } };
 
   return (
     <section
       ref={ref}
       id="how-it-works"
       data-caption="steps"
-      aria-labelledby="tl-steps-title"
+      aria-label={STEPS.label}
+      aria-roledescription="carousel"
       onPointerEnter={() => setHeld(true)}
       onPointerLeave={() => setHeld(false)}
-      className="relative scroll-mt-20 border-0 border-y border-solid border-[var(--line)]"
+      className="relative scroll-mt-20"
     >
-      <div className={`${frame} ${grid} gap-y-6 pt-[clamp(4rem,10vh,7rem)]`}>
-        <p className={`m-0 ${type.body}`}>{STEPS.label}</p>
-        <h2 id="tl-steps-title" className={`m-0 lg:col-span-2 ${type.title}`}>
-          <Words text={STEPS.title} />
-        </h2>
-        <p className={`m-0 self-end ${type.body} text-[var(--dim)] lg:pl-[clamp(1rem,1.75vw,2rem)]`}>{STEPS.text}</p>
-      </div>
-      <div className={`${frame} ${grid} gap-y-8 py-[clamp(3rem,8vh,5rem)]`}>
-        <motion.div ref={numberRef} style={{ y: drift }} className="flex flex-col justify-end gap-6 lg:pr-[clamp(1rem,1.75vw,2rem)]">
-          <span aria-hidden="true" className="relative block h-[1em] overflow-hidden font-[family-name:var(--font-1)] text-[length:clamp(6rem,14vw,16rem)] font-semibold leading-[0.8] tracking-[-0.07em] text-[color-mix(in_srgb,var(--fg)_12%,transparent)]">
-            <AnimatePresence initial={false} mode="popLayout">
-              <motion.span key={index} initial={{ y: "100%" }} animate={{ y: "0%" }} exit={{ y: "-100%" }} transition={{ duration: 0.7, ease }} className="block">
-                {pad(index + 1)}
-              </motion.span>
-            </AnimatePresence>
-          </span>
-        </motion.div>
+      {/* The row, on a band tinted across the page (the column lines show through it), as in the reference. */}
+      <div className="border-0 border-y border-solid border-[var(--line)] bg-[color-mix(in_srgb,var(--fg)_4%,transparent)] py-[clamp(2.5rem,7vh,4rem)]">
+      <div className={`${frame} ${grid} gap-y-8`}>
 
-        <motion.div
-          initial={{ clipPath: "inset(100% 0% 0% 0%)" }}
-          whileInView={{ clipPath: "inset(0% 0% 0% 0%)" }}
-          viewport={{ once: true, margin: "0px 0px -15% 0px" }}
-          transition={{ duration: 1.3, ease }}
-          className="relative aspect-[3/4] overflow-hidden bg-[var(--card)] lg:aspect-auto lg:min-h-[34rem]"
-        >
-          <AnimatePresence initial={false}>
-            <motion.div
-              key={index}
-              initial={{ clipPath: "inset(100% 0% 0% 0%)" }}
-              animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
-              exit={{ opacity: 1 }}
-              transition={{ duration: 1, ease: [0.65, 0, 0.35, 1] }}
-              className="absolute inset-0"
-            >
-              <Image src={step.image} alt="" fill sizes="(min-width: 1024px) 25vw, 100vw" className="object-cover" />
+        {/* Column 1: the home page's picture of the step (its browser window), filling the column edge to edge. */}
+        <div className="relative overflow-hidden">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div key={index} {...change} aria-hidden="true" className="w-full overflow-hidden bg-neutral-50 text-[#1a1a1a]">
+              <div className="flex h-7 items-center gap-1 border-0 border-b border-solid border-black/5 bg-white px-3">
+                <span className="size-1.5 rounded-full bg-black/15" />
+                <span className="size-1.5 rounded-full bg-black/15" />
+                <span className="size-1.5 rounded-full bg-black/15" />
+                <span className="ml-1.5 min-w-0 flex-1 truncate rounded bg-black/[0.05] px-2 py-0.5 text-center text-[0.625rem] text-black/50">{step.url}</span>
+              </div>
+              <StepScreen step={index} />
             </motion.div>
           </AnimatePresence>
-        </motion.div>
+        </div>
 
-        <div className="flex items-end lg:px-[clamp(1rem,1.75vw,2rem)]">
+        {/* Columns 2 and 3: the step's line, set large. */}
+        <div className="flex items-center lg:col-span-2 lg:px-[clamp(1rem,1.75vw,2rem)]">
           <AnimatePresence mode="wait" initial={false}>
-            <motion.div key={index} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.45, ease }} className="flex flex-col gap-3">
-              <span className={`${type.small} text-[var(--accent)]`}>{step.url}</span>
-              <h3 className={`m-0 ${type.name}`}>{step.title}</h3>
-              <p className={`m-0 ${type.body} text-[var(--dim)]`}>{step.text}</p>
-              <Link href={step.cta.href} className={`${cornerLink} mt-3 text-[1.125rem]`}>
+            <motion.p key={index} {...change} className="m-0 font-[family-name:var(--font-1)] text-[length:clamp(1.25rem,calc(0.95rem_+_0.8vw),1.875rem)] font-medium leading-[1.2] tracking-[-0.025em]">
+              {step.text}
+            </motion.p>
+          </AnimatePresence>
+        </div>
+
+        {/* Column 4: previous and next above; the step's title, number and link below. */}
+        <div className="flex flex-col justify-between gap-8">
+          <div className="flex gap-1">
+            <button type="button" aria-label="Previous step" onClick={() => go(-1)} className={arrow}>
+              <ChevronLeft aria-hidden="true" className="size-4" />
+            </button>
+            <button type="button" aria-label="Next step" onClick={() => go(1)} className={arrow}>
+              <ChevronRight aria-hidden="true" className="size-4" />
+            </button>
+          </div>
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div key={index} {...change} aria-live="polite" className="flex flex-col items-start gap-1">
+              <p className={`m-0 ${type.body}`}>{step.title}</p>
+              <p className={`m-0 ${type.small} tabular-nums text-[var(--dim)]`}>
+                Step {pad(index + 1)} / {pad(COUNT)}
+              </p>
+              <Link href={step.cta.href} className={`${cornerLink} mt-4 text-[1rem]`}>
                 {step.cta.label}
                 <span aria-hidden="true" className={corner} />
               </Link>
             </motion.div>
           </AnimatePresence>
         </div>
-
-        <ul className="m-0 flex list-none flex-col gap-1 p-0 lg:pl-[clamp(1rem,1.75vw,2rem)]">
-          {STEPS.items.map((item, i) => (
-            <li key={item.title}>
-              <button
-                type="button"
-                aria-pressed={i === index}
-                onPointerEnter={() => setIndex(i)}
-                onFocus={() => setIndex(i)}
-                onClick={() => setIndex(i)}
-                className={`${focusRing} cursor-pointer rounded-[4px] border-0 bg-transparent p-0 text-left ${type.name} transition-colors duration-300 ${i === index ? "text-[var(--fg)]" : "text-[var(--dim)] hover:text-[var(--fg)]"}`}
-              >
-                {item.title}
-              </button>
-              {i === index && (
-                <span aria-hidden="true" className="mt-2 block h-px bg-[var(--line)]">
-                  <motion.span
-                    key={`${index}-${running}`}
-                    initial={{ scaleX: running ? 0 : 1 }}
-                    animate={{ scaleX: 1 }}
-                    transition={{ duration: running ? AUTOPLAY_MS / 1000 : 0.3, ease: "linear" }}
-                    className="block h-full origin-left bg-[var(--accent)]"
-                  />
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
+      </div>
       </div>
     </section>
   );

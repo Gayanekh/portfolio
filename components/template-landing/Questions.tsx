@@ -15,8 +15,8 @@ export default function Questions() {
     <section id="faq" data-caption="questions" aria-labelledby="tl-faq-title" className="relative scroll-mt-20 py-[clamp(5rem,12vh,9rem)]">
       <div className={`${frame} ${grid} gap-y-10`}>
         <div className="flex flex-col gap-6 lg:col-span-2">
-          <p className={`m-0 ${type.body}`}>{FAQ.label}</p>
-          <h2 id="tl-faq-title" className={`m-0 ${type.title}`}>
+          <p className={`m-0 ${type.kicker}`}>{FAQ.label}</p>
+          <h2 id="tl-faq-title" className={`m-0 ${type.heading}`}>
             <Words text={FAQ.title} />
           </h2>
         </div>

@@ -31,8 +31,9 @@ const slug = person.name.toLowerCase().replace(/[^a-z]+/g, "-");
 const number = (i: number) => String(i + 1).padStart(2, "0");
 const field = "flex items-center justify-between gap-3 rounded-lg border border-foreground/10 bg-white px-3 py-2";
 
-// The product as it looks at each step, in a small browser window.
-function StepScreen({ step }: { step: number }) {
+// The product as it looks at each step, in a small browser window
+// (also shown by /template-landing's How it works).
+export function StepScreen({ step }: { step: number }) {
   if (step === 0) {
     return (
       <div className="grid grid-cols-3 gap-2.5 p-4">

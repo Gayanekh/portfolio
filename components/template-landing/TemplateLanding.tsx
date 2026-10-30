@@ -5,14 +5,13 @@ import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import { CAPTIONS, THEME } from "@/components/template-landing/content";
 import Header from "@/components/template-landing/Header";
 import Hero from "@/components/template-landing/Hero";
-import Work from "@/components/template-landing/Work";
-import Band from "@/components/template-landing/Band";
+import Showcase from "@/components/template-landing/Showcase";
 import Features from "@/components/template-landing/Features";
 import Design from "@/components/template-landing/Design";
-import Claim from "@/components/template-landing/Claim";
+import FinalCTA from "@/components/landing/FinalCTA";
 import Steps from "@/components/template-landing/Steps";
 import Questions from "@/components/template-landing/Questions";
-import End from "@/components/template-landing/End";
+import LandingFooter from "@/components/landing/LandingFooter";
 import { ease, focusRing, frame, themes } from "@/components/template-landing/ui";
 
 type Theme = keyof typeof themes;
@@ -94,16 +93,40 @@ export default function TemplateLanding() {
 
         <Header />
         <main className="relative z-10">
+          {/* The hero slides up off the fixed templates; the rest of the page slides up
+              over them (starting one screen early, opaque, with the grid's hairlines of its
+              own), so however short a section is, the templates never show through. */}
           <Hero />
-          <Work />
-          <Band />
-          <Features />
-          <Design />
-          <Steps />
-          <Questions />
-          <Claim />
+          <Showcase />
+          <div className="relative z-10 -mt-[100svh] bg-[var(--bg)]">
+            <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+              <div className={`relative h-full ${frame}`}>
+                <div className="relative h-full border-0 border-x border-solid border-[var(--line)]">
+                  <span className="absolute inset-y-0 left-1/4 hidden w-px bg-[var(--line)] lg:block" />
+                  <span className="absolute inset-y-0 left-1/2 hidden w-px bg-[var(--line)] lg:block" />
+                  <span className="absolute inset-y-0 left-3/4 hidden w-px bg-[var(--line)] lg:block" />
+                </div>
+              </div>
+            </div>
+            <Features />
+            <Design />
+            <Steps />
+            <Questions />
+          </div>
+          {/* Create with Portory, the home page's own section, held like the templates and closing
+              the page: fixed full screen underneath, FAQ slides up off it, and it stays to the end
+              with the home page's footer laid over its lower part (on a dark fade, its own
+              background cleared). */}
+          <div className="relative z-0 -mt-[100svh] h-[200svh]">
+            <span aria-hidden="true" data-caption="create" className="absolute top-[100svh] block h-0" />
+            <div className="sticky top-0 h-svh overflow-hidden [&_#contact]:mt-0 [&_#contact>div]:h-svh [&_#contact>div]:min-h-0 [&_#contact_.place-items-center]:content-start [&_#contact_.place-items-center]:pt-[clamp(5.5rem,14svh,10rem)]">
+              <FinalCTA />
+              <div data-caption="end" className="pointer-events-none absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black/90 via-black/70 to-transparent pt-[12svh] [&_a]:pointer-events-auto [&_footer]:bg-transparent [&_footer]:pb-0 [&_footer]:pt-0">
+                <LandingFooter />
+              </div>
+            </div>
+          </div>
         </main>
-        <End />
 
         {/* The light/dark switch. */}
         <div role="radiogroup" aria-label="Theme" className="fixed bottom-[clamp(1rem,2.5vh,1.75rem)] left-[clamp(1rem,1.75vw,2rem)] z-40 hidden flex-col gap-0.5 sm:flex">

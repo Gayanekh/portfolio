@@ -1,9 +1,7 @@
 import type { ComponentType } from "react";
 import TemplateRenderer from "@/components/site-templates/core/TemplateRenderer";
-import { productTemplate } from "@/components/site-templates/product";
 import { showcaseTemplate } from "@/components/site-templates/showcase";
 import { personaTemplate } from "@/components/site-templates/persona";
-import { deckTemplate } from "@/components/site-templates/deck";
 import { galleryTemplate } from "@/components/site-templates/gallery";
 import { nocturneTemplate } from "@/components/site-templates/nocturne";
 import { signatureTemplate } from "@/components/site-templates/signature";
@@ -40,10 +38,6 @@ function SignatureSample({ palette, font }: PreviewProps) {
 }
 
 // Site templates apply the palette and font pack themselves, over their own look.
-function ProductSample({ palette, font }: PreviewProps) {
-  return <TemplateRenderer template={productTemplate} palette={palette} font={font} />;
-}
-
 function ShowcaseSample({ palette, font }: PreviewProps) {
   return <TemplateRenderer template={showcaseTemplate} palette={palette} font={font} />;
 }
@@ -58,10 +52,6 @@ function GallerySample({ palette, font }: PreviewProps) {
 
 function NocturneSample({ palette, font }: PreviewProps) {
   return <TemplateRenderer template={nocturneTemplate} palette={palette} font={font} />;
-}
-
-function DeckSample({ palette, font }: PreviewProps) {
-  return <TemplateRenderer template={deckTemplate} palette={palette} font={font} />;
 }
 
 const LIVE_TEMPLATES: TemplateDetail[] = [
@@ -102,15 +92,6 @@ const LIVE_TEMPLATES: TemplateDetail[] = [
     Preview: GallerySample,
   },
   {
-    id: deckTemplate.id,
-    name: deckTemplate.name,
-    description: deckTemplate.description,
-    bestFor: "Product and brand designers, studios",
-    useHref: siteTemplateEditorHref(deckTemplate.id),
-    demoHref: siteTemplateDemoHref(deckTemplate.id),
-    Preview: DeckSample,
-  },
-  {
     id: signatureTemplate.id,
     name: signatureTemplate.name,
     description: signatureTemplate.description,
@@ -118,16 +99,6 @@ const LIVE_TEMPLATES: TemplateDetail[] = [
     useHref: siteTemplateEditorHref(signatureTemplate.id),
     demoHref: "/templates/demo/minimal",
     Preview: SignatureSample,
-  },
-  // TEST TEMPLATE — delete with components/site-templates/product after testing.
-  {
-    id: productTemplate.id,
-    name: productTemplate.name,
-    description: productTemplate.description,
-    bestFor: "Makers and small shops",
-    useHref: siteTemplateEditorHref(productTemplate.id),
-    demoHref: siteTemplateDemoHref(productTemplate.id),
-    Preview: ProductSample,
   },
 ];
 

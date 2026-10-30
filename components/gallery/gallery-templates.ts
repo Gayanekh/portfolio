@@ -15,6 +15,8 @@ export interface GalleryTemplate {
   live?: boolean;
   // Where the card leads, if not the template's detail page.
   href?: string;
+  // False for a template example that has no editor yet (no Use template).
+  editable?: boolean;
 }
 
 const photo = (id: string) => `https://images.unsplash.com/${id}?auto=format&fit=crop&q=80&w=1100`;
@@ -34,12 +36,12 @@ export const GALLERY_TEMPLATES: GalleryTemplate[] = [
   // IN PROGRESS — built step by step from a design reference.
   { id: "persona", name: "Persona", style: "image", bestFor: "Brand and product designers", live: true, href: "/templates/demo/persona" },
   { id: "gallery", name: "Gallery", style: "image", bestFor: "Photographers and artists", live: true, href: "/templates/demo/gallery" },
-  { id: "deck", name: "Deck", style: "image", bestFor: "Product and brand designers, studios", live: true, href: "/templates/demo/deck" },
   // Minimal: the Signature site template, its demo still at /templates/demo/minimal.
   // The earlier Minimal (components/templates) only renders pages published with it.
   { id: "signature", name: "Minimal", style: "image", bestFor: "Web, brand and graphic designers", live: true, href: "/templates/demo/minimal" },
-  // TEST TEMPLATE — delete after testing (see components/site-templates/product).
-  { id: "product", name: "Product", style: "image", bestFor: "Makers and small shops", live: true, href: "/templates/demo/product" },
+  // Exhibition: a visual template example for an artist's show (no editor
+  // yet), shown by its screenshot.
+  { id: "exhibition", name: "Exhibition", style: "image", bestFor: "Painters, artists and galleries", image: "/images/templates/exhibition-2026-10.jpg", href: "/exhibition", editable: false },
   { id: "atelier", name: "Atelier", style: "image", bestFor: "Designers and makers", image: photo("photo-1487014679447-9f8336841d58") },
   { id: "ledger", name: "Ledger", style: "text", bestFor: "Teachers and consultants", image: photo("photo-1502945015378-0e284ca1a5be") },
   { id: "chapter", name: "Chapter", style: "case", bestFor: "Researchers and writers", image: photo("photo-1522199755839-a2bacb67c546") },

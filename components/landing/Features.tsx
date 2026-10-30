@@ -10,7 +10,7 @@ import { displayTitle, ease, focusRing, kicker, lead, section, fluidText } from 
 import { scrollPageTo } from "@/lib/scroll";
 
 // Content from the landing-redesign branch's "Everything you need" section.
-type FeatureVisual = "templates" | "edit" | "phone" | "address" | "switch" | "draft";
+export type FeatureVisual = "templates" | "edit" | "phone" | "address" | "switch" | "draft";
 
 const INTRO = {
   kicker: "Features",
@@ -50,8 +50,9 @@ const floating = "bg-white shadow-[0_12px_30px_-16px_rgb(0_0_0/0.3)]";
 // The three fanned template cards: left, middle, right (centred, then shifted and tilted).
 const FAN = ["-translate-x-[78%] -rotate-[8deg]", "-translate-x-1/2", "-translate-x-[22%] rotate-[8deg]"];
 
-// A small, quiet picture of each feature, drawn from the product's parts.
-function Visual({ kind }: { kind: FeatureVisual }) {
+// A small, quiet picture of each feature, drawn from the product's parts
+// (also shown by /template-landing's Features).
+export function Visual({ kind }: { kind: FeatureVisual }) {
   switch (kind) {
     case "templates":
       return (

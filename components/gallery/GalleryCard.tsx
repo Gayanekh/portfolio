@@ -91,14 +91,16 @@ export default function GalleryCard({ template, index }: { template: GalleryTemp
             <Eye aria-hidden="true" className="size-4" />
             Preview
           </Link>
-          <Link
-            href={editorHref}
-            aria-label={`Use the ${template.name} template`}
-            className={`${focusRing} group/use inline-flex h-9 items-center gap-1.5 rounded bg-foreground px-3 text-[0.8125rem] font-medium text-white no-underline shadow-[0_2px_8px_rgb(0_0_0/0.2)] transition-colors hover:bg-foreground/85`}
-          >
-            Use template
-            <MoveRight aria-hidden="true" className="size-4 transition-transform duration-300 group-hover/use:translate-x-0.5" />
-          </Link>
+          {template.editable !== false && (
+            <Link
+              href={editorHref}
+              aria-label={`Use the ${template.name} template`}
+              className={`${focusRing} group/use inline-flex h-9 items-center gap-1.5 rounded bg-foreground px-3 text-[0.8125rem] font-medium text-white no-underline shadow-[0_2px_8px_rgb(0_0_0/0.2)] transition-colors hover:bg-foreground/85`}
+            >
+              Use template
+              <MoveRight aria-hidden="true" className="size-4 transition-transform duration-300 group-hover/use:translate-x-0.5" />
+            </Link>
+          )}
         </motion.div>
       </motion.div>
 

@@ -1,6 +1,6 @@
 import { HERO as HOME_HERO, STACK, TEMPLATES, TEMPLATE_PITCH } from "@/components/new-landing/content";
-import { CLOSING as HOME_CLOSING, FAQ as HOME_FAQ } from "@/components/landing-next/content";
-import { CLAIM as HOME_CLAIM, DESIGN as HOME_DESIGN, FEATURES as HOME_FEATURES, FOOTER as HOME_FOOTER, STEPS as HOME_STEPS, TEMPLATES as HOME_TEMPLATES } from "@/components/line-landing/content";
+import { FAQ as HOME_FAQ } from "@/components/landing-next/content";
+import { DESIGN as HOME_DESIGN, FEATURES as HOME_FEATURES, STEPS as HOME_STEPS } from "@/components/line-landing/content";
 import { STYLE_LABEL } from "@/components/landing/sample-portfolios";
 import { siteTemplateEditorHref } from "@/components/site-templates/registry";
 
@@ -46,46 +46,16 @@ export const CAPTIONS: Record<string, string> = {
   design: "Make it yours",
   steps: "How it works",
   questions: "Questions, answered",
-  claim: "Your address",
-  end: "Create with Portory",
+  create: "Create with Portory",
+  end: "Portory",
 };
 
-// The home hero, "Your work has a story. Show it with Portory.", with its
-// first two words set giant around the window onto the templates.
-export const HERO = {
-  top: "YOUR",
-  bottom: "WORK",
-  title: `${HOME_HERO.title} ${HOME_HERO.accent}`,
-  text: HOME_HERO.text,
-  side: "Portfolio builder",
-  hover: "Hover",
-  primary: HOME_HERO.primary,
-  secondary: { href: "#templates", label: "See the templates" },
-  account: { lead: "Already have an account?", ...LOGIN },
-};
-
-// The templates section, laid out like the reference's "Our work".
-export const WORK = {
-  label: "Templates",
-  title: plain(HOME_TEMPLATES.title),
-  text: HOME_TEMPLATES.text,
-  all: HOME_TEMPLATES.all,
-  // The call under the templates, like the reference's "Want to build
-  // something better?": the closing title, the footer's line, Get started.
-  cta: { title: plain(HOME_CLOSING.title), text: HOME_FOOTER.tagline, link: START },
-};
-
-// Who Portory is for, in the home FAQ's own words.
-export const AUDIENCE = ["Teachers", "Photographers", "Consultants", "Nurses", "Engineers", "Students", "Career changers"];
 
 export const FEATURES = {
   label: HOME_FEATURES.label,
   title: plain(HOME_FEATURES.title),
   text: "No code, no fiddling with layouts. Just your work, shown well.",
   items: Object.values(HOME_FEATURES.items).map(({ title, text }) => ({ title, text })),
-  // A real template's opening screen down the first column.
-  image: STACK[0].image,
-  imageName: STACK[0].name,
 };
 
 export const DESIGN = {
@@ -95,9 +65,6 @@ export const DESIGN = {
   // The template the home page's styler restyles.
   template: "gallery",
   start: HOME_DESIGN.start,
-  colours: "Colours",
-  fonts: "Fonts",
-  shuffle: "Shuffle",
 };
 
 export const STEPS = {
@@ -109,19 +76,5 @@ export const STEPS = {
 
 export const FAQ = { label: "FAQ", title: "Questions, answered", items: HOME_FAQ.items };
 
-export const CLAIM = { ...HOME_CLAIM, title: plain(HOME_CLAIM.title) };
-
-export const END = {
-  lead: "Create with",
-  name: "Portory",
-  tagline: HOME_FOOTER.tagline,
-  start: { href: "/templates", label: "Browse templates" },
-  groups: [
-    { title: "Portory", links: [{ href: "/", label: "Home" }, ...HOME_FOOTER.links] },
-    { title: "Account", links: [LOGIN, REGISTER, { href: "/account", label: "Your account" }] },
-  ],
-  copyright: HOME_FOOTER.copyright,
-  top: "Back to top · Back to top · ",
-};
 
 export const THEME = { light: "Light", dark: "Dark" };
