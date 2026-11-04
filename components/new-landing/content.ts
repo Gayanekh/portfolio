@@ -39,6 +39,7 @@ export const TEMPLATES = LANDING_ORDER.map((template) => ({
   id: template.id,
   name: template.name,
   style: template.style,
+  category: template.category,
   bestFor: template.bestFor,
   description: getTemplateDetail(template.id)?.description ?? "",
   href: template.href,

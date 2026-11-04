@@ -8,10 +8,10 @@ const projects = [
 ];
 
 export const demoPortfolioData: PortfolioData = {
-  name: "Gayane Khachatryan",
+  name: "Nora Calder",
   role: "Product Designer",
   availableYear: "2026",
-  email: "hello@gayanekhachatryan.com",
+  email: "hello@noracalder.com",
   avatar: "/avatar.png",
   aboutHeading: "About",
   aboutBody: "Design-focused product thinker creating intuitive, research-driven digital experiences across fintech, SaaS, and healthcare.",

@@ -6,7 +6,8 @@ import { DETAILS, PHOTOS, STACK, WORKS } from "./shared";
 // disciplines (UI/UX, development, photography, graphic design). A near-black
 // page with film grain, warm off-white text, an ember accent, Fraunces for
 // display and DM Mono for small labels, until a palette or font pack is
-// picked. Its sample content is Gayane Khachatryan's (after /gayane).
+// picked. Its sample content is a made-up designer's, Nora Calder (the user
+// asked to replace her own name and details).
 
 const photo = (id: string, width = 1800) => `https://images.unsplash.com/${id}?auto=format&fit=crop&q=82&w=${width}`;
 
@@ -89,7 +90,7 @@ export const nocturneTemplate = defineTemplate({
       label: "Header",
       Component: Header,
       stack: false,
-      defaults: { siteTitle: "Gayane Khachatryan", mark: "GK", city: "Fullerton, CA", timeZone: "America/Los_Angeles" },
+      defaults: { siteTitle: "Nora Calder", mark: "NC", city: "Fullerton, CA", timeZone: "America/Los_Angeles" },
       fields: [
         { name: "city", label: "City" },
         { name: "timeZone", label: "Time zone (such as America/Los_Angeles)" },
@@ -101,8 +102,8 @@ export const nocturneTemplate = defineTemplate({
       Component: Hero,
       defaults: {
         eyebrow: "Portfolio — 2026 · Senior Product Designer",
-        first: "Gayane",
-        last: "Khachatryan",
+        first: "Nora",
+        last: "Calder",
         lead: "I",
         role1: "design interfaces people trust.",
         role2: "write the code behind them.",
@@ -265,22 +266,22 @@ export const nocturneTemplate = defineTemplate({
         label: "Contact",
         title: "Let's make something *remarkable.*",
         cta: "Write to me",
-        email: "gayane.khachatryan@hotmail.com",
+        email: "hello@noracalder.com",
         copy: "Copy email",
         copied: "Copied",
         detail1Label: "Phone",
-        detail1Value: "(714) 330-6339",
-        detail1Url: "tel:+17143306339",
+        detail1Value: "(714) 555-0142",
+        detail1Url: "tel:+17145550142",
         detail2Label: "LinkedIn",
-        detail2Value: "gayane-khachatryan",
-        detail2Url: "https://www.linkedin.com/in/gayane-khachatryan-a805383ab",
+        detail2Value: "nora-calder",
+        detail2Url: "",
         detail3Label: "Based in",
         detail3Value: "Fullerton, California",
         detail3Url: "",
         detail4Label: "Open to",
         detail4Value: "Full-time & freelance",
         detail4Url: "",
-        copyright: "© 2026 Gayane Khachatryan",
+        copyright: "© 2026 Nora Calder",
         credit: "Designed and built with care, made in Portory",
         top: "Back to top",
       },

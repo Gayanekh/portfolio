@@ -37,7 +37,7 @@ export const WORKS = [
 // paintings in a row at one height, arrows under them and one link.
 export const SHOWCASE = {
   label: "Explore the works",
-  href: "/exhibition/works",
+  href: "/templates/demo/exhibition/works",
   previous: "Previous work",
   next: "Next work",
 };
@@ -56,7 +56,7 @@ export const ABOUT = {
   ],
 };
 
-// The works page (/exhibition/works), opened from "Explore the works".
+// The works page (/templates/demo/exhibition/works), opened from "Explore the works".
 export const GALLERY = {
   title: "The works",
   grid: "Grid view",

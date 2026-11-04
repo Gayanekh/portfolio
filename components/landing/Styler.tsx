@@ -36,7 +36,7 @@ const useWide = () => useSyncExternalStore(subscribeWide, () => window.matchMedi
 // stage (60% fixed, 40% with its width: 0.87 at 1280px), so their small
 // capitals stay readable; below xl they fold into two chips (StyleChips).
 const STAGE_WIDTH_REM = 87;
-function useStageScale() {
+export function useStageScale() {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const stage = ref.current;
@@ -57,7 +57,7 @@ function useStageScale() {
 // palette's five colours, or "Aa" in the font) with its name. A chip opens
 // its full card over the template, under the chips; the choice restyles the
 // template at once, and a click outside or Escape closes it.
-function StyleChips({ palette, font, onPalette, onFont, accent }: { palette: string; font: string; onPalette: (id: string) => void; onFont: (id: string) => void; accent: string }) {
+export function StyleChips({ palette, font, onPalette, onFont, accent }: { palette: string; font: string; onPalette: (id: string) => void; onFont: (id: string) => void; accent: string }) {
   const [open, setOpen] = useState<"palette" | "font" | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -122,7 +122,7 @@ function StyleChips({ palette, font, onPalette, onFont, accent }: { palette: str
 }
 
 // A different random pick from a list.
-const other = <T extends { id: string }>(list: T[], current: string) => {
+export const other = <T extends { id: string }>(list: T[], current: string) => {
   const rest = list.filter((item) => item.id !== current);
   return rest[Math.floor(Math.random() * rest.length)].id;
 };

@@ -327,7 +327,7 @@ export default function WorksGallery() {
             top, and at the foot the page's name standing on end over a short
             thin line that runs into the bottom edge. */}
         <aside className="pointer-events-none fixed bottom-0 left-0 top-0 z-50 flex flex-col items-start justify-between px-[clamp(1rem,2vw,1.75rem)] pt-4">
-          <Link href="/exhibition" aria-label={`${ARTIST.name}, ${ARTIST.show}`} className={`${focusRing} pointer-events-auto flex flex-col rounded ${handFont} text-[1.9rem] leading-[0.85] text-[var(--bone)] no-underline`}>
+          <Link href="/templates/demo/exhibition" aria-label={`${ARTIST.name}, ${ARTIST.show}`} className={`${focusRing} pointer-events-auto flex flex-col rounded ${handFont} text-[1.9rem] leading-[0.85] text-[var(--bone)] no-underline`}>
             {/* The signature on two lines: first name over surname. */}
             {ARTIST.signature.split(" ").map((word, i) => (
               <span key={word} className={i ? "pl-[0.6em]" : undefined}>

@@ -27,6 +27,9 @@ import { ease, FieldValue, Frame, type, useScrollProgress, useWide } from "./kit
 const ROLE_HOLD = 2.6;
 
 // A word rising letter by letter.
+// Each letter rises out of its own mask; the masks reach a little past the letter
+// on either side (padding, cancelled by a negative margin) so an italic letter's
+// lean is not clipped.
 function Letters({ field, className, delay }: { field: string; className: string; delay: number }) {
   const { value, editing, node } = useField(field);
   const still = useReducedMotion();
@@ -34,7 +37,7 @@ function Letters({ field, className, delay }: { field: string; className: string
   return (
     <span aria-label={value} className={className}>
       {[...value].map((char, i) => (
-        <span key={i} aria-hidden="true" className="-mb-[0.3em] inline-block overflow-hidden pb-[0.3em] align-bottom">
+        <span key={i} aria-hidden="true" className="-mb-[0.3em] -ml-[0.06em] -mr-[0.28em] inline-block overflow-hidden pb-[0.3em] pl-[0.06em] pr-[0.28em] align-bottom">
           <motion.span className="inline-block" initial={{ y: "115%" }} animate={{ y: "0%" }} transition={{ duration: 1.2, ease, delay: delay + i * 0.045 }}>
             {char === " " ? " " : char}
           </motion.span>
@@ -136,11 +139,11 @@ export default function NocturneHero({ roles, targets }: { roles: number[]; targ
             <FieldValue field="eyebrow" />
           </motion.div>
           <h1 className="m-0 flex flex-col">
-            <Letters field="first" delay={0.25} className="block font-display text-[length:clamp(4.5rem,15.5cqw,15rem)] font-light italic leading-[0.85] tracking-[-0.045em]" />
+            <Letters field="first" delay={0.25} className="block font-display text-[length:clamp(3.5rem,11cqw,10.5rem)] font-light italic leading-[0.85] tracking-[-0.045em]" />
             <Letters
               field="last"
               delay={0.55}
-              className="mt-[0.34em] block whitespace-nowrap pl-[0.06em] text-[length:clamp(2.1rem,7.6cqw,7.6rem)] font-semibold uppercase leading-[0.9] tracking-[-0.05em] @xl:pl-[9cqw]"
+              className="mt-[0.34em] block whitespace-nowrap pl-[0.06em] text-[length:clamp(1.75rem,5.6cqw,5.5rem)] font-semibold uppercase leading-[0.9] tracking-[-0.05em] @xl:pl-[9cqw]"
             />
           </h1>
           <div className="mt-6 flex items-baseline gap-3 whitespace-nowrap font-display text-[length:clamp(1.05rem,2cqw,1.9rem)] font-light @xl:pl-[9cqw]">

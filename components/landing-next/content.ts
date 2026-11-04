@@ -10,7 +10,7 @@ import { COLOR_PALETTES, FONT_PACKS } from "@/components/template-detail/theme-o
 
 // The new world's own pages: the landing, and its templates page (the
 // Portory home page keeps /templates).
-export const LANDING_PAGE = "/exhibition";
+export const LANDING_PAGE = "/templates/demo/exhibition";
 export const TEMPLATES_PAGE = "/templates";
 
 export const NAV = [

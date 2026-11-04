@@ -1,4 +1,5 @@
-import { DM_Mono, DM_Sans, Fraunces, IBM_Plex_Mono, IBM_Plex_Sans, Inter_Tight, Playfair_Display, Space_Grotesk, Space_Mono } from "next/font/google";
+import { DM_Mono, DM_Sans, Fraunces, IBM_Plex_Mono, Inter_Tight, Playfair_Display, Space_Grotesk, Space_Mono } from "next/font/google";
+import localFont from "next/font/local";
 
 // Style options shared by every template on its detail page. A template reads
 // the theme tokens from globals.css (bg-card, text-foreground, border-border,
@@ -8,15 +9,20 @@ import { DM_Mono, DM_Sans, Fraunces, IBM_Plex_Mono, IBM_Plex_Sans, Inter_Tight, 
 
 /* ---------- Fonts ---------- */
 
-const interTight = Inter_Tight({ subsets: ["latin"], variable: "--tf-inter-tight" });
-const dmSans = DM_Sans({ subsets: ["latin"], variable: "--tf-dm-sans" });
-const dmMono = DM_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--tf-dm-mono" });
-const fraunces = Fraunces({ subsets: ["latin"], variable: "--tf-fraunces" });
-const playfair = Playfair_Display({ subsets: ["latin"], variable: "--tf-playfair" });
-const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--tf-space-grotesk" });
-const spaceMono = Space_Mono({ subsets: ["latin"], weight: ["400", "700"], variable: "--tf-space-mono" });
-const plexSans = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], variable: "--tf-plex-sans" });
-const plexMono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--tf-plex-mono" });
+// The packs' fonts load when a pack is shown, not up front on every page that
+// offers them (preload: false), so a landing page does not fetch them all.
+const interTight = Inter_Tight({ subsets: ["latin"], preload: false, variable: "--tf-inter-tight" });
+const dmSans = DM_Sans({ subsets: ["latin"], preload: false, variable: "--tf-dm-sans" });
+const dmMono = DM_Mono({ subsets: ["latin"], preload: false, weight: ["400", "500"], variable: "--tf-dm-mono" });
+const fraunces = Fraunces({ subsets: ["latin"], preload: false, variable: "--tf-fraunces" });
+const playfair = Playfair_Display({ subsets: ["latin"], preload: false, variable: "--tf-playfair" });
+const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], preload: false, variable: "--tf-space-grotesk" });
+const spaceMono = Space_Mono({ subsets: ["latin"], preload: false, weight: ["400", "700"], variable: "--tf-space-mono" });
+// IBM Plex Sans is kept in the project (its Latin variable font, from Google
+// Fonts) rather than fetched by next/font/google, whose address for it breaks
+// the Turbopack dev server.
+const plexSans = localFont({ src: "./fonts/ibm-plex-sans-latin.woff2", weight: "100 700", display: "swap", preload: false, variable: "--tf-plex-sans" });
+const plexMono = IBM_Plex_Mono({ subsets: ["latin"], preload: false, weight: ["400", "500"], variable: "--tf-plex-mono" });
 
 // Put this on any element that shows the options, so the fonts are loaded there.
 export const themeFontVariables = [interTight, dmSans, dmMono, fraunces, playfair, spaceGrotesk, spaceMono, plexSans, plexMono]

@@ -1,149 +1,108 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useInView } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
-import { Visual, type FeatureVisual } from "@/components/landing/Features";
-import { FEATURES, START } from "@/components/template-landing/content";
-import { useStill, Words } from "@/components/template-landing/scroll-fx";
-import { ease, focusRing, frame, grid, pad, type } from "@/components/template-landing/ui";
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Link2, Lock, MousePointerClick, Repeat, Smartphone, type LucideIcon } from "lucide-react";
+import { FEATURES as CARDS } from "@/components/other-landing/content";
+import FeatureArt from "@/components/template-landing/FeatureArt";
+import Label from "@/components/template-landing/Label";
+import { ease, frame, serif, themes } from "@/components/template-landing/ui";
 
-const COUNT = FEATURES.items.length;
-// How long each feature stays before the next while it plays by itself.
-const AUTOPLAY_MS = 5200;
-// The home page's picture for each feature, in the same order.
-const VISUALS: FeatureVisual[] = ["templates", "edit", "phone", "switch", "draft", "address"];
+const FEATURES = {
+  label: "Features",
+  // Two lines, as on /landing: the second ends on the one word in the serif italic.
+  title: [{ lead: "Everything you need,", soft: "" }, { lead: "nothing in the", soft: "way." }],
+};
 
-// Features, laid out like How it works: across the top, a small label over
-// the title set large, the intro and a small dark button. Then, in the grid's
-// columns: the feature's number large, light and regular weight at the foot
-// of its column, level with the drawing's foot on the section's bottom line,
-// the home page's drawing of it (wiping up as it changes), its title and line,
-// and every feature listed (the one on show dark, a hairline under it filling
-// while it is on show). Pointing at or focusing one shows it; it moves on by
-// itself while on screen and not pointed at.
+const ICONS: Record<(typeof CARDS.items)[number]["id"], LucideIcon> = {
+  screens: Smartphone,
+  switch: Repeat,
+  address: Link2,
+  edit: MousePointerClick,
+  draft: Lock,
+};
+
+// The address card in the page's one address form.
+const ADDRESS_TEXT = "Publish to portory.net/you and share one link everywhere.";
+
+
+// Features: the label on the left and the title in two lines from the grid's
+// second line (its last word in the serif italic). Under it, after the Opus
+// reference's process row (the user asked for it) in the page's own card
+// design: the five features in one row of cards, one open and wide with its
+// number, icon, a small drawing of the feature (FeatureArt), its title and
+// line; the others narrow, with the number, icon and a greyed title.
+// Pointing at a card (or focusing or tapping it) opens it while the others
+// narrow. On phones and tablets all five stack, each open. They rise into
+// place as the section comes in. The section is dark (the page's dark theme
+// colours, the user asked), the cards near-black with a fine outline, as on Opus.
 export default function Features() {
-  const still = useStill();
-  const ref = useRef<HTMLElement>(null);
-  const inView = useInView(ref, { amount: 0.4 });
-  const [index, setIndex] = useState(0);
-  const [held, setHeld] = useState(false);
-  const feature = FEATURES.items[index];
-  const running = !still && !held && inView;
-
-  useEffect(() => {
-    if (!running) return;
-    const timer = window.setTimeout(() => setIndex((i) => (i + 1) % COUNT), AUTOPLAY_MS);
-    return () => window.clearTimeout(timer);
-  }, [index, running]);
-
+  const [open, setOpen] = useState(0);
   return (
-    <section
-      ref={ref}
-      id="features"
-      data-caption="features"
-      aria-labelledby="tl-features-title"
-      onPointerEnter={() => setHeld(true)}
-      onPointerLeave={() => setHeld(false)}
-      className="relative scroll-mt-20"
-    >
-      <div className={`${frame} ${grid} pt-[clamp(5rem,12vh,9rem)]`}>
-        {/* The heading: a small label over one large line, the intro and the button. */}
-        <div className="flex flex-col items-start gap-2 lg:col-span-4">
-          <p className={`m-0 ${type.kicker}`}>{FEATURES.label}</p>
-          <h2 id="tl-features-title" className={`m-0 ${type.heading}`}>
-            <Words text={`${FEATURES.title}.`} />
-          </h2>
-          <p className={`m-0 mt-[clamp(0.75rem,1.5vw,1.25rem)] max-w-[34rem] ${type.body} text-[var(--dim)]`}>{FEATURES.text}</p>
-          <Link
-            href={START.href}
-            className={`${focusRing} group mt-[clamp(1rem,2vw,1.5rem)] inline-flex items-center gap-3 rounded-[4px] bg-[var(--fg)] py-1.5 pl-3 pr-1.5 font-mono text-[0.8125rem] uppercase tracking-[0.12em] text-[var(--bg)] no-underline transition-opacity hover:opacity-85`}
-          >
-            {START.label}
-            <span aria-hidden="true" className="grid size-[1.375rem] place-items-center rounded-[3px] border border-solid border-current">
-              <ArrowUpRight strokeWidth={2} className="size-3.5 transition-transform duration-300 group-hover:-translate-y-px group-hover:translate-x-px" />
-            </span>
-          </Link>
-        </div>
-      </div>
-
-      <div className={`${frame} ${grid} gap-y-8 pt-[clamp(3rem,8vh,5rem)]`}>
-        {/* The number, large, light and regular weight, at the column's foot level with the picture's. */}
-        <div className="flex flex-col justify-end lg:pr-[clamp(1rem,1.75vw,2rem)]">
-          <span aria-hidden="true" className="relative block h-[0.86em] overflow-hidden font-[family-name:var(--font-1)] text-[length:clamp(6rem,14vw,16rem)] font-normal leading-[0.86] tracking-[-0.06em] text-[color-mix(in_srgb,var(--fg)_7%,transparent)]">
-            <AnimatePresence initial={false} mode="popLayout">
-              <motion.span key={index} initial={{ y: "100%" }} animate={{ y: "0%" }} exit={{ y: "-100%" }} transition={{ duration: 0.7, ease }} className="block">
-                {pad(index + 1)}
-              </motion.span>
-            </AnimatePresence>
-          </span>
-        </div>
-
-        {/* The home page's drawing of the feature, wiping up as it changes. */}
-        <motion.div
-          initial={{ clipPath: "inset(100% 0% 0% 0%)" }}
-          whileInView={{ clipPath: "inset(0% 0% 0% 0%)" }}
-          viewport={{ once: true, margin: "0px 0px -15% 0px" }}
-          transition={{ duration: 1.3, ease }}
-          className="relative aspect-[3/4] overflow-hidden bg-neutral-200 lg:aspect-auto lg:min-h-[34rem]"
-        >
-          <AnimatePresence initial={false}>
-            <motion.div
-              key={index}
-              initial={{ clipPath: "inset(100% 0% 0% 0%)" }}
-              animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
-              exit={{ opacity: 1 }}
-              transition={{ duration: still ? 0 : 1, ease: [0.65, 0, 0.35, 1] }}
-              className="absolute inset-0 grid place-items-center bg-neutral-200"
-            >
-              <div className="grid aspect-[4/5] w-[92%] place-items-center">
-                <Visual kind={VISUALS[index] ?? "templates"} />
-              </div>
-            </motion.div>
-          </AnimatePresence>
+    <section id="features" data-caption="features" aria-labelledby="tl-features-title" className={`relative scroll-mt-20 bg-[var(--bg)] text-[var(--fg)] py-[clamp(4.5rem,8.2vw,7.5rem)] ${themes.dark}`}>
+      <div className={`${frame} grid gap-10 lg:grid-cols-4 lg:gap-0`}>
+        <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "0px 0px -10% 0px" }} transition={{ duration: 0.9, ease }} className="flex flex-col gap-1.5">
+          <Label>{FEATURES.label}</Label>
         </motion.div>
-
-        {/* Its title and line. */}
-        <div className="flex items-end pb-[clamp(3rem,8vh,5rem)] lg:px-[clamp(1rem,1.75vw,2rem)]">
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div key={index} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.45, ease }} className="flex flex-col gap-3">
-              <span className={`${type.small} text-[var(--accent)]`}>Feature {pad(index + 1)}</span>
-              <h3 className={`m-0 ${type.name}`}>{feature.title}</h3>
-              <p className={`m-0 ${type.body} text-[var(--dim)]`}>{feature.text}</p>
-            </motion.div>
-          </AnimatePresence>
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between lg:col-span-3">
+          {/* The title's lines rise out of their masks together, set off by the title coming into view. */}
+          <motion.h2 id="tl-features-title" initial="hidden" whileInView="shown" viewport={{ once: true, margin: "0px 0px -10% 0px" }} className="m-0 text-[clamp(2rem,3.3vw,3rem)] font-medium leading-[0.96] tracking-[-0.055em]">
+            {FEATURES.title.map(({ lead, soft }, i) => (
+              <span key={lead} className="block overflow-hidden pb-[0.08em] sm:whitespace-nowrap">
+                <motion.span variants={{ hidden: { y: "105%" }, shown: { y: "0%", transition: { duration: 1, ease, delay: i * 0.08 } } }} className="block">
+                  {lead}
+                  {soft && (
+                    <>
+                      {" "}
+                      <span className={`${serif} tracking-[-0.03em]`}>{soft}</span>
+                    </>
+                  )}
+                </motion.span>
+              </span>
+            ))}
+          </motion.h2>
         </div>
-
-        {/* Every feature, the one on show dark with its hairline filling. */}
-        <ul className="m-0 flex list-none flex-col gap-1 p-0 pb-[clamp(3rem,8vh,5rem)] lg:pl-[clamp(1rem,1.75vw,2rem)]">
-          {FEATURES.items.map((item, i) => (
-            <li key={item.title}>
-              <button
-                type="button"
-                aria-pressed={i === index}
-                onPointerEnter={() => setIndex(i)}
-                onFocus={() => setIndex(i)}
-                onClick={() => setIndex(i)}
-                className={`${focusRing} cursor-pointer rounded-[4px] border-0 bg-transparent p-0 text-left ${type.name} transition-colors duration-300 ${i === index ? "text-[var(--fg)]" : "text-[var(--dim)] hover:text-[var(--fg)]"}`}
-              >
-                {item.title}
-              </button>
-              {i === index && (
-                <span aria-hidden="true" className="mt-2 block h-px bg-[var(--line)]">
-                  <motion.span
-                    key={`${index}-${running}`}
-                    initial={{ scaleX: running ? 0 : 1 }}
-                    animate={{ scaleX: 1 }}
-                    transition={{ duration: running ? AUTOPLAY_MS / 1000 : 0.3, ease: "linear" }}
-                    className="block h-full origin-left bg-[var(--accent)]"
-                  />
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
       </div>
+
+      <ul className={`${frame} m-0 mt-14 flex list-none flex-col gap-[0.625rem] lg:h-[clamp(23rem,29vw,27rem)] lg:flex-row`}>
+        {CARDS.items.map((item, i) => {
+          const Icon = ICONS[item.id];
+          const wide = open === i;
+          return (
+            <motion.li
+              key={item.id}
+              tabIndex={0}
+              onMouseEnter={() => setOpen(i)}
+              onFocus={() => setOpen(i)}
+              onClick={() => setOpen(i)}
+              aria-expanded={wide}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+              transition={{ duration: 1, ease, delay: i * 0.06 }}
+              className={`group relative flex min-w-0 cursor-pointer flex-col justify-between gap-4 overflow-hidden border border-solid border-[var(--line)] bg-[#0a0a0a] p-[clamp(1.25rem,1.8vw,1.75rem)] outline-none transition-[flex-grow] duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:ring-2 focus-visible:ring-[var(--fg)] motion-reduce:transition-none  lg:basis-0 ${wide ? "lg:grow-[2.6]" : "lg:grow"}`}
+            >
+              {/* Top: the number and the icon. */}
+              <span className="flex items-center justify-between font-mono text-[0.75rem] tracking-[0.04em] text-[color-mix(in_srgb,var(--fg)_55%,transparent)]">
+                {String(i + 1).padStart(2, "0")}
+                <Icon aria-hidden="true" strokeWidth={2} className={`size-5 transition-colors duration-500 ${wide ? "text-[var(--fg)]" : "text-[color-mix(in_srgb,var(--fg)_40%,transparent)] max-lg:text-[var(--fg)]"}`} />
+              </span>
+              {/* The middle: the card's drawing, in the open card (always, on phones and tablets). */}
+              <span className={`grid flex-1 place-items-center py-6 transition-[opacity,transform] duration-500 motion-reduce:transition-none lg:min-w-[20rem] ${wide ? "scale-100 opacity-100 delay-150" : "lg:pointer-events-none lg:scale-95 lg:opacity-0"}`}>
+                <FeatureArt id={item.id} />
+              </span>
+              {/* The foot: the title, and the line in the open card. */}
+              <span className="flex flex-col gap-2">
+                {/* The title keeps one width, a closed card's (the row's width less its four gaps, over 6.6 shares, less the padding), so it wraps the same way open or closed and does not re-wrap, and jump, while the cards resize. */}
+                <h3 className={`m-0 lg:w-[calc((min(100vw,90rem)_-_2*clamp(1.5rem,3vw,3rem)_-_2.5rem)/6.6_-_2*clamp(1.25rem,1.8vw,1.75rem)_-_2px)] text-[length:clamp(1.125rem,calc(0.95rem_+_0.4vw),1.375rem)] font-medium leading-[1.2] tracking-[-0.02em] transition-colors duration-500 ${wide ? "text-[var(--fg)]" : "text-[color-mix(in_srgb,var(--fg)_45%,transparent)] max-lg:text-[var(--fg)]"}`}>{item.title}</h3>
+                <p className={`m-0 max-w-[24rem] text-[0.9375rem] leading-[1.5] text-[var(--dim)] overflow-hidden transition-[opacity,max-height] duration-500 motion-reduce:transition-none lg:min-w-[20rem] ${wide ? "max-h-24 opacity-100 delay-200" : "lg:pointer-events-none lg:max-h-0 lg:opacity-0"}`}>
+                  {item.id === "address" ? ADDRESS_TEXT : item.text}
+                </p>
+              </span>
+            </motion.li>
+          );
+        })}
+      </ul>
     </section>
   );
 }

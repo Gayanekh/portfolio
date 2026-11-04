@@ -3,6 +3,7 @@ import { FAQ as HOME_FAQ } from "@/components/landing-next/content";
 import { DESIGN as HOME_DESIGN, FEATURES as HOME_FEATURES, STEPS as HOME_STEPS } from "@/components/line-landing/content";
 import { STYLE_LABEL } from "@/components/landing/sample-portfolios";
 import { siteTemplateEditorHref } from "@/components/site-templates/registry";
+import { GALLERY_TEMPLATES, categoryLabel } from "@/components/gallery/gallery-templates";
 
 // Everything /template-landing says, in page order; the sections only lay it
 // out. It is the Portory home page's own content, read from the modules that
@@ -21,8 +22,8 @@ export const REGISTER = { href: "/register", label: "Create an account" };
 // The home page's sections, by their anchors.
 export const NAV = [
   { href: "#templates", label: "Templates" },
-  { href: "#features", label: "Features" },
   { href: "#make-it-yours", label: "Design" },
+  { href: "#features", label: "Features" },
   { href: "#how-it-works", label: "How it works" },
   { href: "#faq", label: "FAQ" },
 ];
@@ -38,9 +39,45 @@ export const TEMPLATES_ALL = TEMPLATES.map((template, i) => ({
   editor: siteTemplateEditorHref(template.id),
 }));
 
+// The templates grid (/other-landing's, in place of the old slider): each template's cover, name, pitch and tags (its category, then
+// what it works best with). Demos open in a new tab.
+// The templates that can be opened in the editor (Exhibition has no editor yet).
+export const EDITABLE_IDS = TEMPLATES.filter((template) => GALLERY_TEMPLATES.find((item) => item.id === template.id)?.editable !== false).map((template) => template.id);
+
+// The cover pictures the user supplied (public/images/landing-covers), by template.
+const COVER_PHOTOS: Record<string, { src: string; ground: string; focus: string; fill?: boolean } | undefined> = {
+  // `ground`: the picture's own edge colour (shown while it loads); `focus`: the part
+  // a square card keeps when it crops the 4:3 picture (its name side).
+  gallery: { src: "/images/landing-covers/gallery.webp", ground: "#efeceb", focus: "50% 50%" },
+  signature: { src: "/images/landing-covers/signature.webp", ground: "#ebe9e7", focus: "40% 50%" },
+  nocturne: { src: "/images/landing-covers/nocturne.webp", ground: "#1d1d1d", focus: "12% 50%" },
+  // Persona's cover is the user's own art-directed picture, near square like the
+  // cards, so it fills its card edge to edge (`fill`) rather than floating on its ground.
+  persona: { src: "/images/landing-covers/persona-2026-11c.webp", ground: "#d9d6d3", focus: "50% 50%", fill: true },
+};
+
+export const GRID = {
+  label: "Templates",
+  // The header, after the Opus reference's "Our recent projects": a title
+  // (its last word soft), a line and a link to every template.
+  title: [{ lead: "Templates for every", soft: "" }, { lead: "kind of", soft: "work." }],
+  text: "Real websites, each with its own sample content. Open any demo in a new tab, or pick one and make it yours.",
+  link: { href: "/templates", label: "All templates" },
+  items: TEMPLATES_ALL.map((template) => ({
+    id: template.id,
+    name: template.name,
+    // Its kind, and whether it can be edited yet (Exhibition is a demo only).
+    tags: EDITABLE_IDS.includes(template.id) ? [categoryLabel(template.category)] : [categoryLabel(template.category), "Demo only"],
+    screen: template.image,
+    // A finished cover picture, where the user gave one (the others build theirs from the screenshot).
+    photo: COVER_PHOTOS[template.id],
+    href: template.href,
+  })),
+};
+
 // What the fixed caption in the bottom right says while each section is in view.
 export const CAPTIONS: Record<string, string> = {
-  top: "Portfolio builder",
+  top: "More than portfolios",
   templates: "Templates for every kind of work",
   features: "Everything you need",
   design: "Make it yours",
@@ -67,11 +104,19 @@ export const DESIGN = {
   start: HOME_DESIGN.start,
 };
 
+const STEP_TEXT = [
+  "Pick a layout that suits how you like to present your work. Switch any time; your content stays put.",
+  "Fill in your details and work samples one section at a time. The live preview shows exactly how your website will look.",
+  "Get your own address at portory.net/you to send to anyone. Edit any time and publish your changes when they’re ready.",
+];
+
 export const STEPS = {
   label: HOME_STEPS.label,
   title: plain(HOME_STEPS.title),
   text: "Three steps, and you can change anything later. Portory keeps every one of them simple.",
-  items: HOME_STEPS.steps.map((step, i) => ({ ...step, image: STACK[i].image })),
+  // The home page's steps, worded for this page: "website", one address form
+  // (portory.net/you) and curly apostrophes.
+  items: HOME_STEPS.steps.map((step, i) => ({ ...step, text: STEP_TEXT[i] ?? step.text, image: STACK[i].image })),
 };
 
 export const FAQ = { label: "FAQ", title: "Questions, answered", items: HOME_FAQ.items };

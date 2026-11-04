@@ -6,18 +6,31 @@
 // colour variables on the root, and everything reads them, so switching
 // is one class.
 
+import { fontVariables } from "@/components/editorial-landing/ui";
+
+// The type of /landing (and /editorial-landing): Inter Tight for all text,
+// headings and body alike, Geist Mono for the small uppercase labels, and
+// Instrument Serif italic for a headline's accent words.
+export const fonts = `${fontVariables} font-[family-name:var(--el-sans)] [--font-1:var(--el-sans)] [--font-heading:var(--el-sans)] [&_.font-mono]:font-[family-name:var(--el-mono)]`;
+export const serif = "font-[family-name:var(--el-serif)] font-normal italic tracking-[-0.02em]";
+
 export const ease = [0.22, 1, 0.36, 1] as const;
 export const pad = (n: number) => String(n).padStart(2, "0");
 
 // The two themes. --bg the page, --fg the type, --dim quiet type, --line the
-// hairlines, --card a raised surface, --dot the halftone, --accent one signal colour.
+// hairlines, --card a raised surface, --dot the halftone, --accent one signal
+// colour, --warm the warm off-white some sections sit on.
 export const themes = {
-  light: "[--bg:#f1f1f1] [--fg:#0d0d0d] [--dim:#8c8c8c] [--line:rgb(13_13_13/0.11)] [--card:#e8e8e7] [--dot:rgb(13_13_13/0.28)] [--accent:#ff4d1a]",
-  dark: "[--bg:#0f0f0f] [--fg:#efefed] [--dim:#7d7d7d] [--line:rgb(239_239_237/0.12)] [--card:#191919] [--dot:rgb(239_239_237/0.22)] [--accent:#ff6a3d]",
+  light: "[--bg:#ffffff] [--warm:#ffffff] [--fg:#0d0d0d] [--dim:#6b6b6b] [--line:rgb(13_13_13/0.11)] [--card:#e8e8e7] [--dot:rgb(13_13_13/0.28)] [--accent:#bb4e1c]",
+  dark: "[--bg:#0f0f0f] [--warm:#161616] [--fg:#efefed] [--dim:#7d7d7d] [--line:rgb(239_239_237/0.12)] [--card:#191919] [--dot:rgb(239_239_237/0.22)] [--accent:#d96a3a]",
 };
 
-// The page's frame: a margin each side and four equal columns inside it.
-export const frame = "mx-auto w-full px-[clamp(1rem,1.75vw,2rem)]";
+// The page's frame: up to 1440px wide, centred, with a margin either side
+// growing from 24px on phones to 48px on large screens.
+export const frame = "mx-auto w-full max-w-[90rem] px-[clamp(1.5rem,3vw,3rem)]";
+// Where the content starts and ends across a full-width box: the frame's edge
+// (for things placed absolutely, like the hero's).
+export const side = "max(clamp(1.5rem,3vw,3rem),calc((100%_-_90rem)/2_+_clamp(1.5rem,3vw,3rem)))";
 export const grid = "grid grid-cols-1 lg:grid-cols-4";
 
 export const type = {
@@ -41,3 +54,4 @@ export const corner = "pointer-events-none absolute right-0 top-0 size-[0.4rem] 
 
 // The halftone dots, fading out towards the middle.
 export const dots = "pointer-events-none bg-[radial-gradient(circle,var(--dot)_1px,transparent_1.3px)] bg-[size:11px_11px]";
+

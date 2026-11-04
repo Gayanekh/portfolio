@@ -234,7 +234,7 @@ export default function TemplateBuilderPage({
             href="/templates/demo/minimal"
             className="text-[length:clamp(0.625rem,calc(0.528rem_+_0.4vw),0.688rem)] font-mono text-foreground/40 tracking-[0.15em] uppercase hover:text-foreground/70 transition-colors duration-300"
           >
-            Gayane Khachatryan
+            Nora Calder
           </Link>
           <Link
             href="/templates/demo/minimal"

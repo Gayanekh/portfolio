@@ -132,7 +132,10 @@ function WallTile({
 // and a soft light follows the pointer. The heading floats in front, drifting
 // the other way. Its words rise into place as the band scrolls into view.
 // Reduced motion keeps it all still. Keeps the #contact anchor.
-export default function FinalCTA({ reveal }: { reveal?: MotionValue<number> } = {}) {
+//
+// Elsewhere it can say other words (`lead`, `name`) and, `compact`, fill the
+// box it is put in (a footer's picture) rather than standing as a band.
+export default function FinalCTA({ reveal, lead = BROWSE.lead, name = BROWSE.name, compact = false, leadFont = "font-[family-name:var(--tf-fraunces)] font-light" }: { reveal?: MotionValue<number>; lead?: string; name?: string; compact?: boolean; leadFont?: string } = {}) {
   const reduced = useReducedMotionConfig();
   const [shown, setShown] = useState(0);
   // The tile under the pointer, the only one lit (none without a pointer).
@@ -189,11 +192,11 @@ export default function FinalCTA({ reveal }: { reveal?: MotionValue<number> } = 
 
   // Pulled up into the address section's foot, so the wall's fade starts before any edge.
   return (
-    <section id="contact" aria-label={`${BROWSE.lead} ${BROWSE.name}`} className="relative mt-[clamp(-6rem,calc(-1.456rem_-_9.467vw),-4rem)] scroll-mt-24">
+    <section id={compact ? undefined : "contact"} aria-label={`${lead} ${name}`} className={compact ? "relative h-full" : "relative mt-[clamp(-6rem,calc(-1.456rem_-_9.467vw),-4rem)] scroll-mt-24"}>
       <div
         onPointerMove={lean}
         onPointerLeave={rest}
-        className="relative isolate h-[min(110svh,68rem)] min-h-[40rem] overflow-hidden bg-foreground"
+        className={`relative isolate overflow-hidden bg-foreground ${compact ? "h-full min-h-[24rem]" : "h-[min(110svh,68rem)] min-h-[40rem]"}`}
       >
         {/* The wall, leaning with the pointer. It runs past the band's edges, so the outer tiles are cut off.
             A mask fades the tiles themselves in from the section above and out into the footer; the
@@ -234,18 +237,18 @@ export default function FinalCTA({ reveal }: { reveal?: MotionValue<number> } = 
         <div className={`pointer-events-none absolute inset-0 grid place-items-center px-6 [perspective:1200px] ${themeFontVariables}`}>
           <motion.div style={{ x: textX, y: textY, rotateX: textRotateX, rotateY: textRotateY }} className="text-center">
             <motion.h2
-              aria-label={`${BROWSE.lead} ${BROWSE.name}`}
+              aria-label={`${lead} ${name}`}
               initial="hidden"
               whileInView="shown"
               viewport={{ once: true, amount: 0.5 }}
               transition={{ staggerChildren: 0.14 }}
               className={`m-0 flex flex-col items-center ${fluidText.ctaTitle} leading-[1.05] text-white [text-shadow:0_2px_40px_rgb(0_0_0/0.5)]`}
             >
-              <motion.span aria-hidden="true" variants={line} className="block font-[family-name:var(--tf-fraunces)] font-light tracking-[-0.01em]">
-                {BROWSE.lead}
+              <motion.span aria-hidden="true" variants={line} className={`block ${leadFont} tracking-[-0.01em]`}>
+                {lead}
               </motion.span>
               <motion.span aria-hidden="true" variants={line} className="block font-medium tracking-[-0.035em]">
-                {BROWSE.name}
+                {name}
               </motion.span>
             </motion.h2>
           </motion.div>
