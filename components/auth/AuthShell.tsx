@@ -5,7 +5,7 @@ import { createContext, useContext, useState, type MouseEvent } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import AuthBadge from "@/components/auth/AuthBadge";
 import AuthGlow from "@/components/auth/AuthGlow";
-import { authSans, authSerif } from "@/components/auth/auth-fonts";
+import { authSans, authDisplay } from "@/components/auth/auth-fonts";
 import { requestHeadingFocus } from "@/components/auth/LoginExperience";
 import { fluidText } from "@/components/landing/landing-ui";
 import { getSafeNext } from "@/lib/auth-routing";
@@ -63,7 +63,7 @@ const note = "m-0 max-w-[26ch] text-[0.7188rem] leading-[1.5] text-foreground/75
 // The auth page as a quiet editorial spread: soft grey and gold glows on an
 // off-white page, a large light serif headline in staggered lines with small
 // notes beside it, the form on the right, a turning badge and long arrow at
-// the edge, and a thin labelled rule along the bottom. On desktop it fits one
+// the edge. Everything sits centred under the header. On desktop it fits one
 // screen; below 861px the parts stack and the page scrolls. On phones the
 // headline, its notes and the badge are left out, so the form (with its own
 // heading and switch link) comes first under the logo and Back. Shared by the
@@ -91,12 +91,15 @@ export default function AuthShell({ header, children }: { header: React.ReactNod
       <div data-site-scale className={`${authSans.className} relative isolate flex min-h-dvh flex-col overflow-hidden bg-[#f1f0ee] text-foreground antialiased min-[861px]:h-dvh`}>
         <AuthGlow />
 
-        <header className="flex min-h-11 items-center justify-between gap-3 px-[clamp(1rem,calc(-0.577rem_+_6.154vw),3rem)] pt-[clamp(1rem,calc(-0.448rem_+_3.62vw),1.5rem)]">{header}</header>
+        {/* The header shares the content's side spacing, so the logo lines up
+            with the headline (the form on phones) and Back with the form. */}
+        <header className="flex min-h-11 items-center justify-between gap-3 pl-[clamp(1rem,calc(-2.371rem_+_10.374vw),12.8rem)] pr-[clamp(1rem,calc(-3.187rem_+_12.182vw),14.4rem)] pt-[clamp(1rem,calc(-0.448rem_+_3.62vw),1.5rem)]">{header}</header>
 
-        <div className="grid flex-1 gap-14 pl-[clamp(1rem,calc(-2.371rem_+_10.374vw),12.8rem)] pr-[clamp(1rem,calc(-3.187rem_+_12.182vw),14.4rem)] py-[clamp(1.5rem,calc(5.396rem_-_7.24vw),2.5rem)] min-[861px]:min-h-0 min-[861px]:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)] min-[861px]:items-center min-[861px]:gap-16">
+        {/* Centred in the space under the header on every screen */}
+        <div className="grid flex-1 content-center gap-14 pl-[clamp(1rem,calc(-2.371rem_+_10.374vw),12.8rem)] pr-[clamp(1rem,calc(-3.187rem_+_12.182vw),14.4rem)] py-[clamp(1.5rem,calc(5.396rem_-_7.24vw),2.5rem)] min-[861px]:min-h-0 min-[861px]:grid-cols-[minmax(0,1.3fr)_minmax(0,0.7fr)] min-[861px]:items-center min-[861px]:gap-16">
           {/* Headline, its notes and the switch link */}
           <section key={mode} className="@container grid gap-10 max-sm:hidden">
-            <div className={`${authSerif.className} ${fluidText.authTitle} font-light leading-[0.98] tracking-[-0.025em]`}>
+            <div className={`${authDisplay.className} ${fluidText.authTitle} font-light leading-[0.98] tracking-[-0.045em]`}>
               <div className="flex flex-wrap items-start gap-x-10 gap-y-4">
                 <p className={`${enter} fade-in slide-in-from-bottom-4 duration-700 m-0`}>{text.lines[0]}</p>
                 <p className={`${enter} ${authSans.className} fade-in delay-500 duration-700 ${note} mt-[0.4em] tracking-normal`}>{text.noteTop}</p>
@@ -116,7 +119,7 @@ export default function AuthShell({ header, children }: { header: React.ReactNod
                   href={`/${text.target}`}
                   onClick={onSwitch}
                   aria-disabled={busy || undefined}
-                  className={`${authSerif.className} group inline-flex items-center gap-3 text-[1.375rem] font-light text-foreground focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-foreground aria-disabled:pointer-events-none aria-disabled:opacity-50`}
+                  className={`${authDisplay.className} group inline-flex items-center gap-3 text-[1.375rem] font-light text-foreground focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-4 focus-visible:outline-foreground aria-disabled:pointer-events-none aria-disabled:opacity-50`}
                 >
                   {text.switchAction}
                   <svg aria-hidden="true" viewBox="0 0 48 12" className="w-10 transition-transform duration-500 group-hover:translate-x-1.5" fill="none" stroke="currentColor" strokeWidth="1">
@@ -128,7 +131,7 @@ export default function AuthShell({ header, children }: { header: React.ReactNod
           </section>
 
           {/* The form */}
-          <section className={`@container ${enter} fade-in slide-in-from-bottom-6 delay-300 duration-700 w-full max-w-[23.75rem] min-[861px]:max-h-full min-[861px]:justify-self-end min-[861px]:overflow-y-auto min-[861px]:py-2`}>
+          <section className={`@container ${enter} fade-in slide-in-from-bottom-6 delay-300 duration-700 w-full max-w-[23.75rem] max-sm:justify-self-center min-[861px]:max-h-full min-[861px]:justify-self-end min-[861px]:overflow-y-auto min-[861px]:py-2`}>
             {children}
           </section>
         </div>
@@ -141,12 +144,6 @@ export default function AuthShell({ header, children }: { header: React.ReactNod
           </svg>
         </div>
 
-        {/* Thin labelled rule along the bottom */}
-        <footer className="flex items-center gap-6 pl-[clamp(1rem,calc(-2.371rem_+_10.374vw),12.8rem)] pr-[clamp(1rem,calc(-3.187rem_+_12.182vw),14.4rem)] pb-5 text-[0.75rem] font-semibold">
-          <span>Portfolios that open doors</span>
-          <span aria-hidden="true" className={`${enter} fade-in slide-in-from-left-8 duration-1000 h-px flex-1 bg-foreground/30`} />
-          <span>Portory</span>
-        </footer>
       </div>
     </AuthBusyContext.Provider>
   );

@@ -70,7 +70,7 @@ export const fluidText = {
   // A page's own title (the templates page).
   // From md up its grid is marked @container and the title stays 5.875% of
   // the grid's width (its share at 1366px), so it keeps its line breaks.
-  pageTitle: "text-[length:clamp(2.5rem,calc(2.047rem_+_1.86vw),5rem)] md:text-[length:clamp(1.75rem,min(calc(2.047rem_+_1.86vw),5.875cqi),5rem)]",
+  pageTitle: "text-[length:clamp(1.75rem,calc(1.3rem_+_1.2vw),3.25rem)] md:text-[length:clamp(1.5rem,min(calc(1.3rem_+_1.2vw),3.8cqi),3.25rem)]",
   // The account page's name.
   profileName: "text-[length:clamp(2.4rem,calc(1.44rem_+_1.35vw),3.6rem)]",
   // The editor sidebar's template name.
@@ -84,7 +84,7 @@ export const fluidText = {
   // A template's title on a slider card.
   cardTitle: "text-[length:clamp(1.706rem,calc(1.297rem_+_0.908vw),2.75rem)]",
   // The closing call to action.
-  ctaTitle: "text-[length:clamp(1.75rem,calc(1.134rem_+_1.387vw),3.25rem)]",
+  ctaTitle: "text-[length:clamp(1.5rem,calc(0.907rem_+_1.11vw),2.6rem)]",
   // An FAQ question; the footer's lead line.
   question: "text-[length:clamp(1.15rem,calc(0rem_+_1.801vw),1.5rem)]",
   footerLead: "text-[length:clamp(1.15rem,calc(0rem_+_1.6vw),1.45rem)]",
@@ -135,7 +135,7 @@ export const text = {
 // as it narrows by marking itself @container and setting --fit to the
 // title's share of its width at 1366px (e.g. [--fit:8.47cqi]); the title
 // then shrinks with the column, like a picture.
-export const displayTitle = "m-0 text-balance text-[length:clamp(1.75rem,min(calc(1.5rem_+_1.406vw),var(--fit,100vw)),3.75rem)] font-medium leading-[0.98] tracking-[-0.045em]";
+export const displayTitle = "m-0 text-balance text-[length:clamp(1.5rem,min(calc(1.2rem_+_1.125vw),calc(var(--fit,100vw)*0.8)),3rem)] font-medium leading-[0.98] tracking-[-0.045em]";
 // The brand colour (--primary) as the landing's one accent. Small text uses a
 // slightly deeper shade, so it stays readable on the light page.
 export const accentText = "text-[color:color-mix(in_srgb,var(--primary),black_13%)]";

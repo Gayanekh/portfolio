@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Reveal } from "@/components/landing/Reveal";
+import { MaskWords } from "@/components/landing/scroll-fx";
 import { displayTitle, kickerOnDark, lead, section, solidButton, fit } from "@/components/landing/landing-ui";
 
 // Content from the landing-redesign branch's "Claim your address" section.
@@ -34,7 +35,9 @@ export default function ClaimAddress() {
     <section id="claim-address" aria-label={CLAIM.title} className={`${section} bg-foreground text-white ${fit.sectionY} [&_:focus-visible]:outline-white`}>
       <Reveal className="mx-auto flex w-content-width flex-col items-center gap-6 text-center">
         <p className={kickerOnDark}>{CLAIM.kicker}</p>
-        <h2 className={`${displayTitle} text-white`}>{CLAIM.title}</h2>
+        <h2 className={`${displayTitle} text-white`}>
+          <MaskWords text={CLAIM.title} />
+        </h2>
         <p className={`${lead} max-w-[36rem] text-white/65`}>{CLAIM.text}</p>
         <form
           className="mt-4 flex w-full max-w-[40rem] flex-col gap-3 sm:flex-row"

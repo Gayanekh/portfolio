@@ -5,7 +5,7 @@ import { type FormEvent, type MouseEvent, useEffect, useRef } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { authSerif } from "@/components/auth/auth-fonts";
+import { authDisplay } from "@/components/auth/auth-fonts";
 import { fluidText } from "@/components/landing/landing-ui";
 
 // Set by the auth links so the next route's heading takes focus on mount.
@@ -96,7 +96,7 @@ export default function LoginExperience(props: LoginExperienceProps) {
   return (
     <div data-mode={mode} className="group/auth grid w-full gap-6 [@media(max-height:720px)]:gap-4 animate-in fade-in slide-in-from-bottom-2 duration-500 motion-reduce:animate-none">
       <div className="grid gap-2">
-        <h1 ref={heading} tabIndex={-1} className={`${authSerif.className} ${fluidText.authFormTitle} font-light leading-tight tracking-[-0.02em] outline-none`}>{isRegister ? "Welcome to Portory" : <>Welcome back<span className="sm:hidden"> to your portfolio</span></>}</h1>
+        <h1 ref={heading} tabIndex={-1} className={`${authDisplay.className} ${fluidText.authFormTitle} font-light leading-tight tracking-[-0.035em] outline-none`}>{isRegister ? "Welcome to Portory" : <>Welcome back<span className="sm:hidden"> to your portfolio</span></>}</h1>
         <p className="text-[0.9375rem] leading-relaxed text-foreground/70">{isRegister ? "Join Portory for free to build a portfolio worth sharing." : "Log in to keep editing your portfolio."}</p>
       </div>
 

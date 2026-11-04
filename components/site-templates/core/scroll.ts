@@ -13,12 +13,14 @@ export function viewOf(parent: HTMLElement | null) {
   return parent ? parent.getBoundingClientRect() : { top: 0, height: window.innerHeight };
 }
 
-// Glide the page until `element` is at the top of the view: a slow, eased
-// scroll, the same in the editor's canvas and on the page.
+// Glide the page until `element` is at the top of the view (less its
+// scroll-margin-top, such as a pinned header's height): a slow, eased scroll,
+// the same in the editor's canvas and on the page.
 export function glideTo(element: HTMLElement) {
   const parent = scrollParent(element);
   const from = parent ? parent.scrollTop : window.scrollY;
-  const to = from + element.getBoundingClientRect().top - viewOf(parent).top;
+  const margin = parseFloat(getComputedStyle(element).scrollMarginTop) || 0;
+  const to = from + element.getBoundingClientRect().top - viewOf(parent).top - margin;
   return animate(from, to, {
     duration: 1.2,
     ease: [0.65, 0, 0.35, 1],

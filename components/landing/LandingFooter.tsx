@@ -1,12 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUp } from "lucide-react";
 import LogoMark from "@/components/brand/LogoMark";
-import { useLanding } from "@/components/landing/LandingProvider";
 import { Reveal } from "@/components/landing/Reveal";
+import { MaskWords } from "@/components/landing/scroll-fx";
 import { focusRing, fluidText } from "@/components/landing/landing-ui";
-import { scrollPageTo } from "@/lib/scroll";
 
 const TAGLINE = "A simple way to create and publish a portfolio that feels like you.";
 
@@ -25,9 +23,8 @@ const footerLink = `${focusRing} rounded text-[0.95rem] text-white/60 no-underli
 // The footer, dark, continuing the closing wall above it (FinalCTA), laid out
 // like the How it works grid: columns divided by hairlines and nothing boxed
 // in. The brand with its line set large and light, the page's links, and a
-// way back to the top; then the copyright.
+// short line on starting; then the copyright.
 export default function LandingFooter() {
-  const { motionReduced } = useLanding();
   // Extra bottom space below lg keeps the copyright clear of the floating call to action.
   return (
     <footer aria-label="Site footer" className="relative w-full overflow-hidden bg-foreground pb-24 pt-[clamp(4rem,calc(1.456rem_+_9.467vw),6rem)] text-white lg:pb-4 [&_:focus-visible]:outline-white">
@@ -38,7 +35,9 @@ export default function LandingFooter() {
             <Link href="/" aria-label="Portory home" className={`${focusRing} grid size-10 place-items-center rounded-xl bg-white transition-transform duration-300 hover:-translate-y-0.5`}>
               <LogoMark className="size-7" />
             </Link>
-            <p className={`m-0 max-w-[26rem] text-balance ${fluidText.footerLead} font-light leading-[1.3] tracking-[-0.02em] text-white/85`}>{TAGLINE}</p>
+            <p className={`m-0 max-w-[26rem] text-balance ${fluidText.footerLead} font-light leading-[1.3] tracking-[-0.02em] text-white/85`}>
+              <MaskWords text={TAGLINE} delay={0.1} />
+            </p>
           </Reveal>
 
           {/* The page's links. */}
@@ -59,20 +58,12 @@ export default function LandingFooter() {
             </nav>
           </Reveal>
 
-          {/* Back to the top. */}
-          <Reveal delay={0.12} className="flex flex-col justify-between gap-8 border-white/10 py-10 sm:border-l sm:pl-6">
+          {/* Start. */}
+          <Reveal delay={0.12} className="flex flex-col gap-8 border-white/10 py-10 sm:border-l sm:pl-6">
             <div className="flex flex-col gap-5">
               <p className={label}>Start</p>
               <p className="m-0 max-w-[16rem] text-[0.95rem] leading-relaxed text-white/60">Pick a template, make it yours and publish it, all in one place.</p>
             </div>
-            <button
-              type="button"
-              onClick={() => scrollPageTo(0, { immediate: !!motionReduced })}
-              className={`${focusRing} group inline-flex w-fit cursor-pointer items-center gap-2 rounded border border-white/15 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:border-white/40`}
-            >
-              Back to top
-              <ArrowUp aria-hidden="true" className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5" />
-            </button>
           </Reveal>
         </div>
 

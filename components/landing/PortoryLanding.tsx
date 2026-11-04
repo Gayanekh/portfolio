@@ -1,7 +1,6 @@
 import BackToTop from "@/components/BackToTop";
-import ClaimAddress from "@/components/landing/ClaimAddress";
 import Features from "@/components/landing/Features";
-import FinalCTA from "@/components/landing/FinalCTA";
+import CtaReveal from "@/components/landing/CtaReveal";
 import LandingFooter from "@/components/landing/LandingFooter";
 import LandingHeader from "@/components/landing/LandingHeader";
 import LandingProvider from "@/components/landing/LandingProvider";
@@ -28,8 +27,8 @@ export default function PortoryLanding() {
           <Styler />
           <Steps />
           <Questions className="bg-transparent" />
-          <ClaimAddress />
-          <FinalCTA />
+          {/* The address section slides up over "Create with Portory", fixed beneath it. */}
+          <CtaReveal />
         </main>
         <LandingFooter />
         <BackToTop phone={false} />

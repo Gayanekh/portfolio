@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { MoveRight, Shuffle } from "lucide-react";
 import { Reveal } from "@/components/landing/Reveal";
+import { MaskWords, useScrollValue } from "@/components/landing/scroll-fx";
 import PreviewFrame from "@/components/template-detail/PreviewFrame";
 import { getTemplateDetail } from "@/components/template-detail/template-registry";
 import { FontCard, PaletteCard, glowOf, signature } from "@/components/template-detail/StyleCards";
@@ -16,7 +17,7 @@ const STYLER = {
   kicker: "Design",
   title: "Make it yours in a click",
   text: "Pick a colour palette and a font pairing, and the whole template changes with you. Try it on a real template.",
-  template: "persona",
+  template: "gallery",
   start: { href: "/templates", label: "Get started" },
 };
 
@@ -35,7 +36,7 @@ const useWide = () => useSyncExternalStore(subscribeWide, () => window.matchMedi
 // stage (60% fixed, 40% with its width: 0.87 at 1280px), so their small
 // capitals stay readable; below xl they fold into two chips (StyleChips).
 const STAGE_WIDTH_REM = 87;
-function useStageScale() {
+export function useStageScale() {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const stage = ref.current;
@@ -56,7 +57,7 @@ function useStageScale() {
 // palette's five colours, or "Aa" in the font) with its name. A chip opens
 // its full card over the template, under the chips; the choice restyles the
 // template at once, and a click outside or Escape closes it.
-function StyleChips({ palette, font, onPalette, onFont, accent }: { palette: string; font: string; onPalette: (id: string) => void; onFont: (id: string) => void; accent: string }) {
+export function StyleChips({ palette, font, onPalette, onFont, accent }: { palette: string; font: string; onPalette: (id: string) => void; onFont: (id: string) => void; accent: string }) {
   const [open, setOpen] = useState<"palette" | "font" | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -121,7 +122,7 @@ function StyleChips({ palette, font, onPalette, onFont, accent }: { palette: str
 }
 
 // A different random pick from a list.
-const other = <T extends { id: string }>(list: T[], current: string) => {
+export const other = <T extends { id: string }>(list: T[], current: string) => {
   const rest = list.filter((item) => item.id !== current);
   return rest[Math.floor(Math.random() * rest.length)].id;
 };
@@ -136,6 +137,8 @@ export default function Styler() {
   const [font, setFont] = useState(FONT_PACKS[0].id);
   const wide = useWide();
   const stageRef = useStageScale();
+  // The stage grows to full size as it scrolls up the screen.
+  const [growRef, grow] = useScrollValue<HTMLDivElement>([0.86, 1], ["start end", "start 0.3"]);
   const template = getTemplateDetail(STYLER.template);
   if (!template) return null;
 
@@ -152,7 +155,9 @@ export default function Styler() {
         <Reveal className="grid grid-cols-1 items-end gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,min(26rem,42%))] lg:gap-[min(4rem,6.5%)]">
           <div className="@container flex flex-col gap-5 [--fit:8.47cqi]">
             <p className={kicker}>{STYLER.kicker}</p>
-            <h2 className={displayTitle}>{STYLER.title}</h2>
+            <h2 className={displayTitle}>
+              <MaskWords text={STYLER.title} />
+            </h2>
           </div>
           <p className={lead}>{STYLER.text}</p>
         </Reveal>
@@ -161,6 +166,7 @@ export default function Styler() {
             them. The palette's colours glow behind the preview and fade out into
             the page, so the section has no edges. */}
         <Reveal className="relative isolate">
+          <motion.div ref={growRef} style={{ scale: grow }} className="relative origin-top">
           <AnimatePresence initial={false}>
             <motion.div
               key={activePalette.id}
@@ -232,6 +238,7 @@ export default function Styler() {
               </button>
             </div>
           </div>
+          </motion.div>
         </Reveal>
       </div>
     </section>

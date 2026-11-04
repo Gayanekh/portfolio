@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useInView, useReducedMotionConfig } from "framer-motion";
 import { ArrowDown, ArrowUp, Check, Copy, Link2, MoveRight, Plus } from "lucide-react";
 import { Reveal } from "@/components/landing/Reveal";
+import { MaskWords, useScrollValue } from "@/components/landing/scroll-fx";
 import { PEOPLE, TEMPLATES, TEMPLATE_IMAGE } from "@/components/landing/sample-portfolios";
 import { displayTitle, ease, focusRing, kicker, lead, section, fit, fluidText } from "@/components/landing/landing-ui";
 
@@ -30,8 +31,9 @@ const slug = person.name.toLowerCase().replace(/[^a-z]+/g, "-");
 const number = (i: number) => String(i + 1).padStart(2, "0");
 const field = "flex items-center justify-between gap-3 rounded-lg border border-foreground/10 bg-white px-3 py-2";
 
-// The product as it looks at each step, in a small browser window.
-function StepScreen({ step }: { step: number }) {
+// The product as it looks at each step, in a small browser window
+// (also shown by /template-landing's How it works).
+export function StepScreen({ step }: { step: number }) {
   if (step === 0) {
     return (
       <div className="grid grid-cols-3 gap-2.5 p-4">
@@ -130,6 +132,8 @@ export default function Steps() {
   const [focused, setFocused] = useState(false);
   const canvasRef = useRef<HTMLDivElement>(null);
   const inView = useInView(canvasRef, { amount: 0.4 });
+  // The canvas grows into place as it scrolls up the screen.
+  const [growRef, grow] = useScrollValue<HTMLDivElement>([0.88, 1], ["start end", "start 0.3"]);
   const playing = !reduced && !hovered && !focused && inView;
 
   // Autoplay; choosing a step restarts the wait because `step` changes.
@@ -164,12 +168,15 @@ export default function Steps() {
         <Reveal className="grid grid-cols-1 items-end gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,min(26rem,42%))] lg:gap-[min(4rem,6.5%)]">
           <div className="@container flex flex-col gap-5 [--fit:8.47cqi]">
             <p className={kicker}>{INTRO.kicker}</p>
-            <h2 className={displayTitle}>{INTRO.title}</h2>
+            <h2 className={displayTitle}>
+              <MaskWords text={INTRO.title} />
+            </h2>
           </div>
           <p className={lead}>{INTRO.text}</p>
         </Reveal>
 
         <Reveal>
+          <motion.div ref={growRef} style={{ scale: grow }} className="origin-top">
           {/* The canvas. Its sizes: --win the window, --rail the arrows'
               column, --pad and --gap the spacing; the dark band covers the
               rail and just under half the window. */}
@@ -266,6 +273,7 @@ export default function Steps() {
               {arrow(1)}
             </div>
           </div>
+          </motion.div>
         </Reveal>
       </div>
     </section>

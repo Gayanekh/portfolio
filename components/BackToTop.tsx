@@ -8,7 +8,8 @@ import { scrollPageTo } from "@/lib/scroll";
 
 // A dark square button in the bottom-right corner that appears once the page
 // has scrolled past `after` pixels and takes it back to the top (smoothly,
-// unless motion is reduced). Used on the gallery and the landing pages.
+// unless motion is reduced), its arrow centred; on hover it fades to the
+// primary colour and the arrow lifts. Used on the gallery and the landing pages.
 // `phone={false}` leaves it out on phones, where the landing's floating bar
 // has its own.
 export default function BackToTop({ after = 600, phone = true }: { after?: number; phone?: boolean }) {
@@ -28,9 +29,9 @@ export default function BackToTop({ after = 600, phone = true }: { after?: numbe
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 16 }}
           transition={{ duration: 0.3, ease }}
-          className={`${focusRing} ${phone ? "" : "max-sm:hidden"} fixed bottom-6 right-6 z-50 grid size-11 cursor-pointer place-items-center rounded bg-foreground text-background shadow-[0_8px_24px_-8px_rgb(0_0_0/0.4)]`}
+          className={`${focusRing} group/top ${phone ? "" : "max-sm:hidden"} fixed bottom-6 right-6 z-50 grid size-11 cursor-pointer place-items-center rounded-[4px] border-0 bg-foreground p-0 text-background shadow-[0_8px_24px_-8px_rgb(0_0_0/0.4)] ring-1 ring-white/20 transition-colors duration-300 hover:bg-[var(--accent,#bb4e1c)] hover:text-white`}
         >
-          <ArrowUp className="size-5" />
+          <ArrowUp aria-hidden="true" className="size-5 transition-transform duration-300 group-hover/top:-translate-y-0.5" />
         </motion.button>
       )}
     </AnimatePresence>

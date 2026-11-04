@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import BackToHome from "@/components/BackToHome";
 import BackToTop from "@/components/BackToTop";
 import GalleryCard from "@/components/gallery/GalleryCard";
-import { GALLERY_STYLES, SHOWN_TEMPLATES, type GalleryStyle } from "@/components/gallery/gallery-templates";
+import { GALLERY_CATEGORIES, SHOWN_TEMPLATES, type GalleryCategory } from "@/components/gallery/gallery-templates";
 import LandingHeader from "@/components/landing/LandingHeader";
 import { accentText, ease, focusRing, fluidText } from "@/components/landing/landing-ui";
 
@@ -21,33 +20,28 @@ const rise = (delay: number) => ({
 // filters, and a grid of template previews. Cards open the builder in the
 // same tab; a back-to-top button appears once you've scrolled.
 export default function TemplateGallery() {
-  const [style, setStyle] = useState<GalleryStyle | "all">("all");
-  const [hovered, setHovered] = useState<GalleryStyle | "all" | null>(null);
+  const [style, setStyle] = useState<GalleryCategory | "all">("all");
+  const [hovered, setHovered] = useState<GalleryCategory | "all" | null>(null);
 
-  const shown = style === "all" ? SHOWN_TEMPLATES : SHOWN_TEMPLATES.filter((t) => t.style === style);
-  // Only the styles some template has (a filter with nothing in it is left out).
-  const styles = GALLERY_STYLES.filter((option) => option.id === "all" || SHOWN_TEMPLATES.some((t) => t.style === option.id));
+  const shown = style === "all" ? SHOWN_TEMPLATES : SHOWN_TEMPLATES.filter((t) => t.category === style);
+  // The kinds of website, only those some template has (a filter with
+  // nothing in it is left out).
+  const styles: { id: GalleryCategory | "all"; label: string }[] = [{ id: "all", label: "All templates" }, ...GALLERY_CATEGORIES.filter((option) => SHOWN_TEMPLATES.some((t) => t.category === option.id))];
 
   return (
     <div data-site-scale className="relative min-h-screen bg-background text-foreground">
       <LandingHeader links={false} />
 
       <main className="mx-auto w-content-width pb-24 pt-[clamp(7rem,calc(4.456rem_+_9.467vw),9rem)]">
-        <motion.div {...rise(0)}>
-          <BackToHome className="mb-8" />
-        </motion.div>
-
         <div className="@container grid grid-cols-1 gap-6 md:grid-cols-[1.15fr_1fr] md:gap-[min(4rem,6.5%)]">
           <motion.h1
             {...rise(0.05)}
             className={`m-0 text-balance ${fluidText.pageTitle} font-medium leading-[1.02] tracking-[-0.035em]`}
           >
-            Find the template that fits your work.
+           Templates
           </motion.h1>
           <motion.p {...rise(0.15)} className="m-0 max-w-[34rem] text-[length:clamp(1rem,calc(0.841rem_+_0.592vw),1.125rem)] md:text-[length:clamp(0.9375rem,min(calc(0.841rem_+_0.592vw),1.818cqi),1.125rem)] leading-relaxed text-foreground/70 md:pt-3">
-            Whether you teach, photograph, consult or build, there is a Portory template made for the way you work.
-            Every one is responsive, easy to edit with a live preview, and ready to publish on your own portory.net link.
-          </motion.p>
+Websites for every kind of work — portfolios, photography, events and more. Pick one, make it yours, publish.</motion.p>
         </div>
 
         <motion.div {...rise(0.25)} className="mt-[clamp(3.5rem,calc(1.592rem_+_7.101vw),5rem)] flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -60,7 +54,7 @@ export default function TemplateGallery() {
           {/* Plain filters, moving like the landing page's template tabs: a
               dark pill marks the chosen one and slides to the one hovered,
               then back when the pointer leaves */}
-          <div role="group" aria-label="Filter by style" onMouseLeave={() => setHovered(null)} className="flex flex-wrap gap-1">
+          <div role="group" aria-label="Filter by kind of website" onMouseLeave={() => setHovered(null)} className="flex flex-wrap gap-1">
             {styles.map((option) => {
               const active = option.id === style;
               const lit = (hovered ?? style) === option.id;
@@ -71,7 +65,7 @@ export default function TemplateGallery() {
                   aria-pressed={active}
                   onClick={() => setStyle(option.id)}
                   onMouseEnter={() => setHovered(option.id)}
-                  className={`${focusRing} relative cursor-pointer rounded px-4 py-2.5 text-sm font-medium transition-colors duration-200 ${lit ? "text-white" : "text-foreground"}`}
+                  className={`${focusRing} relative cursor-pointer rounded px-3 py-1.5 text-[0.8125rem] font-medium transition-colors duration-200 ${lit ? "text-white" : "text-foreground"}`}
                 >
                   {lit && <motion.span layoutId="gallery-filter" transition={{ type: "spring", stiffness: 420, damping: 36 }} aria-hidden="true" className="absolute inset-0 rounded bg-foreground" />}
                   <span className="relative">{option.label}</span>
@@ -81,13 +75,14 @@ export default function TemplateGallery() {
           </div>
         </motion.div>
 
-        <motion.ul layout className="m-0 mt-[clamp(2rem,calc(0.728rem_+_4.734vw),3rem)] grid grid-cols-1 gap-x-8 gap-y-10 p-0 sm:grid-cols-2 lg:grid-cols-3">
+        <motion.ul layout style={{ rowGap: "clamp(1.75rem, calc(1.432rem + 1.183vw), 2.25rem)" }} className="m-0 mt-[clamp(1.5rem,calc(0.864rem_+_2.367vw),2.25rem)] grid grid-cols-1 gap-x-8 p-0 sm:grid-cols-2 lg:grid-cols-3">
           <AnimatePresence mode="popLayout" initial={false}>
             {shown.map((template, i) => (
               <GalleryCard key={template.id} template={template} index={i} />
             ))}
           </AnimatePresence>
         </motion.ul>
+
       </main>
 
       <BackToTop />

@@ -28,6 +28,14 @@ const REWIND = { duration: 1.4, ease };
 const WHEEL_QUIET_MS = 250;
 const WHEEL_REPEAT_MS = 900;
 
+// The entrance: the text and the card stack start together on one clock and
+// finish together. The headline's words rise out of their lines one after
+// another, the text and button follow just behind, and the stack wipes up
+// into view from its foot as it settles. With reduced motion it all simply
+// appears.
+const ENTER_MS = 1.2;
+const words = (text: string) => text.split(" ");
+
 const heroButton = `${focusRing} group inline-flex h-12 items-center gap-2 rounded px-6 text-[0.95rem] font-medium no-underline transition-colors`;
 
 export default function HeroTemplates() {
@@ -94,33 +102,58 @@ export default function HeroTemplates() {
     return () => window.clearTimeout(timer);
   }, [active, reduced, paused, inView]);
 
+  const enter = (duration: number, delay = 0) => ({ duration: reduced ? 0 : duration, delay: reduced ? 0 : delay, ease });
+  const rise = { hidden: { opacity: 0, y: 24 }, shown: { opacity: 1, y: 0, transition: enter(0.9) } };
+  const lift = { hidden: { y: "110%" }, shown: { y: "0%", transition: enter(0.9) } };
+  const word = (text: string, i: number) => (
+    <span key={i}>
+      {i > 0 && " "}
+      <span className="-mb-[0.12em] inline-block overflow-hidden pb-[0.12em] align-top">
+        <motion.span className="inline-block" variants={lift}>
+          {text}
+        </motion.span>
+      </span>
+    </span>
+  );
+
   return (
     // The top padding keeps the content clear of the floating header.
     <section ref={sectionRef} id="home" aria-label="Introduction" className="flex min-h-svh items-center pb-[clamp(2.5rem,calc(1rem_+_3vw),4.5rem)] pt-[clamp(7.5rem,calc(6rem_+_3vw),9.5rem)] md:pb-[2.5rem] md:pt-[8.5rem]">
       {/* Side by side: the text on the left, the card stack on the right (stacked on phones). */}
-      <div className="mx-auto grid w-content-width grid-cols-1 items-center gap-[clamp(2.5rem,calc(0.96rem_+_3.2vw),3rem)] md:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)]">
+      {/* One clock for both columns: they start and finish their entrance together. */}
+      <motion.div initial="hidden" animate="shown" className="mx-auto grid w-content-width grid-cols-1 items-center gap-[clamp(2.5rem,calc(0.96rem_+_3.2vw),3rem)] md:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)]">
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease }}
+          variants={{ hidden: {}, shown: { transition: { staggerChildren: reduced ? 0 : 0.18 } } }}
           className="@container flex max-w-[36rem] flex-col items-start gap-5"
         >
           {/* The page's largest heading: a step above the section titles at every width. */}
-          <h1 className={`m-0 text-balance ${fluidText.heroTitle} font-semibold leading-[0.95] tracking-[-0.045em]`}>
-            {HERO.title} <span className="text-foreground/40">{HERO.accent}</span>
-          </h1>
-          <p className={`m-0 max-w-[36rem] text-pretty ${fluidText.heroText} leading-relaxed text-foreground/65`}>{HERO.text}</p>
-          <div className="flex flex-wrap gap-3">
+          <motion.h1
+            aria-label={`${HERO.title} ${HERO.accent}`}
+            variants={{ hidden: {}, shown: { transition: { staggerChildren: reduced ? 0 : 0.045 } } }}
+            className={`m-0 text-balance ${fluidText.heroTitle} font-semibold leading-[0.95] tracking-[-0.045em]`}
+          >
+            <span aria-hidden="true">{words(HERO.title).map(word)}</span>{" "}
+            <span aria-hidden="true" className="text-foreground/40">
+              {words(HERO.accent).map(word)}
+            </span>
+          </motion.h1>
+          <motion.p variants={rise} className={`m-0 max-w-[36rem] text-pretty ${fluidText.heroText} leading-relaxed text-foreground/65`}>{HERO.text}</motion.p>
+          <motion.div variants={rise} className="flex flex-wrap gap-3">
             {/* FloatingCta watches this id to show the button again once it has scrolled away. */}
             <Link id="hero-cta" href={HERO.primary.href} className={`${heroButton} ${primaryButton}`}>
               {HERO.primary.label}
               <MoveRight aria-hidden="true" className="size-5 transition-transform duration-300 group-hover:translate-x-1" />
-            </Link>          </div>
+            </Link>
+          </motion.div>
         </motion.div>
 
-        {/* The card stack. */}
-        <div
+        {/* The card stack, wiping up into view from its foot as it settles. */}
+        <motion.div
           ref={stackRef}
+          variants={{
+            hidden: { clipPath: "inset(100% 0% 0% 0%)", y: 60 },
+            shown: { clipPath: "inset(0% 0% 0% 0%)", y: 0, transition: enter(ENTER_MS) },
+          }}
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
           onFocus={() => setPaused(true)}
@@ -128,8 +161,8 @@ export default function HeroTemplates() {
           className="flex justify-center md:justify-end"
         >
           <StackSlider items={STACK} position={position} active={active} onSelect={setActive} />
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </section>
   );
 }

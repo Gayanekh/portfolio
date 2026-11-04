@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { AnimatePresence, motion, useMotionTemplate, useMotionValue, useReducedMotionConfig, useSpring, useTransform, type MotionValue } from "framer-motion";
 import { themeFontVariables } from "@/components/template-detail/theme-options";
 import { TEMPLATES, TEMPLATE_IMAGE } from "@/components/landing/sample-portfolios";
+import { useStill } from "@/components/landing/scroll-fx";
 import { ease, easedStops, focusRing, fluidText } from "@/components/landing/landing-ui";
 
 const BROWSE = {
@@ -131,7 +132,10 @@ function WallTile({
 // and a soft light follows the pointer. The heading floats in front, drifting
 // the other way. Its words rise into place as the band scrolls into view.
 // Reduced motion keeps it all still. Keeps the #contact anchor.
-export default function FinalCTA() {
+//
+// Elsewhere it can say other words (`lead`, `name`) and, `compact`, fill the
+// box it is put in (a footer's picture) rather than standing as a band.
+export default function FinalCTA({ reveal, lead = BROWSE.lead, name = BROWSE.name, compact = false, leadFont = "font-[family-name:var(--tf-fraunces)] font-light" }: { reveal?: MotionValue<number>; lead?: string; name?: string; compact?: boolean; leadFont?: string } = {}) {
   const reduced = useReducedMotionConfig();
   const [shown, setShown] = useState(0);
   // The tile under the pointer, the only one lit (none without a pointer).
@@ -141,6 +145,11 @@ export default function FinalCTA() {
   const px = useMotionValue(0);
   const py = useMotionValue(0);
   const over = useMotionValue(0);
+  // The wall settles from close up as the address section slides away over
+  // it (`reveal`, from CtaReveal; at rest without it).
+  const still = useStill();
+  const resting = useMotionValue(1);
+  const settle = useTransform(reveal ?? resting, [0, 1], still ? [1, 1] : [1.18, 1]);
   const rotateY = useSpring(useTransform(px, [-0.5, 0.5], [-9, 9]), spring);
   const rotateX = useSpring(useTransform(py, [-0.5, 0.5], [7, -7]), spring);
   const wallScale = useSpring(useTransform(over, [0, 1], [1, 1.04]), spring);
@@ -183,16 +192,16 @@ export default function FinalCTA() {
 
   // Pulled up into the address section's foot, so the wall's fade starts before any edge.
   return (
-    <section id="contact" aria-label={`${BROWSE.lead} ${BROWSE.name}`} className="relative mt-[clamp(-6rem,calc(-1.456rem_-_9.467vw),-4rem)] scroll-mt-24">
+    <section id={compact ? undefined : "contact"} aria-label={`${lead} ${name}`} className={compact ? "relative h-full" : "relative mt-[clamp(-6rem,calc(-1.456rem_-_9.467vw),-4rem)] scroll-mt-24"}>
       <div
         onPointerMove={lean}
         onPointerLeave={rest}
-        className="relative isolate h-[min(110svh,68rem)] min-h-[40rem] overflow-hidden bg-foreground"
+        className={`relative isolate overflow-hidden bg-foreground ${compact ? "h-full min-h-[24rem]" : "h-[min(110svh,68rem)] min-h-[40rem]"}`}
       >
         {/* The wall, leaning with the pointer. It runs past the band's edges, so the outer tiles are cut off.
             A mask fades the tiles themselves in from the section above and out into the footer; the
             perspective sits inside the mask, so the wall keeps its depth. */}
-        <div aria-hidden="true" style={{ maskImage: WALL_MASK, WebkitMaskImage: WALL_MASK }} className="absolute inset-0 -z-10 [perspective:1400px]">
+        <motion.div aria-hidden="true" style={{ maskImage: WALL_MASK, WebkitMaskImage: WALL_MASK, scale: settle }} className="absolute inset-0 -z-10 [perspective:1400px]">
           <motion.div
             style={{ rotateX, rotateY, scale: wallScale }}
             className="absolute -inset-x-[6%] -inset-y-[8%] grid grid-cols-4 grid-rows-3 gap-[clamp(0.75rem,calc(0.432rem_+_1.183vw),1rem)] [transform-style:preserve-3d]"
@@ -217,7 +226,7 @@ export default function FinalCTA() {
           {/* Darken the wall's sides, and its middle behind the heading; inside the mask, so it fades out at the top and foot too and leaves no seam. */}
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,transparent_40%,rgb(0_0_0/0.4)_100%)]" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_42%_36%_at_50%_50%,rgb(0_0_0/0.62),transparent_100%)]" />
-        </div>
+        </motion.div>
 
         {/* The whole band opens the gallery. */}
         <Link href={BROWSE.href} aria-label={BROWSE.label} className={`${focusRing} absolute inset-0 focus-visible:-outline-offset-4 focus-visible:outline-white`} />
@@ -228,18 +237,18 @@ export default function FinalCTA() {
         <div className={`pointer-events-none absolute inset-0 grid place-items-center px-6 [perspective:1200px] ${themeFontVariables}`}>
           <motion.div style={{ x: textX, y: textY, rotateX: textRotateX, rotateY: textRotateY }} className="text-center">
             <motion.h2
-              aria-label={`${BROWSE.lead} ${BROWSE.name}`}
+              aria-label={`${lead} ${name}`}
               initial="hidden"
               whileInView="shown"
               viewport={{ once: true, amount: 0.5 }}
               transition={{ staggerChildren: 0.14 }}
               className={`m-0 flex flex-col items-center ${fluidText.ctaTitle} leading-[1.05] text-white [text-shadow:0_2px_40px_rgb(0_0_0/0.5)]`}
             >
-              <motion.span aria-hidden="true" variants={line} className="block font-[family-name:var(--tf-fraunces)] font-light tracking-[-0.01em]">
-                {BROWSE.lead}
+              <motion.span aria-hidden="true" variants={line} className={`block ${leadFont} tracking-[-0.01em]`}>
+                {lead}
               </motion.span>
               <motion.span aria-hidden="true" variants={line} className="block font-medium tracking-[-0.035em]">
-                {BROWSE.name}
+                {name}
               </motion.span>
             </motion.h2>
           </motion.div>

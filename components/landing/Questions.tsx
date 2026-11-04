@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Minus, Plus } from "lucide-react";
 import { Reveal } from "@/components/landing/Reveal";
+import { MaskWords, riseItem, stagger } from "@/components/landing/scroll-fx";
 import { displayTitle, ease, focusRing, kicker, section, fit, fluidText } from "@/components/landing/landing-ui";
 
 const FAQ: [string, string][] = [
@@ -26,13 +27,15 @@ export default function Questions({ className = "bg-neutral-50" }: { className?:
       <div className="mx-auto grid w-content-width grid-cols-1 gap-[clamp(3rem,calc(0rem_+_6.25vw),4rem)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)]">
         <Reveal className="@container flex max-w-[52rem] flex-col gap-5 [--fit:12.14cqi]">
           <p className={kicker}>FAQ</p>
-          <h2 className={displayTitle}>Questions, answered</h2>
+          <h2 className={displayTitle}>
+            <MaskWords text="Questions, answered" />
+          </h2>
         </Reveal>
-        <div>
+        <motion.div initial="hidden" whileInView="shown" viewport={{ once: true, amount: 0.2 }} variants={stagger}>
           {FAQ.map(([question, answer], i) => {
             const isOpen = open === i;
             return (
-              <div key={question} className="border-t border-black/10 last:border-b">
+              <motion.div key={question} variants={riseItem} className="border-t border-black/10 last:border-b">
                 <h3 className="m-0">
                   <button
                     type="button"
@@ -83,10 +86,10 @@ export default function Questions({ className = "bg-neutral-50" }: { className?:
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

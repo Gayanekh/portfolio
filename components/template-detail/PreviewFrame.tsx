@@ -116,6 +116,8 @@ export default function PreviewFrame({
               key={device}
               ref={frameRef}
               src={templateFrameHref(template.id)}
+              // A whole page: fetched only as it nears the screen.
+              loading="lazy"
               title={`${template.name} template preview`}
               style={{ scale, height: frameHeight }}
               className={`absolute left-0 top-0 origin-top-left border-0 bg-white ${device === "desktop" ? "w-[1280px]" : "w-full"}`}

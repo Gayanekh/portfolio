@@ -1,6 +1,7 @@
-import { Inter_Tight, Newsreader } from "next/font/google";
+import { Inter_Tight } from "next/font/google";
 
-// The auth pages' type: Inter Tight for the small text, labels and form,
-// Newsreader (light) for the large editorial headline and serif accents.
+// The auth pages' type: Inter Tight throughout, as on the rest of the site
+// (its headings). `authSans` sets the small text, labels and form;
+// `authDisplay` the large light headlines (weights 300 and 400).
 export const authSans = Inter_Tight({ subsets: ["latin"] });
-export const authSerif = Newsreader({ subsets: ["latin"], weight: ["300", "400"], style: ["normal", "italic"] });
+export const authDisplay = Inter_Tight({ subsets: ["latin"], weight: ["300", "400"] });

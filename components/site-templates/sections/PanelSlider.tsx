@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { FieldPicture, Menu } from "../core/blocks";
 import { useField, useSectionId } from "../core/context";
+import { ease, MenuIcon, MenuPanel, number, roundButton, soft, useActiveSection } from "./panel-kit";
 
 // A poster-like opening screen with a slider of series, in panels:
 //
@@ -22,11 +23,9 @@ import { useField, useSectionId } from "../core/context";
 // then the text.
 //
 // Its section's fields: `siteTitle`, and for each slide (by prefix,
-// `slide1`...): Eyebrow, Title, Subtitle, Text and Image.
-
-const ease = [0.22, 1, 0.36, 1] as const;
-const soft = [0.65, 0, 0.35, 1] as const;
-const number = (index: number) => String(index + 1).padStart(2, "0");
+// `slide1`...): Eyebrow, Title, Subtitle, Text and Image. `aside` fills the
+// grey panel's lower corner (on phones it comes last), such as an
+// AboutPeek.
 
 // The change of series, in seconds: the image sweeps first, then the text.
 const TIMING = {
@@ -54,6 +53,7 @@ const place = {
   controls: "col-span-2 flex items-center justify-between gap-3 px-5 py-4 @xl:col-span-1 @xl:col-start-3 @xl:row-start-3 @xl:justify-end @xl:px-[2.2cqw] @xl:py-0",
   accentBottom: "hidden bg-primary @xl:col-start-4 @xl:row-start-3 @xl:flex @xl:flex-col @xl:items-center @xl:justify-center @xl:gap-[2.5svh]",
   heading: "z-10 col-span-2 px-5 pt-6 @xl:col-span-2 @xl:col-start-1 @xl:row-start-2 @xl:self-start @xl:px-[3.2cqw] @xl:pt-[6svh]",
+  aside: "col-span-2 border-0 border-t border-solid border-foreground/15 px-5 py-8 @xl:z-10 @xl:col-span-1 @xl:col-start-1 @xl:row-start-3 @xl:min-w-0 @xl:self-center @xl:border-t-0 @xl:px-[3.2cqw] @xl:py-0",
   body: "col-span-2 px-5 pb-14 pt-8 @xl:col-span-1 @xl:col-start-2 @xl:row-span-2 @xl:row-start-2 @xl:self-end @xl:pb-[12svh] @xl:pl-[3.3cqw] @xl:pr-[3cqw] @xl:pt-0",
 };
 
@@ -116,32 +116,16 @@ function Title({ field }: { field: string }) {
   );
 }
 
-const roundButton =
-  "grid size-[clamp(3rem,calc(1.952rem_+_4.301cqw),3.5rem)] cursor-pointer place-items-center rounded-full border border-solid border-foreground/20 bg-transparent text-foreground transition-colors duration-300 hover:border-foreground";
-
-// Three thin lines, crossing into an X while open.
-function MenuIcon({ open }: { open: boolean }) {
-  return (
-    <span className="relative block h-3 w-8">
-      {[0, 1, 2].map((line) => (
-        <motion.span
-          key={line}
-          animate={open ? { top: 6, rotate: line === 1 ? 0 : line === 0 ? 45 : -45, opacity: line === 1 ? 0 : 1 } : { top: line * 5, rotate: 0, opacity: 1 }}
-          transition={{ duration: 0.35, ease }}
-          className="absolute inset-x-0 h-px bg-current"
-        />
-      ))}
-    </span>
-  );
-}
-
 /* ---------- The slider ---------- */
 
-export default function PanelSlider({ slides }: { slides: number[] }) {
+export default function PanelSlider({ slides, aside }: { slides: number[]; aside?: ReactNode }) {
   const id = useSectionId();
   const siteTitle = useField("siteTitle");
   const still = Boolean(useReducedMotion());
   const [open, setOpen] = useState(false);
+  // The menu marks the section in view (none while the hero is).
+  const ref = useRef<HTMLElement>(null);
+  const active = useActiveSection(ref);
   // The slide showing, the one before it (left under the sweep), and which
   // way the change went (1: forwards).
   const [{ index, previous, direction }, setState] = useState({ index: 0, previous: 0, direction: 1 });
@@ -161,7 +145,7 @@ export default function PanelSlider({ slides }: { slides: number[] }) {
   const closed = direction > 0 ? "inset(0% 0% 0% 100%)" : "inset(0% 100% 0% 0%)";
 
   return (
-    <section data-section={id} aria-roledescription="carousel" aria-label={siteTitle.value} className={grid}>
+    <section ref={ref} data-section={id} aria-roledescription="carousel" aria-label={siteTitle.value} className={grid}>
       <div className={place.panel} />
       <div className={place.divider} />
 
@@ -170,7 +154,7 @@ export default function PanelSlider({ slides }: { slides: number[] }) {
       </div>
 
       <div className={place.menu}>
-        <Menu size="small" />
+        <Menu size="small" active={active} />
       </div>
 
       {/* The menu button, and the current number under a thin line */}
@@ -283,22 +267,10 @@ export default function PanelSlider({ slides }: { slides: number[] }) {
         </SlideText>
       </div>
 
+      {aside && <div className={place.aside}>{aside}</div>}
+
       {/* The menu, opening over the screen from the accent column */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            id={`${id}-menu`}
-            initial={{ clipPath: "inset(0% 0% 0% 100%)" }}
-            animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
-            exit={{ clipPath: "inset(0% 0% 0% 100%)" }}
-            transition={{ duration: 0.8, ease: soft }}
-            className="absolute inset-0 z-30 flex flex-col justify-center gap-8 bg-primary px-5 text-card [--foreground:var(--card)] @xl:px-[20cqw]"
-          >
-            <div className="text-[13px] uppercase tracking-[0.1em] text-card/60">{siteTitle.value}</div>
-            <Menu size="large" onFollow={() => setOpen(false)} />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <MenuPanel id={`${id}-menu`} open={open} title={siteTitle.value} active={active} onClose={() => setOpen(false)} className="absolute inset-0" />
     </section>
   );
 }
