@@ -45,17 +45,17 @@ export const TEMPLATES_ALL = TEMPLATES.map((template, i) => ({
 export const EDITABLE_IDS = TEMPLATES.filter((template) => GALLERY_TEMPLATES.find((item) => item.id === template.id)?.editable !== false).map((template) => template.id);
 
 // The cover pictures the user supplied (public/images/landing-covers), by template.
-const COVER_PHOTOS: Record<string, { src: string; ground: string; focus: string; fill?: boolean; contain?: boolean; corner?: boolean } | undefined> = {
-  // `ground`: the picture's own colour (shown while it loads). The user's covers are
+const COVER_PHOTOS: Record<string, { src: string; ground: string; focus: string; fill?: boolean; contain?: boolean; corner?: boolean; extra?: number } | undefined> = {
+  // `ground`: the picture's own side-edge colour (shown while it loads). The user's covers are
   // all made at 2000 × 1870, the cards' own shape, so each fills its card edge to
   // edge (`fill`), uncropped where the card is that shape.
-  gallery: { src: "/images/landing-covers/gallery-cover.webp", ground: "#e4e5e7", focus: "50% 50%", fill: true },
-  signature: { src: "/images/landing-covers/minimal-cover.webp", ground: "#f1f1f1", focus: "50% 50%", fill: true },
-  nocturne: { src: "/images/landing-covers/nocturne-cover.webp", ground: "#9a9a9a", focus: "50% 50%", fill: true },
-  showcase: { src: "/images/landing-covers/showcase-cover.webp", ground: "#ececea", focus: "50% 50%", fill: true },
-  exhibition: { src: "/images/landing-covers/exhibition-cover.webp", ground: "#ebebe9", focus: "50% 50%", fill: true },
+  gallery: { src: "/images/landing-covers/gallery-cover.webp", ground: "#e3e5e6", focus: "50% 50%", fill: true },
+  signature: { src: "/images/landing-covers/minimal-cover.webp", ground: "#f3f3f3", focus: "50% 50%", fill: true },
+  nocturne: { src: "/images/landing-covers/nocturne-cover.webp", ground: "#a0a0a0", focus: "50% 50%", fill: true },
+  showcase: { src: "/images/landing-covers/showcase-cover-d.webp", ground: "#eeeeec", focus: "50% 50%", fill: true },
+  exhibition: { src: "/images/landing-covers/exhibition-cover.webp", ground: "#ecedea", focus: "50% 50%", fill: true },
   // Persona's cover is the user's earlier one, near square like the cards (filled too).
-  persona: { src: "/images/landing-covers/persona-2026-11c.webp", ground: "#c8c2bf", focus: "50% 50%", fill: true },
+  persona: { src: "/images/landing-covers/persona-2026-11c.webp", ground: "#d6d2cf", focus: "50% 50%", fill: true },
 };
 
 export const GRID = {

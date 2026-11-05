@@ -105,8 +105,8 @@ export default function Design() {
                 <span aria-hidden="true" className="absolute inset-x-[14%] top-0 -z-10 hidden h-8 -translate-y-1/3 rounded-full bg-black/[0.05] blur-2xl lg:block" />
                 <span aria-hidden="true" className="absolute inset-x-[12%] bottom-0 -z-10 hidden h-10 translate-y-1/3 rounded-full bg-black/[0.09] blur-2xl lg:block" />
                 {/* The template is a picture here, not a page: it does not take the scroll (or clicks) from the page; the pickers restyle it. */}
-                <div className="relative w-full text-[#1a1a1a] [&_iframe]:pointer-events-none">
-                  <PreviewFrame template={template} device={wide ? "desktop" : "mobile"} palette={palette} font={font} fill fillPhone height={wide ? fit.previewDesktop : fit.previewHeight} />
+                <div className="relative w-full text-[#1a1a1a]">
+                  <PreviewFrame template={template} device={wide ? "desktop" : "mobile"} palette={palette} font={font} fill fillPhone still height={wide ? fit.previewDesktop : fit.previewHeight} />
                   <StyleChips palette={palette} font={font} onPalette={setPalette} onFont={setFont} accent={signature(activePalette)} />
                 </div>
               </div>

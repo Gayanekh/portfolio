@@ -236,10 +236,21 @@ export function Marquee({ children, speed = 50, className = "" }: { children: Re
   const still = useReducedMotion();
   const editing = Boolean(useTemplate().edit);
   const moving = !still && !editing;
+  // Off the screen it does nothing: reading its width every frame slows the page around it.
+  const visible = useRef(true);
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      visible.current = entry.isIntersecting;
+    });
+    observer.observe(track);
+    return () => observer.disconnect();
+  }, [moving]);
 
   useAnimationFrame((_, delta) => {
     const track = trackRef.current;
-    if (!moving || !track) return;
+    if (!moving || !track || !visible.current) return;
     rate.current += ((hovered ? 0.15 : 1) - rate.current) * Math.min(1, delta / 300);
     const half = track.scrollWidth / 2;
     let next = x.get() - (speed * rate.current * delta) / 1000;

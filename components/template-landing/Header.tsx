@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll } from "framer-motion";
 import { X } from "lucide-react";
 import AuthControls from "@/components/auth/AuthControls";
 import { useAccount } from "@/components/auth/useAccount";
@@ -62,8 +62,38 @@ function Roll({ text }: { text: string }) {
 // wordmark on the left and Menu on the right, at the top of the page (not fixed),
 // which opens the side panel (below); Escape, the veil, the close button or
 // a link closes it.
-export default function Header() {
+// On another page (`base`, e.g. "/" from /templates) the section links lead back
+// to the home page's sections; with `sections={false}` there are none (only the
+// wordmark and the account, on every screen, and no menu).
+// `width` sets the row's width (the page's own frame by default), so the wordmark and
+// the account line up with another page's content.
+export default function Header({ base = "", sections = true, width = frame }: { base?: string; sections?: boolean; width?: string } = {}) {
   const [open, setOpen] = useState(false);
+  // At the top the header sits on the page; scrolling down it moves away with the
+  // page; scrolling back up it slides in, fixed at the top on a white bar, and stays
+  // until the page scrolls down again (the user asked). Below the first screen's top
+  // 80px a little scrolling either way is ignored, so it does not flicker.
+  const still = useReducedMotion();
+  const { scrollY } = useScroll();
+  const last = useRef(0);
+  const [pinned, setPinned] = useState(false);
+  const [away, setAway] = useState(false);
+  useMotionValueEvent(scrollY, "change", (y) => {
+    const delta = y - last.current;
+    last.current = y;
+    if (y < 80) {
+      setPinned(false);
+      setAway(false);
+      return;
+    }
+    if (delta > 4) setAway(true);
+    else if (delta < -4) {
+      setAway(false);
+      setPinned(true);
+    }
+  });
+  const hidden = away && !open;
+  const floating = pinned && !hidden;
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => event.key === "Escape" && setOpen(false);
@@ -77,44 +107,54 @@ export default function Header() {
           on the frame's left edge, above "Your website,"; on the right edge, on wide
           screens, the sections as small soft grey links, close together, turning dark on hover, and,
           a little apart, the account (Log in); below lg the Menu button (the word and
-          its two lines) opening the panel. They scroll away with the page (not fixed). */}
-      <div className="pointer-events-none absolute inset-x-0 top-[clamp(0.75rem,2vh,1.25rem)] z-50">
-        <div className={`${frame} flex h-12 items-center justify-between`}>
+          its two lines) opening the panel. Fixed, shown on the way back up (above). */}
+      <motion.div
+        initial={false}
+        animate={{ y: hidden ? "-110%" : "0%" }}
+        transition={still ? { duration: 0 } : { duration: 0.45, ease }}
+        className={`pointer-events-none fixed inset-x-0 top-0 z-50 py-[clamp(0.75rem,2vh,1.25rem)] transition-[background-color,backdrop-filter] duration-300 ${floating ? "bg-[color-mix(in_srgb,var(--bg)_88%,transparent)] backdrop-blur-xl" : "bg-transparent"}`}
+      >
+        <div className={`${width} flex h-12 items-center justify-between`}>
           <div className="contents">
             <Link href="/" aria-label="Portory home" className={`${focusRing} pointer-events-auto flex h-11 items-center rounded-[4px]`}>
-              <Logo className="h-7 w-auto !text-[var(--fg)]" title={null} />
+              {/* The logo in its own colour (#2d2d2d), a little small (the user asked). */}
+              <Logo className="h-[1.3rem] w-auto" title={null} />
             </Link>
-            <nav aria-label="Sections" className="pointer-events-auto flex items-center max-lg:hidden">
-              <ul className="m-0 flex list-none items-center gap-[clamp(1rem,1.4vw,1.5rem)] p-0">
-                {NAV.filter((link) => link.href !== "#faq").map((link) => (
-                  <li key={link.href}>
-                    <a href={link.href} className={`${focusRing} block rounded-[4px] text-[0.9375rem] font-normal leading-[1.3] tracking-[-0.01em] text-[var(--dim)] no-underline transition-colors duration-300 hover:text-[var(--fg)]`}>
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-              <span aria-hidden="true" className="mx-[clamp(1rem,1.4vw,1.5rem)] block h-4 w-px bg-[var(--line)]" />
+            <nav aria-label="Sections" className={`pointer-events-auto flex items-center ${sections ? "max-lg:hidden" : ""}`}>
+              {sections && (
+                <ul className="m-0 flex list-none items-center gap-[clamp(1rem,1.4vw,1.5rem)] p-0">
+                  {NAV.filter((link) => link.href !== "#faq").map((link) => (
+                    <li key={link.href}>
+                      <a href={base + link.href} className={`${focusRing} block rounded-[4px] text-[0.9375rem] font-normal leading-[1.3] tracking-[-0.01em] text-[var(--dim)] no-underline transition-colors duration-300 hover:text-[var(--fg)]`}>
+                        {link.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {sections && <span aria-hidden="true" className="mx-[clamp(1rem,1.4vw,1.5rem)] block h-4 w-px bg-[var(--line)]" />}
               <Account />
             </nav>
-            <button
-              type="button"
-              aria-expanded={open}
-              aria-controls="template-landing-menu"
-              onClick={() => setOpen(!open)}
-              className={`${focusRing} group/menu pointer-events-auto -mr-1 flex lg:hidden h-11 cursor-pointer items-center gap-3 rounded-[4px] border-0 bg-transparent px-1 text-[1.0625rem] font-medium leading-none tracking-[-0.01em] text-[var(--fg)]`}
-            >
-              Menu
-              {/* Two equal lines in the word's own stroke and height (round ends, as the
+            {sections && (
+              <button
+                type="button"
+                aria-expanded={open}
+                aria-controls="template-landing-menu"
+                onClick={() => setOpen(!open)}
+                className={`${focusRing} group/menu pointer-events-auto -mr-1 flex lg:hidden h-11 cursor-pointer items-center gap-3 rounded-[4px] border-0 bg-transparent px-1 text-[1.0625rem] font-medium leading-none tracking-[-0.01em] text-[var(--fg)]`}
+              >
+                Menu
+                {/* Two equal lines in the word's own stroke and height (round ends, as the
                   letters'), so the icon reads as part of the word; on hover they draw closer. */}
-              <span aria-hidden="true" className="relative block h-[0.55em] w-[1.15em] transition-transform duration-300 group-hover/menu:scale-x-[0.8]">
-                <span className={`absolute left-0 top-0 h-[0.1em] w-full rounded-full bg-current transition-transform duration-500 ${open ? "translate-y-[0.225em] rotate-45" : ""}`} />
-                <span className={`absolute bottom-0 left-0 h-[0.1em] w-full rounded-full bg-current transition-transform duration-500 ${open ? "-translate-y-[0.225em] -rotate-45" : ""}`} />
-              </span>
-            </button>
+                <span aria-hidden="true" className="relative block h-[0.55em] w-[1.15em] transition-transform duration-300 group-hover/menu:scale-x-[0.8]">
+                  <span className={`absolute left-0 top-0 h-[0.1em] w-full rounded-full bg-current transition-transform duration-500 ${open ? "translate-y-[0.225em] rotate-45" : ""}`} />
+                  <span className={`absolute bottom-0 left-0 h-[0.1em] w-full rounded-full bg-current transition-transform duration-500 ${open ? "-translate-y-[0.225em] -rotate-45" : ""}`} />
+                </span>
+              </button>
+            )}
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* The menu: a light panel (the user asked; the page's soft grey) sliding in from
           the right over a faint veil, holding the wordmark and a close button, the
@@ -146,7 +186,7 @@ export default function Header() {
               <ul className="m-0 mt-auto flex list-none flex-col p-0">
                 {NAV.map((link, i) => (
                   <motion.li key={link.href} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease, delay: 0.25 + i * 0.05 }} className="border-0 border-t border-solid border-[rgb(13_13_13/0.11)] last:border-b">
-                    <a href={link.href} onClick={() => setOpen(false)} className={`${focusRing} group block rounded-[4px] py-3 text-[clamp(1.625rem,2vw,1.875rem)] font-normal leading-[1.2] tracking-[-0.03em] text-[#0d0d0d] no-underline`}>
+                    <a href={base + link.href} onClick={() => setOpen(false)} className={`${focusRing} group block rounded-[4px] py-3 text-[clamp(1.625rem,2vw,1.875rem)] font-normal leading-[1.2] tracking-[-0.03em] text-[#0d0d0d] no-underline`}>
                       <Roll text={link.label} />
                     </a>
                   </motion.li>
@@ -154,7 +194,11 @@ export default function Header() {
               </ul>
 
               <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease, delay: 0.25 + NAV.length * 0.05 }} className="mt-10">
-                <Link href={START.href} onClick={() => setOpen(false)} className={`${focusRing} grid h-12 place-items-center rounded-[10px] border border-solid border-[#0d0d0d] bg-transparent text-[1rem] font-medium text-[#0d0d0d] no-underline transition-colors duration-300 hover:bg-[#0d0d0d] hover:text-[#f3f3f1]`}>
+                <Link
+                  href={START.href}
+                  onClick={() => setOpen(false)}
+                  className={`${focusRing} grid h-12 place-items-center rounded-[10px] border border-solid border-[#0d0d0d] bg-transparent text-[1rem] font-medium text-[#0d0d0d] no-underline transition-colors duration-300 hover:bg-[#0d0d0d] hover:text-[#f3f3f1]`}
+                >
                   {START.label}
                 </Link>
               </motion.div>

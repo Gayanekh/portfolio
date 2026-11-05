@@ -104,6 +104,27 @@
   }
 }
 
+/* A landing cover's picture slides inside its card as the card crosses the
+   screen, driven by the browser's own scrolling (components/template-landing/CoverPhoto).
+   The card names the timeline: being overflow-hidden, it would otherwise count
+   as the picture's scroller. */
+@keyframes cover-drift {
+  from { transform: translateY(calc(var(--cover-drift) * -1)); }
+  to { transform: translateY(var(--cover-drift)); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .cover-timeline {
+      view-timeline-name: --cover;
+    }
+    .cover-drift {
+      animation: cover-drift linear both;
+      animation-timeline: --cover;
+      animation-range: cover;
+    }
+  }
+}
+
 .card {border: 1px solid #fafafa;
     box-shadow: 0 1px 2px #0000000d;background: linear-gradient(to bottom right, 
 color-mix(in srgb, #fafafa 80%, transparent), 
