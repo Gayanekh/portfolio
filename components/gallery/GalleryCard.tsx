@@ -112,7 +112,7 @@ function CoverCard({ template, index, inProgress, note }: { template: GalleryTem
         <Link href={template.href} target="_blank" rel="noopener" aria-label={`Preview the ${template.name} template (opens in a new tab)`} className={`${focusRing} block rounded-2xl no-underline`}>
           {template.cover ? (
             // eslint-disable-next-line @next/next/no-img-element -- a local cover image
-            <img src={template.cover} alt="" loading={index < 6 ? "eager" : "lazy"} decoding="async" className="block aspect-[16/10] w-full rounded-2xl bg-foreground/5 object-cover ring-1 ring-foreground/10" />
+            <img src={template.cover} alt="" loading={index < 6 ? "eager" : "lazy"} decoding="async" style={template.coverFocus ? { objectPosition: template.coverFocus } : template.coverFrame ? { backgroundColor: template.coverGround } : template.coverGround ? { backgroundColor: template.coverGround, backgroundImage: `url(${template.cover})`, backgroundSize: "6000% 100%", backgroundPosition: "0 0", backgroundRepeat: "no-repeat" } : undefined} className={`block aspect-[16/10] w-full rounded-2xl ring-1 ring-foreground/10 ${template.coverFrame ? "object-contain py-[5%] drop-shadow-[0_10px_18px_rgb(0_0_0/0.16)]" : template.coverGround ? "object-contain" : "bg-foreground/5 object-cover"}`} />
           ) : (
             <span className="relative block aspect-[16/10] w-full overflow-hidden rounded-2xl bg-foreground/5 ring-1 ring-foreground/10">
               <Cover src={template.screen ?? ""} name={template.name} shape="fill" drift />

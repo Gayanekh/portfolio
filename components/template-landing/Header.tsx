@@ -20,7 +20,7 @@ function Account({ menu = false, onPick }: { menu?: boolean; onPick?: () => void
         <AuthControls start={false} />
       </div>
     );
-  const quiet = `${focusRing} rounded-[4px] ${menu ? type.body : "text-[1.125rem]"} text-[var(--dim)] no-underline transition-colors duration-300 hover:text-[var(--fg)]`;
+  const quiet = `${focusRing} rounded-[4px] ${menu ? type.body : "block text-[0.9375rem] leading-[1.3] tracking-[-0.01em]"} text-[var(--dim)] no-underline transition-colors duration-300 hover:text-[var(--fg)]`;
   return (
     <div className={`flex items-center ${menu ? "gap-6" : "gap-[clamp(1rem,2vw,2rem)]"}`}>
       <Link href={LOGIN.href} onClick={onPick} className={quiet}>
@@ -73,45 +73,57 @@ export default function Header() {
 
   return (
     <>
-      {/* As on the Monolog reference: the wordmark at the top left and the menu
-          button at the top right, on the frame's edges; they sit at the top of the
-          page and scroll away with it (not fixed). */}
+      {/* Open, no box (the user chose it, to match the type-only hero): the wordmark
+          on the frame's left edge, above "Your website,"; on the right edge, on wide
+          screens, the sections as small soft grey links, close together, turning dark on hover, and,
+          a little apart, the account (Log in); below lg the Menu button (the word and
+          its two lines) opening the panel. They scroll away with the page (not fixed). */}
       <div className="pointer-events-none absolute inset-x-0 top-[clamp(0.75rem,2vh,1.25rem)] z-50">
-        <div className={`${frame} flex items-center justify-between`}>
-          <Link href="/" aria-label="Portory home" className={`${focusRing} pointer-events-auto flex h-11 items-center rounded-[4px]`}>
-            {/* The plain wordmark, as /other-landing's header has it (the user asked). */}
-            <Logo className="h-7 w-auto !text-[var(--fg)]" title={null} />
-          </Link>
-          <button
-            type="button"
-            aria-expanded={open}
-            aria-controls="template-landing-menu"
-            onClick={() => setOpen(!open)}
-            className={`${focusRing} group/menu pointer-events-auto flex h-11 cursor-pointer items-stretch gap-[5px] rounded-[10px] border-0 bg-transparent p-0 ${type.small} font-medium text-[var(--fg)]`}
-          >
-            {/* Two outlined parts, "menu" and the lines, rounded, a small space between
-                them; pointed at (or focused, or open) the space closes, the seam goes and
-                they read as one outlined button. */}
-            <span className={`flex items-center rounded-[10px] border border-solid border-[var(--fg)] bg-[color-mix(in_srgb,var(--bg)_82%,transparent)] px-4 backdrop-blur-xl transition-[border-radius,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/menu:rounded-r-none group-hover/menu:border-r-transparent group-focus-visible/menu:rounded-r-none group-focus-visible/menu:border-r-transparent ${open ? "rounded-r-none border-r-transparent" : ""}`}>menu</span>
-            <span className={`grid w-11 place-items-center rounded-[10px] border border-solid border-[var(--fg)] bg-[color-mix(in_srgb,var(--bg)_82%,transparent)] backdrop-blur-xl transition-[border-radius,margin,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/menu:-ml-[6px] group-hover/menu:rounded-l-none group-hover/menu:border-l-transparent group-focus-visible/menu:-ml-[6px] group-focus-visible/menu:rounded-l-none group-focus-visible/menu:border-l-transparent ${open ? "-ml-[6px] rounded-l-none border-l-transparent" : ""}`}>
-              <span aria-hidden="true" className="relative block h-[9px] w-4">
-                <span className={`absolute left-0 top-0 h-[1.5px] w-full bg-current transition-transform duration-500 ${open ? "translate-y-[3.75px] rotate-45" : ""}`} />
-                <span className={`absolute left-0 top-1/2 h-[1.5px] w-full -translate-y-1/2 bg-current transition-opacity duration-300 ${open ? "opacity-0" : ""}`} />
-                <span className={`absolute bottom-0 left-0 h-[1.5px] w-full bg-current transition-transform duration-500 ${open ? "-translate-y-[3.75px] -rotate-45" : ""}`} />
+        <div className={`${frame} flex h-12 items-center justify-between`}>
+          <div className="contents">
+            <Link href="/" aria-label="Portory home" className={`${focusRing} pointer-events-auto flex h-11 items-center rounded-[4px]`}>
+              <Logo className="h-7 w-auto !text-[var(--fg)]" title={null} />
+            </Link>
+            <nav aria-label="Sections" className="pointer-events-auto flex items-center max-lg:hidden">
+              <ul className="m-0 flex list-none items-center gap-[clamp(1rem,1.4vw,1.5rem)] p-0">
+                {NAV.filter((link) => link.href !== "#faq").map((link) => (
+                  <li key={link.href}>
+                    <a href={link.href} className={`${focusRing} block rounded-[4px] text-[0.9375rem] font-normal leading-[1.3] tracking-[-0.01em] text-[var(--dim)] no-underline transition-colors duration-300 hover:text-[var(--fg)]`}>
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              <span aria-hidden="true" className="mx-[clamp(1rem,1.4vw,1.5rem)] block h-4 w-px bg-[var(--line)]" />
+              <Account />
+            </nav>
+            <button
+              type="button"
+              aria-expanded={open}
+              aria-controls="template-landing-menu"
+              onClick={() => setOpen(!open)}
+              className={`${focusRing} group/menu pointer-events-auto -mr-1 flex lg:hidden h-11 cursor-pointer items-center gap-3 rounded-[4px] border-0 bg-transparent px-1 text-[1.0625rem] font-medium leading-none tracking-[-0.01em] text-[var(--fg)]`}
+            >
+              Menu
+              {/* Two equal lines in the word's own stroke and height (round ends, as the
+                  letters'), so the icon reads as part of the word; on hover they draw closer. */}
+              <span aria-hidden="true" className="relative block h-[0.55em] w-[1.15em] transition-transform duration-300 group-hover/menu:scale-x-[0.8]">
+                <span className={`absolute left-0 top-0 h-[0.1em] w-full rounded-full bg-current transition-transform duration-500 ${open ? "translate-y-[0.225em] rotate-45" : ""}`} />
+                <span className={`absolute bottom-0 left-0 h-[0.1em] w-full rounded-full bg-current transition-transform duration-500 ${open ? "-translate-y-[0.225em] -rotate-45" : ""}`} />
               </span>
-            </span>
-          </button>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* The menu, after the Monolog reference: the page veiled in a warm grey and a
-          dark panel sliding in from the right, holding the wordmark and a close
-          button, the sections set large between hairlines (each word rolling up
-          letter by letter on hover), the start button and the account at its foot. */}
+      {/* The menu: a light panel (the user asked; the page's soft grey) sliding in from
+          the right over a faint veil, holding the wordmark and a close button, the
+          sections between hairlines (each word rolling up letter by letter on hover),
+          an outlined start button and the account, small, at its foot. */}
       <AnimatePresence>
         {open && (
           <>
-            <motion.div key="veil" aria-hidden="true" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5, ease }} onClick={() => setOpen(false)} className="fixed inset-0 z-[60] bg-[rgb(105_102_99/0.3)]" />
+            <motion.div key="veil" aria-hidden="true" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5, ease }} onClick={() => setOpen(false)} className="fixed inset-0 z-[60] bg-[rgb(13_13_13/0.12)]" />
             <motion.nav
               key="panel"
               id="template-landing-menu"
@@ -120,21 +132,21 @@ export default function Header() {
               animate={{ x: "0%" }}
               exit={{ x: "100%" }}
               transition={{ duration: 0.6, ease: [0.76, 0, 0.24, 1] }}
-              className="fixed inset-y-0 right-0 z-[70] flex w-full max-w-[29rem] flex-col bg-[#0f0f0f] px-10 pb-10 pt-10 text-[#f8f7f6] max-sm:px-6"
+              className="fixed inset-y-0 right-0 z-[70] flex w-full max-w-[24rem] flex-col border-0 border-l border-solid border-[rgb(13_13_13/0.08)] bg-[#f3f3f1] px-8 pb-8 pt-8 text-[#0d0d0d] shadow-[-24px_0_60px_-30px_rgb(0_0_0/0.25)] max-sm:px-6"
             >
               <div className="flex items-center justify-between">
                 <Link href="/" aria-label="Portory home" onClick={() => setOpen(false)} className={`${focusRing} rounded-[4px]`}>
-                  <Logo className="h-[1.6rem] w-auto !text-[#f8f7f6]" title={null} />
+                  <Logo className="h-7 w-auto !text-[#0d0d0d]" title={null} />
                 </Link>
-                <button type="button" aria-label="Close menu" onClick={() => setOpen(false)} className={`${focusRing} grid size-10 cursor-pointer place-items-center rounded-[4px] border-0 bg-transparent p-0 text-[#f8f7f6]`}>
+                <button type="button" aria-label="Close menu" onClick={() => setOpen(false)} className={`${focusRing} grid size-10 cursor-pointer place-items-center rounded-[4px] border-0 bg-transparent p-0 text-[#0d0d0d]`}>
                   <X aria-hidden="true" className="size-5" strokeWidth={1.5} />
                 </button>
               </div>
 
               <ul className="m-0 mt-auto flex list-none flex-col p-0">
                 {NAV.map((link, i) => (
-                  <motion.li key={link.href} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease, delay: 0.25 + i * 0.05 }} className={i ? "border-0 border-t border-solid border-white/15" : ""}>
-                    <a href={link.href} onClick={() => setOpen(false)} className={`${focusRing} group block rounded-[4px] py-2.5 text-[2rem] font-normal leading-[1.2] tracking-[-0.01em] text-[#f8f7f6] no-underline`}>
+                  <motion.li key={link.href} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease, delay: 0.25 + i * 0.05 }} className="border-0 border-t border-solid border-[rgb(13_13_13/0.11)] last:border-b">
+                    <a href={link.href} onClick={() => setOpen(false)} className={`${focusRing} group block rounded-[4px] py-3 text-[clamp(1.625rem,2vw,1.875rem)] font-normal leading-[1.2] tracking-[-0.03em] text-[#0d0d0d] no-underline`}>
                       <Roll text={link.label} />
                     </a>
                   </motion.li>
@@ -142,12 +154,12 @@ export default function Header() {
               </ul>
 
               <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease, delay: 0.25 + NAV.length * 0.05 }} className="mt-10">
-                <Link href={START.href} onClick={() => setOpen(false)} className={`${focusRing} grid h-14 place-items-center rounded-[8px] bg-[#f8f7f6] text-[1.0625rem] text-[#0f0f0f] no-underline transition-opacity hover:opacity-85`}>
+                <Link href={START.href} onClick={() => setOpen(false)} className={`${focusRing} grid h-12 place-items-center rounded-[10px] border border-solid border-[#0d0d0d] bg-transparent text-[1rem] font-medium text-[#0d0d0d] no-underline transition-colors duration-300 hover:bg-[#0d0d0d] hover:text-[#f3f3f1]`}>
                   {START.label}
                 </Link>
               </motion.div>
 
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, ease, delay: 0.5 }} className="mt-auto pt-12 [--dim:rgb(248_247_246/0.6)] [--fg:#f8f7f6]">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, ease, delay: 0.5 }} className="mt-auto pt-10 text-[0.9375rem] [--dim:#6b6b6b] [--fg:#0d0d0d]">
                 <Account menu onPick={() => setOpen(false)} />
               </motion.div>
             </motion.nav>

@@ -12,6 +12,9 @@ const base = `${focusRing} group/button inline-flex h-11 w-fit shrink-0 cursor-p
 const tones = {
   dark: "bg-[var(--fg)] text-[var(--bg)] hover:bg-[var(--accent)] hover:text-white focus-visible:bg-[var(--accent)] focus-visible:text-white",
   light: "bg-[var(--card)] text-[var(--fg)] hover:bg-[var(--accent)] hover:text-white focus-visible:bg-[var(--accent)] focus-visible:text-white",
+  // Outlined (the hero's, the user asked): like the header's menu buttons, a fine
+  // line in the ink and 10px corners; on hover it stays as it is (no fill) and only the arrow slides.
+  outline: "!rounded-[10px] !border border-solid border-[var(--fg)] bg-transparent text-[var(--fg)]",
 };
 const arrow = <MoveRight aria-hidden="true" className="size-4 transition-transform duration-300 group-hover/button:translate-x-1" />;
 

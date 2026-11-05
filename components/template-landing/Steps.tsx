@@ -70,7 +70,7 @@ export default function Steps() {
         </motion.div>
         <div className="flex flex-col gap-6 lg:col-span-3 lg:flex-row lg:items-end lg:justify-between lg:gap-10">
           {/* The title's lines rise out of their masks together, set off by the title coming into view. */}
-          <motion.h2 id="tl-steps-title" initial="hidden" whileInView="shown" viewport={{ once: true, margin: "0px 0px -10% 0px" }} className="m-0 text-[clamp(2rem,3.3vw,3rem)] font-medium leading-[0.96] tracking-[-0.055em]">
+          <motion.h2 id="tl-steps-title" initial="hidden" whileInView="shown" viewport={{ once: true, margin: "0px 0px -10% 0px" }} className="m-0 text-[length:clamp(2.25rem,calc(1.6rem_+_2.2vw),3.5rem)] font-medium leading-[0.96] tracking-[-0.055em]">
             {INTRO.title.map(({ lead, soft }, i) => (
               <span key={lead} className="block overflow-hidden pb-[0.08em] sm:whitespace-nowrap">
                 <motion.span variants={{ hidden: { y: "105%" }, shown: { y: "0%", transition: { duration: 1, ease, delay: i * 0.08 } } }} className="block">
@@ -113,7 +113,7 @@ export default function Steps() {
                   <span aria-hidden="true" className="pointer-events-none absolute left-[clamp(2rem,3vw,2.75rem)] top-[clamp(1rem,1.6vw,1.5rem)] select-none text-[clamp(6rem,10vw,9.5rem)] font-semibold leading-[0.8] tracking-[-0.06em] text-[color-mix(in_srgb,var(--fg)_5%,transparent)]">
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  <h3 className="relative m-0 mt-[clamp(3.75rem,5.4vw,5.25rem)] text-[clamp(2rem,3.2vw,3rem)] font-medium leading-[1.02] tracking-[-0.045em]">
+                  <h3 className="relative m-0 mt-[clamp(3.75rem,5.4vw,5.25rem)] text-[length:clamp(1.75rem,calc(1.2rem_+_1.6vw),2.5rem)] font-medium leading-[1.04] tracking-[-0.045em]">
                     {row.caps} <span className={`${serif} font-normal tracking-[-0.02em]`}>{row.soft}.</span>
                   </h3>
                   <p className="m-0 mt-4 max-w-[25rem] text-[clamp(1rem,1.15vw,1.0625rem)] leading-[1.55] tracking-[-0.01em] text-[var(--dim)]">{step.text}</p>
