@@ -94,7 +94,8 @@ export default function GalleryCard({ template, index }: { template: GalleryTemp
   );
 }
 
-// A template with a cover (the landing page's: its picture, or one built from its
+// A template with a cover, in a 3:2 rectangular card with the whole picture shown
+// (the user asked) (the landing page's: its picture, or one built from its
 // screenshot as the landing does): the cover itself, with the View bubble following
 // the pointer over it (ViewArea), and under it the name, its category and who
 // it suits. The cover and the name open the demo in a new tab.
@@ -111,8 +112,15 @@ function CoverCard({ template, index, inProgress, note }: { template: GalleryTem
       <ViewArea>
         <Link href={template.href} target="_blank" rel="noopener" aria-label={`Preview the ${template.name} template (opens in a new tab)`} className={`${focusRing} block rounded-2xl no-underline`}>
           {template.cover ? (
-            // eslint-disable-next-line @next/next/no-img-element -- a local cover image
-            <img src={template.cover} alt="" loading={index < 6 ? "eager" : "lazy"} decoding="async" style={template.coverFocus ? { objectPosition: template.coverFocus } : template.coverFrame ? { backgroundColor: template.coverGround } : template.coverGround ? { backgroundColor: template.coverGround, backgroundImage: `url(${template.cover})`, backgroundSize: "6000% 100%", backgroundPosition: "0 0", backgroundRepeat: "no-repeat" } : undefined} className={`block aspect-[16/10] w-full rounded-2xl ring-1 ring-foreground/10 ${template.coverFrame ? "object-contain py-[5%] drop-shadow-[0_10px_18px_rgb(0_0_0/0.16)]" : template.coverGround ? "object-contain" : "bg-foreground/5 object-cover"}`} />
+            // A rectangular card (3:2, the user asked) with the whole picture in it; the sides
+            // beside it are its own left and right edges stretched out, so they blend in.
+            <span className="relative block aspect-[3/2] w-full overflow-hidden rounded-2xl bg-foreground/5 ring-1 ring-foreground/10">
+              {(["0 0", "100% 0"] as const).map((at, i) => (
+                <span key={at} aria-hidden="true" style={{ backgroundImage: `url(${template.cover})`, backgroundSize: "6000% 100%", backgroundPosition: at, backgroundRepeat: "no-repeat" }} className={`absolute inset-y-0 block w-1/2 ${i ? "right-0" : "left-0"}`} />
+              ))}
+              {/* eslint-disable-next-line @next/next/no-img-element -- a local cover image */}
+              <img src={template.cover} alt="" loading={index < 6 ? "eager" : "lazy"} decoding="async" className="absolute inset-0 block h-full w-full object-contain" />
+            </span>
           ) : (
             <span className="relative block aspect-[16/10] w-full overflow-hidden rounded-2xl bg-foreground/5 ring-1 ring-foreground/10">
               <Cover src={template.screen ?? ""} name={template.name} shape="fill" drift />

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import Cover from "@/components/other-landing/Cover";
 import CoverPhoto from "@/components/template-landing/CoverPhoto";
@@ -12,13 +12,15 @@ import { ease, focusRing, frame, serif } from "@/components/template-landing/ui"
 
 // The cards in the Endcap reference's selected-work manner (the user asked),
 // all one size: near-square, two to a row filling their columns, the right one
-// set lower; on phones they stack, full width, as 3:2 rectangles (the user asked).
+// set lower; on phones they stack, full width, in the same shape.
 // Each opens its demo in a new tab. Under
 // each cover, after the Opus reference's project cards (the user asked): the
 // name on the left and, on the right of the same line, its tags as small
 // outlined pills (they wrap under the name when there is no room).
 
 export default function Templates() {
+  // The cards rise by `transform`, not `y`: Motion hands it to the compositor, so it stays smooth while the page scrolls. MotionConfig's reduced motion only covers `y`, so it is stopped here.
+  const reduced = useReducedMotion();
   return (
     <section id="templates" data-caption="templates" aria-labelledby="tl-templates-title" className={`${frame} relative scroll-mt-20 py-[clamp(4.5rem,8.2vw,7.5rem)]`}>
       {/* The header, in the page's section-title manner (as Features'): on the left
@@ -54,10 +56,10 @@ export default function Templates() {
         {GRID.items.map((item, i) => {
           const shape = "landscape";
           return (
-            <motion.li key={item.id} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "0px 0px -5% 0px" }} transition={{ duration: 1, ease, delay: (i % 2) * 0.08 }} className="md:even:mt-[clamp(3rem,7vw,6.25rem)]">
+            <motion.li key={item.id} initial={{ opacity: 0, transform: "translateY(24px)" }} whileInView={{ opacity: 1, transform: "translateY(0px)" }} viewport={{ once: true, margin: "0px 0px -5% 0px" }} transition={{ duration: 1, ease, delay: (i % 2) * 0.08, ...(reduced && { transform: { duration: 0 } }) }} className="md:even:mt-[clamp(3rem,7vw,6.25rem)]">
               <a href={item.href} target="_blank" rel="noopener noreferrer" className={`${focusRing} group block rounded-[10px] text-[var(--fg)] no-underline`}>
                 <span className="relative block">
-                  {item.photo ? <CoverPhoto src={item.photo.src} ground={item.photo.ground} focus={item.photo.focus} name={item.name} shape={shape} fit={!item.photo.fill && !item.photo.contain} whole={item.photo.fill} contain={item.photo.contain} corner={item.photo.corner} /> : <Cover src={item.screen} name={item.name} shape={shape} drift />}
+                  {item.photo ? <CoverPhoto src={item.photo.src} ground={item.photo.ground} focus={item.photo.focus} name={item.name} shape={shape} fit={!item.photo.fill && !item.photo.contain} whole={item.photo.fill} contain={item.photo.contain} corner={item.photo.corner} extra={item.photo.extra} /> : <Cover src={item.screen} name={item.name} shape={shape} drift />}
                   {/* After the Opus reference: on hover a white circle with an arrow in the primary colour comes up at the card's bottom right. */}
                   <span aria-hidden="true" className="pointer-events-none absolute bottom-[clamp(1rem,1.8vw,1.5rem)] right-[clamp(1rem,1.8vw,1.5rem)] grid size-14 translate-y-2 scale-90 place-items-center rounded-full bg-white text-[var(--accent)] opacity-0 shadow-[0_8px_24px_-8px_rgb(0_0_0/0.25)] transition-[opacity,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:scale-100 group-focus-visible:opacity-100">
                     <ArrowUpRight className="size-6" strokeWidth={1.75} />

@@ -5,8 +5,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import BackToTop from "@/components/BackToTop";
 import GalleryCard from "@/components/gallery/GalleryCard";
 import { GALLERY_CATEGORIES, SHOWN_TEMPLATES, type GalleryCategory } from "@/components/gallery/gallery-templates";
-import LandingHeader from "@/components/landing/LandingHeader";
-import { accentText, ease, focusRing, fluidText } from "@/components/landing/landing-ui";
+import Header from "@/components/template-landing/Header";
+import { fonts, frame, themes } from "@/components/template-landing/ui";
+import { ease, focusRing } from "@/components/landing/landing-ui";
 
 const rise = (delay: number) => ({
   initial: { opacity: 0, y: 24 },
@@ -15,9 +16,8 @@ const rise = (delay: number) => ({
 });
 
 // Every Portory template on one page, under the landing page's header (without
-// its section links), after the reference gallery: a large
-// heading with a short description beside it, a results count with style
-// filters, and a grid of template previews. Cards open the builder in the
+// its section links), in the landing's frame and type: the title with a short
+// line beside it, the filters, and a grid of template previews. Cards open the builder in the
 // same tab; a back-to-top button appears once you've scrolled.
 export default function TemplateGallery() {
   const [style, setStyle] = useState<GalleryCategory | "all">("all");
@@ -29,28 +29,29 @@ export default function TemplateGallery() {
   const styles: { id: GalleryCategory | "all"; label: string }[] = [{ id: "all", label: "All templates" }, ...GALLERY_CATEGORIES.filter((option) => SHOWN_TEMPLATES.some((t) => t.category === option.id))];
 
   return (
-    <div data-site-scale className="relative min-h-screen bg-background text-foreground">
-      <LandingHeader links={false} />
+    <div data-site-scale className="relative min-h-screen bg-white text-foreground [--background:#ffffff]">
+      {/* The home page's header and its scroll behaviour (the user asked): it goes away
+          as the page scrolls down and comes back, fixed, on the way up; without the home page's
+          section links (the user asked), only the logo and Log in. In the home page's type and colours, on this
+          page's ground. */}
+      <div className={`${fonts} ${themes.light} [--bg:var(--background)]`}>
+        <Header sections={false} />
+      </div>
 
-      <main className="mx-auto w-content-width pb-24 pt-[clamp(7rem,calc(4.456rem_+_9.467vw),9rem)]">
-        <div className="@container grid grid-cols-1 gap-6 md:grid-cols-[1.15fr_1fr] md:gap-[min(4rem,6.5%)]">
-          <motion.h1
-            {...rise(0.05)}
-            className={`m-0 text-balance ${fluidText.pageTitle} font-medium leading-[1.02] tracking-[-0.035em]`}
-          >
-           Templates
+      {/* In the home page's frame, type and sizes (the user asked): the title as its
+          section titles, the line small beside it. */}
+      <main className={`${frame} ${fonts} ${themes.light} [--bg:var(--background)] pb-24 pt-[clamp(7rem,calc(4.456rem_+_9.467vw),9rem)]`}>
+        <div className="flex flex-col gap-[clamp(1.25rem,2vw,1.75rem)] lg:flex-row lg:items-end lg:justify-between lg:gap-10">
+          <motion.h1 {...rise(0.05)} className="m-0 text-[length:clamp(2.25rem,calc(1.6rem_+_2.2vw),3.5rem)] font-medium leading-[0.96] tracking-[-0.055em] text-[var(--fg)]">
+            Templates
           </motion.h1>
-          <motion.p {...rise(0.15)} className="m-0 max-w-[34rem] text-[length:clamp(1rem,calc(0.841rem_+_0.592vw),1.125rem)] md:text-[length:clamp(0.9375rem,min(calc(0.841rem_+_0.592vw),1.818cqi),1.125rem)] leading-relaxed text-foreground/70 md:pt-3">
-Websites for every kind of work — portfolios, photography, events and more. Pick one, make it yours, publish.</motion.p>
+          <motion.p {...rise(0.15)} className="m-0 max-w-[21rem] pb-[0.35rem] text-[0.875rem] leading-[1.5] tracking-[-0.005em] text-[var(--dim)]">
+            Websites for every kind of work — portfolios, photography, events and more. Pick one, make it yours, publish.
+          </motion.p>
         </div>
 
-        <motion.div {...rise(0.25)} className="mt-[clamp(3.5rem,calc(1.592rem_+_7.101vw),5rem)] flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <p aria-live="polite" className="m-0 text-sm font-medium">
-            <motion.span key={shown.length} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, ease }} className={`${accentText} inline-block`}>
-              {shown.length}
-            </motion.span>{" "}
-            {shown.length === 1 ? "Result" : "Results"}
-          </p>
+        {/* The filters (the results count was removed at the user's request). */}
+        <motion.div {...rise(0.25)} className="mt-[clamp(3rem,6vw,5rem)] flex">
           {/* Plain filters, moving like the landing page's template tabs: a
               dark pill marks the chosen one and slides to the one hovered,
               then back when the pointer leaves */}
@@ -75,7 +76,7 @@ Websites for every kind of work — portfolios, photography, events and more. Pi
           </div>
         </motion.div>
 
-        <motion.ul layout style={{ rowGap: "clamp(1.75rem, calc(1.432rem + 1.183vw), 2.25rem)" }} className="m-0 mt-[clamp(1.5rem,calc(0.864rem_+_2.367vw),2.25rem)] grid grid-cols-1 gap-x-8 p-0 sm:grid-cols-2 lg:grid-cols-3">
+        <motion.ul layout style={{ rowGap: "clamp(1.75rem, calc(1.432rem + 1.183vw), 2.25rem)" }} className="m-0 mt-[clamp(1.5rem,calc(0.864rem_+_2.367vw),2.25rem)] grid grid-cols-1 gap-x-[clamp(1rem,1.6vw,1.5rem)] p-0 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           <AnimatePresence mode="popLayout" initial={false}>
             {shown.map((template, i) => (
               <GalleryCard key={template.id} template={template} index={i} />

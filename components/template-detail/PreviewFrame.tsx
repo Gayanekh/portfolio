@@ -18,7 +18,8 @@ const DESKTOP_WIDTH = 1280;
 // `fill` lets the desktop window take its column's full width, and
 // `fillPhone` the phone window too (the template then lays itself out for
 // that width, e.g. a tablet's); `address` replaces the one in the browser
-// bar and `height` the window's height.
+// bar and `height` the window's height. With `still` the template is a picture:
+// it takes no scrolling, touches or focus, so a swipe over it moves the page.
 export default function PreviewFrame({
   template,
   device,
@@ -28,6 +29,7 @@ export default function PreviewFrame({
   fillPhone = false,
   address,
   height = "h-[min(76vh,46rem)]",
+  still = false,
 }: {
   template: TemplateDetail;
   device: Device;
@@ -37,6 +39,7 @@ export default function PreviewFrame({
   fillPhone?: boolean;
   address?: string;
   height?: string;
+  still?: boolean;
 }) {
   const frameRef = useRef<HTMLIFrameElement>(null);
   const [bodyRef, animate] = useAnimate<HTMLDivElement>();
@@ -119,9 +122,12 @@ export default function PreviewFrame({
               // A whole page: fetched only as it nears the screen.
               loading="lazy"
               title={`${template.name} template preview`}
+              scrolling={still ? "no" : undefined}
+              inert={still}
               style={{ scale, height: frameHeight }}
               className={`absolute left-0 top-0 origin-top-left border-0 bg-white ${device === "desktop" ? "w-[1280px]" : "w-full"}`}
             />
+            {still && <div aria-hidden="true" className="absolute inset-0" />}
             <motion.div
               aria-hidden="true"
               initial={false}
