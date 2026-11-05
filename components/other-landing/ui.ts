@@ -48,6 +48,9 @@ export const cover = {
   // /template-landing's grid, in the Endcap reference's sizes: a near-square
   // card and a full-width banner.
   tile: "aspect-[670/626]",
+  // /template-landing's cards: a 3:2 rectangle one to a row (phones), the
+  // near-square tile two to a row (the user asked).
+  landscape: "aspect-[3/2] md:aspect-[670/626]",
   banner: "aspect-[1328/581]",
   fill: "!absolute inset-0 !rounded-none",
   // Where the windows sit: the whole box unless a parent sets --cover-zoom

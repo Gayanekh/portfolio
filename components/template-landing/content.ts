@@ -45,15 +45,17 @@ export const TEMPLATES_ALL = TEMPLATES.map((template, i) => ({
 export const EDITABLE_IDS = TEMPLATES.filter((template) => GALLERY_TEMPLATES.find((item) => item.id === template.id)?.editable !== false).map((template) => template.id);
 
 // The cover pictures the user supplied (public/images/landing-covers), by template.
-const COVER_PHOTOS: Record<string, { src: string; ground: string; focus: string; fill?: boolean } | undefined> = {
-  // `ground`: the picture's own edge colour (shown while it loads); `focus`: the part
-  // a square card keeps when it crops the 4:3 picture (its name side).
-  gallery: { src: "/images/landing-covers/gallery.webp", ground: "#efeceb", focus: "50% 50%" },
-  signature: { src: "/images/landing-covers/signature.webp", ground: "#ebe9e7", focus: "40% 50%" },
-  nocturne: { src: "/images/landing-covers/nocturne.webp", ground: "#1d1d1d", focus: "12% 50%" },
-  // Persona's cover is the user's own art-directed picture, near square like the
-  // cards, so it fills its card edge to edge (`fill`) rather than floating on its ground.
-  persona: { src: "/images/landing-covers/persona-2026-11c.webp", ground: "#d9d6d3", focus: "50% 50%", fill: true },
+const COVER_PHOTOS: Record<string, { src: string; ground: string; focus: string; fill?: boolean; contain?: boolean; corner?: boolean } | undefined> = {
+  // `ground`: the picture's own colour (shown while it loads). The user's covers are
+  // all made at 2000 × 1870, the cards' own shape, so each fills its card edge to
+  // edge (`fill`), uncropped where the card is that shape.
+  gallery: { src: "/images/landing-covers/gallery-cover.webp", ground: "#e4e5e7", focus: "50% 50%", fill: true },
+  signature: { src: "/images/landing-covers/minimal-cover.webp", ground: "#f1f1f1", focus: "50% 50%", fill: true },
+  nocturne: { src: "/images/landing-covers/nocturne-cover.webp", ground: "#9a9a9a", focus: "50% 50%", fill: true },
+  showcase: { src: "/images/landing-covers/showcase-cover.webp", ground: "#ececea", focus: "50% 50%", fill: true },
+  exhibition: { src: "/images/landing-covers/exhibition-cover.webp", ground: "#ebebe9", focus: "50% 50%", fill: true },
+  // Persona's cover is the user's earlier one, near square like the cards (filled too).
+  persona: { src: "/images/landing-covers/persona-2026-11c.webp", ground: "#c8c2bf", focus: "50% 50%", fill: true },
 };
 
 export const GRID = {

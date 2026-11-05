@@ -101,7 +101,7 @@ export default function Invite() {
       <div className={`${frame} flex flex-col gap-10 lg:flex-row-reverse lg:items-center lg:justify-center lg:gap-[clamp(8rem,18vw,18rem)]`}>
         <div className="flex flex-col items-start">
           {/* Each line has room on the right for the italic question mark, which leans past it. */}
-          <motion.h2 id="tl-invite-title" initial="hidden" whileInView="shown" viewport={{ once: true, margin: "0px 0px -10% 0px" }} className="m-0 text-[clamp(2rem,3.4vw,3.25rem)] font-normal leading-[1] tracking-[-0.055em]">
+          <motion.h2 id="tl-invite-title" initial="hidden" whileInView="shown" viewport={{ once: true, margin: "0px 0px -10% 0px" }} className="m-0 text-[length:clamp(2.25rem,calc(1.6rem_+_2.2vw),3.25rem)] font-normal leading-[1] tracking-[-0.055em]">
             {INVITE.title.map(({ lead, soft }, i) => (
               <span key={lead} className="block overflow-hidden pb-[0.1em] pr-[0.15em] sm:whitespace-nowrap">
                 <motion.span variants={{ hidden: { y: "105%" }, shown: { y: "0%", transition: { duration: 1, ease, delay: i * 0.08 } } }} className="block">

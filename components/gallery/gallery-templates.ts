@@ -39,6 +39,12 @@ export interface GalleryTemplate {
   // Kept here (not read from the site templates' registry) so the gallery does
   // not load every template's code.
   inProgress?: string;
+  // A cover shown whole (not cropped) on this colour, for a tall picture.
+  coverGround?: string;
+  // With coverGround: set framed on it (plain, with a soft shadow) instead of blended.
+  coverFrame?: boolean;
+  // Where a cropped cover is held (object-position), for a tall picture.
+  coverFocus?: string;
   // Placeholder photo. Not needed for a live template, which shows itself.
   image?: string;
   // A real template from the template registry (components/template-detail).
@@ -61,17 +67,17 @@ export const GALLERY_STYLES: { id: GalleryStyle | "all"; label: string }[] = [
 export const GALLERY_TEMPLATES: GalleryTemplate[] = [
   // Site templates (components/site-templates) open their demo: the real
   // template, with Use This Template to open it in the editor.
-  { id: "nocturne", name: "Nocturne", style: "image", category: "portfolio", cover: "/images/landing-covers/nocturne.webp", bestFor: "UI/UX designers, developers, photographers and graphic designers", live: true, href: "/templates/demo/nocturne" },
-  { id: "showcase", name: "Showcase", style: "image", category: "portfolio", screen: "/images/templates/showcase-2026-10.jpg", bestFor: "Photographers, UI/UX and graphic designers", live: true, href: "/templates/demo/showcase" },
+  { id: "nocturne", name: "Nocturne", style: "image", category: "portfolio", cover: "/images/landing-covers/nocturne-cover.webp", bestFor: "UI/UX designers, developers, photographers and graphic designers", live: true, href: "/templates/demo/nocturne" },
+  { id: "showcase", name: "Showcase", style: "image", category: "portfolio", cover: "/images/landing-covers/showcase-cover.webp", bestFor: "Photographers, UI/UX and graphic designers", live: true, href: "/templates/demo/showcase" },
   // IN PROGRESS — built step by step from a design reference.
   { id: "persona", name: "Persona", style: "image", category: "portfolio", cover: "/images/landing-covers/persona-2026-11c.webp", bestFor: "Brand and product designers", live: true, href: "/templates/demo/persona" },
-  { id: "gallery", name: "Gallery", style: "image", category: "photography", cover: "/images/landing-covers/gallery.webp", bestFor: "Photographers and artists", live: true, href: "/templates/demo/gallery" },
+  { id: "gallery", name: "Gallery", style: "image", category: "photography", cover: "/images/landing-covers/gallery-cover.webp", bestFor: "Photographers and artists", live: true, href: "/templates/demo/gallery" },
   // Minimal: the Signature site template, its demo still at /templates/demo/minimal.
   // The earlier Minimal (components/templates) only renders pages published with it.
-  { id: "signature", name: "Minimal", style: "image", category: "portfolio", cover: "/images/landing-covers/signature.webp", bestFor: "Web, brand and graphic designers", live: true, href: "/templates/demo/minimal" },
+  { id: "signature", name: "Minimal", style: "image", category: "portfolio", cover: "/images/landing-covers/minimal-cover.webp", bestFor: "Web, brand and graphic designers", live: true, href: "/templates/demo/minimal" },
   // Exhibition: a visual template example for an artist's show (no editor
   // yet), shown by its screenshot.
-  { id: "exhibition", name: "Exhibition", style: "image", category: "events", bestFor: "Painters, artists and galleries", screen: "/images/templates/exhibition-2026-10.jpg", href: "/templates/demo/exhibition", editable: false },
+  { id: "exhibition", name: "Exhibition", style: "image", category: "events", bestFor: "Painters, artists and galleries", cover: "/images/landing-covers/exhibition-cover.webp", href: "/templates/demo/exhibition", editable: false },
   { id: "atelier", name: "Atelier", style: "image", category: "agency", bestFor: "Designers and makers", image: photo("photo-1487014679447-9f8336841d58") },
   { id: "ledger", name: "Ledger", style: "text", category: "business", bestFor: "Teachers and consultants", image: photo("photo-1502945015378-0e284ca1a5be") },
   { id: "chapter", name: "Chapter", style: "case", category: "personal", bestFor: "Researchers and writers", image: photo("photo-1522199755839-a2bacb67c546") },

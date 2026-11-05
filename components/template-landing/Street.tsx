@@ -155,8 +155,8 @@ export default function Street() {
 
   return (
     <div ref={ref} aria-hidden="true" className={`relative z-10 overflow-hidden bg-[#0f0f0f] py-[clamp(1.25rem,2.5vw,2.25rem)] ${themes.dark}`}>
-      {/* On phones the drawing is shown larger, cropped to its right part (windows 03 to 05). */}
-      <svg viewBox="0 0 1440 400" className="mx-auto block h-auto w-full max-w-[64rem] max-md:w-[164%] max-md:max-w-none max-md:-translate-x-[38%]">
+      {/* On phones the whole drawing shows (windows 01 to 05, the user asked), its empty margins trimmed so it is as large as the width allows. */}
+      <svg viewBox="0 0 1440 400" className="mx-auto block h-auto w-full max-w-[64rem] max-md:w-[117%] max-md:max-w-none max-md:-translate-x-[8%]">
         {/* The ruler along the top, its ticks at each window's edges. */}
         <motion.path d="M150 70 H1300" {...soft} {...draw(0, 1.8)} />
         {[150, 360, 570, 800, 1030, 1300].map((x, i) => (

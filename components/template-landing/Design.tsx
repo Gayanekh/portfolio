@@ -65,9 +65,9 @@ export default function Design() {
             <Label>{DESIGN.label}</Label>
           </motion.div>
           {/* The title's lines rise out of their masks together, set off by the title coming into view. */}
-          <motion.h2 id="tl-design-title" initial="hidden" whileInView="shown" viewport={{ once: true, margin: "0px 0px -10% 0px" }} className="m-0 text-[clamp(2rem,3.3vw,3rem)] font-medium leading-[0.96] tracking-[-0.055em]">
+          <motion.h2 id="tl-design-title" initial="hidden" whileInView="shown" viewport={{ once: true, margin: "0px 0px -10% 0px" }} className="m-0 text-[length:clamp(2.25rem,calc(1.6rem_+_2.2vw),3.5rem)] font-medium leading-[0.96] tracking-[-0.055em]">
             {TITLE.map(({ lead, soft }, i) => (
-              <span key={lead} className="block overflow-hidden pb-[0.08em] sm:whitespace-nowrap">
+              <span key={lead} className="block overflow-hidden pb-[0.08em] sm:whitespace-nowrap lg:whitespace-normal 2xl:whitespace-nowrap">
                 <motion.span variants={{ hidden: { y: "105%" }, shown: { y: "0%", transition: { duration: 1, ease, delay: i * 0.08 } } }} className="block">
                   {lead}
                   {soft && (

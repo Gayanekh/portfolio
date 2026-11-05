@@ -35,7 +35,7 @@ function Window({ src, alt, place, crop }: { src: string; alt: string; place: st
 // windows move slowly against the bands as the cover crosses the screen, as
 // if fixed behind it (the Opus reference's project images); not for anyone
 // who prefers less motion.
-export default function Cover({ src, name, shape, drift = false }: { src: string; name: string; shape: "square" | "wide" | "fill" | "tile" | "banner"; drift?: boolean }) {
+export default function Cover({ src, name, shape, drift = false }: { src: string; name: string; shape: "square" | "wide" | "fill" | "tile" | "banner" | "landscape"; drift?: boolean }) {
   const box = useRef<HTMLSpanElement>(null);
   // No drift on touch screens: moving the windows with the scroll made phone scrolling stutter.
   const reduced = useReducedMotion();
