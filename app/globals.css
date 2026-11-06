@@ -125,19 +125,30 @@
   }
 }
 
-/* The dot on /gayane-khachatryan's line travels down the screen as the page scrolls,
-   driven by the browser's own scrolling; without scroll timelines it rests at the top. */
-.gk-dot {
-  transform: translateX(calc(-50% + 0.5px));
+/* /gayane-khachatryan's scroll motion, driven by the browser's own scrolling: a
+   heading's letters slide in from the right and appear one after another as it
+   enters the screen (.gk-letter, each with its index in --i), and cards sharpen,
+   rise and grow into place (.gk-stack). Without scroll timelines they simply show. */
+.gk-letter {
+  display: inline-block;
 }
-@keyframes gk-dot {
-  to { transform: translateX(calc(-50% + 0.5px)) translateY(calc(100svh - 4.5rem)); }
+@keyframes gk-letter {
+  from { opacity: 0; transform: translateX(calc(0.5em + var(--i) * 0.04em)); }
+}
+@keyframes gk-stack {
+  from { opacity: 0.15; filter: blur(6px); transform: translateY(3rem) scale(0.95); }
 }
 @media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: scroll()) {
-    .gk-dot {
-      animation: gk-dot linear both;
-      animation-timeline: scroll(root);
+  @supports (animation-timeline: view()) {
+    .gk-letter {
+      animation: gk-letter linear both;
+      animation-timeline: view();
+      animation-range: entry calc(20% + var(--i) * 3%) cover calc(28% + var(--i) * 3%);
+    }
+    .gk-stack {
+      animation: gk-stack linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 32%;
     }
   }
 }

@@ -1,5 +1,7 @@
-// Everything /gayane-khachatryan says, from Gayane's CV, plus Portory as a project.
-// The phone number on the CV is left out on purpose: these pages are public.
+// Everything /gayane-khachatryan says: Gayane's CV and the real projects from the
+// Nocturne template's sample content (ZEMA, OGMA), plus Portory. Only real facts:
+// Nocturne's invented work, statistics and contact details are left out (the user
+// chose), and the CV's phone number stays off these public pages.
 
 export const BASE = "/gayane-khachatryan";
 
@@ -9,84 +11,59 @@ export const PERSON = {
   name: "Gayane Khachatryan",
   role: "Senior Product Designer",
   location: "Fullerton, CA",
-  since: "Since 2015",
   status: "Authorized to work in the U.S.",
   email: "gayane.khachatryan@hotmail.com",
   linkedin: "https://www.linkedin.com/in/gayane-khachatryan-a805383ab",
-  timeZone: "America/Los_Angeles",
-  // Set this to a PDF in public/ and About shows Download CV.
-  cv: undefined as string | undefined,
 };
 
 export const NAV = [
   { label: "Home", href: BASE },
-  { label: "Info", href: `${BASE}/about` },
   { label: "Work", href: `${BASE}/work` },
+  { label: "About", href: `${BASE}/about` },
   { label: "Contact", href: `${BASE}/contact` },
 ];
 
-export const STATEMENT = {
-  lead: "A senior product designer with 10+ years of experience —",
-  soft: "designing complex web and mobile products, from multi-role platforms to dashboards and data-heavy workflows.",
+// The hero's headline, in the reference's three sizes: a huge word, a small line beside it, a large word.
+export const HERO = {
+  big: "Calm",
+  small: "Interfaces . Complex",
+  large: "Products",
+  intro: "Ten years of designing complex web and mobile products, from first flow to production UI.",
+  cta: "See work",
 };
 
-export const SERVICES = [
-  { name: "Product & UX Design", text: "End-to-end experiences for complex products, from requirements and user flows to wireframes, prototypes and production-ready UI." },
-  { name: "Dashboards & Data-Heavy UI", text: "Dashboards, admin tools, data tables, forms and operational workflows for information-dense products." },
-  { name: "Design Systems", text: "Reusable components and UI patterns in Figma and code, keeping interfaces consistent across web and mobile." },
-  { name: "Design-to-Code", text: "Hands-on production UI in React, React Native, Next.js and TypeScript, working closely with engineers." },
+export const SERVICES = ["UI/UX Design", "Design Systems", "Design-to-Code"];
+
+// A project shows its `image`, or its name large on a dark panel when it has none yet.
+export const WORKS: { name: string; category: string; year: string; tags: string; text: string; image?: string; href?: string }[] = [
+  { name: "Portory", category: "Website template platform", year: "2026", tags: "Product · Design · Code", text: "Designed and built: a catalogue of ready-made website templates, with live previews and palettes and fonts that restyle a template in a click.", image: "/images/gayane/portory.webp", href: "/" },
+  { name: "ZEMA Patients", category: "UI/UX", year: "2024–26", tags: "Web & mobile · Booking · User flows", text: "Patient flows for a medical-tourism platform, from search and doctor profiles to pricing, booking and a dashboard, with accessible states for every form." },
+  { name: "ZEMA Admin", category: "Product", year: "2024–26", tags: "Dashboards · Provider workflows · Data export", text: "Dashboards, submission flows, user management and data export for the doctors, facilities and administrators who run the platform every day." },
+  { name: "ZEMA Design System", category: "Design system", year: "2024–26", tags: "Figma · Tailwind · NativeWind · shadcn/ui", text: "Reusable components in Figma and in code that keep web and mobile consistent, with every state designed up front." },
+  { name: "OGMA Business", category: "UI/UX", year: "2015–24", tags: "Data platforms · Dashboards · Forms", text: "Business and data-management products: dashboards, admin tools, data tables, forms and operational workflows." },
 ];
 
-// A project shows its `image`, or its name and line on a plain panel when it has none yet.
-export const PROJECTS: { name: string; kind: string; year: string; line: string; tags: string[]; image?: string; href?: string }[] = [
-  {
-    name: "Portory",
-    kind: "Website template platform",
-    year: "'26",
-    line: "Designed and built: a catalogue of ready-made website templates, with live previews and palettes and fonts that restyle a template in a click.",
-    tags: ["Web"],
-    image: "/images/gayane/portory.webp",
-    href: "/",
-  },
-  {
-    name: "ZEMA",
-    kind: "Medical-tourism platform",
-    year: "'24–'26",
-    line: "One platform for patients, doctors, healthcare facilities and administrators, across web and mobile.",
-    tags: ["Web", "Mobile"],
-  },
-  {
-    name: "OGMA",
-    kind: "Web and mobile products",
-    year: "'15–'24",
-    line: "Business and data-management platforms, music platforms and mobile applications.",
-    tags: ["Web", "Mobile"],
-  },
+export const EXPERTISE = [
+  { name: "UI/UX Design", text: "Multi-role platforms, dashboards and data-heavy workflows, designed so that complicated things feel calm.", tags: ["User flows", "Wireframes", "Prototypes", "High-fidelity UI"] },
+  { name: "Design Systems", text: "Reusable components and UI patterns in Figma and code, keeping web and mobile consistent.", tags: ["Figma", "Component libraries", "Design QA", "Tokens"] },
+  { name: "Design-to-Code", text: "Hands-on front-end work, so what was designed is exactly what gets built.", tags: ["React", "React Native", "Next.js", "TypeScript"] },
+  { name: "Accessibility", text: "Labels, focus, errors and contrast designed into every component state.", tags: ["WCAG-oriented", "Form states", "Contrast", "Touch targets"] },
+  { name: "AI-Assisted Workflow", text: "Claude Code and Copilot to explore alternatives, draft specs and review components faster.", tags: ["Claude", "Claude Code", "ChatGPT", "GitHub Copilot"] },
 ];
 
-export const WORK_FILTERS = ["All", "Web", "Mobile"];
+export const PROCESS = [
+  { title: "Discover", text: "Requirements, roles and the real tasks behind them." },
+  { title: "Define", text: "Flows, structure and the edge cases nobody mentions." },
+  { title: "Design", text: "Prototypes and high-fidelity UI, every state included." },
+  { title: "Deliver", text: "Handoff, design QA and the details in code." },
+];
 
 export const ABOUT = {
-  lead: "I'm Gayane — a senior UI/UX and product designer based in Fullerton, California, with 10+ years of experience designing complex web and mobile products.",
-  more: "I build and maintain design systems, bring hands-on front-end skills in React, React Native, Next.js and TypeScript, and work closely with engineers to keep design and implementation consistent. I design with accessibility in mind and use AI-assisted design-to-code workflows.",
-  years: "© 2015–26",
+  lead: "I'm a senior product designer with ten years of work on complex web and mobile products.",
+  more: "I build design systems, write front-end code in React, React Native, Next.js and TypeScript, and work closely with engineers to keep design and implementation consistent. I design with accessibility in mind and use AI-assisted design-to-code workflows.",
 };
 
-export const STATS = [
-  { value: "10+", label: "Years of experience" },
-  { value: "9", label: "Years at OGMA" },
-  { value: "4", label: "User roles on ZEMA" },
-  { value: "2", label: "Platforms: web & mobile" },
-];
-
-export const STACK = [
-  { name: "Figma", use: "Design systems and prototypes" },
-  { name: "React", use: "Web interfaces" },
-  { name: "React Native", use: "Mobile interfaces" },
-  { name: "Next.js", use: "Production web apps" },
-  { name: "TypeScript", use: "Typed front-end code" },
-  { name: "Tailwind CSS", use: "Design-system styling" },
-];
+export const STACK = ["React", "Next.js", "TypeScript", "React Native", "Tailwind CSS", "NativeWind", "shadcn/ui", "Figma", "Ant Design", "Git & GitHub", "Claude Code", "Jira"];
 
 export const EXPERIENCE = [
   {
@@ -148,6 +125,7 @@ export const FAQS = [
 ];
 
 export const CONTACT = {
-  title: "Reach out.",
-  text: "I'd love to hear from you, whether you're hiring, looking to collaborate on a product, or simply want to say hello.",
+  lead: "Let's Work",
+  soft: "Together.",
+  text: "Hiring, a product to talk through, or just hello: write to me.",
 };
