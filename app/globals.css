@@ -125,6 +125,23 @@
   }
 }
 
+/* The dot on /gayane-khachatryan's line travels down the screen as the page scrolls,
+   driven by the browser's own scrolling; without scroll timelines it rests at the top. */
+.gk-dot {
+  transform: translateX(calc(-50% + 0.5px));
+}
+@keyframes gk-dot {
+  to { transform: translateX(calc(-50% + 0.5px)) translateY(calc(100svh - 4.5rem)); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) {
+    .gk-dot {
+      animation: gk-dot linear both;
+      animation-timeline: scroll(root);
+    }
+  }
+}
+
 .card {border: 1px solid #fafafa;
     box-shadow: 0 1px 2px #0000000d;background: linear-gradient(to bottom right, 
 color-mix(in srgb, #fafafa 80%, transparent), 
