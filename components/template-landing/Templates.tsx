@@ -1,11 +1,11 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
 import Cover from "@/components/other-landing/Cover";
 import CoverPhoto from "@/components/template-landing/CoverPhoto";
 import { GRID } from "@/components/template-landing/content";
 import Button from "@/components/template-landing/Button";
+import MagneticCircle from "@/components/template-landing/MagneticCircle";
 import Label from "@/components/template-landing/Label";
 import { ease, focusRing, frame, serif } from "@/components/template-landing/ui";
 
@@ -59,10 +59,14 @@ export default function Templates() {
             <motion.li key={item.id} initial={{ opacity: 0, transform: "translateY(24px)" }} whileInView={{ opacity: 1, transform: "translateY(0px)" }} viewport={{ once: true, margin: "0px 0px -5% 0px" }} transition={{ duration: 1, ease, delay: (i % 2) * 0.08, ...(reduced && { transform: { duration: 0 } }) }} className="md:even:mt-[clamp(3rem,7vw,6.25rem)]">
               <a href={item.href} target="_blank" rel="noopener noreferrer" className={`${focusRing} group block rounded-[10px] text-[var(--fg)] no-underline`}>
                 <span className="relative block">
-                  {item.photo ? <CoverPhoto src={item.photo.src} ground={item.photo.ground} focus={item.photo.focus} name={item.name} shape={shape} fit={!item.photo.fill && !item.photo.contain} whole={item.photo.fill} contain={item.photo.contain} corner={item.photo.corner} extra={item.photo.extra} /> : <Cover src={item.screen} name={item.name} shape={shape} drift />}
-                  {/* After the Opus reference: on hover a white circle with an arrow in the primary colour comes up at the card's bottom right. */}
-                  <span aria-hidden="true" className="pointer-events-none absolute bottom-[clamp(1rem,1.8vw,1.5rem)] right-[clamp(1rem,1.8vw,1.5rem)] grid size-14 translate-y-2 scale-90 place-items-center rounded-full bg-white text-[var(--accent)] opacity-0 shadow-[0_8px_24px_-8px_rgb(0_0_0/0.25)] transition-[opacity,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:scale-100 group-focus-visible:opacity-100">
-                    <ArrowUpRight className="size-6" strokeWidth={1.75} />
+                  {/* After the igoro.framer.media works cards (the user asked, 1:1): on hover the picture blurs 10px and grows 3%, and a light circle with a dark arrow fades in at the centre and follows the cursor magnetically (MagneticCircle). */}
+                  <span className="block overflow-hidden rounded-[4px]">
+                    <span className="block origin-center transition-[filter,transform] duration-[650ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03] group-hover:blur-[10px] group-hover:delay-100 group-hover:duration-[900ms] group-focus-visible:scale-[1.03] group-focus-visible:blur-[10px] motion-reduce:transition-none">
+                      {item.photo ? <CoverPhoto src={item.photo.src} ground={item.photo.ground} focus={item.photo.focus} name={item.name} shape={shape} fit={!item.photo.fill && !item.photo.contain} whole={item.photo.fill} contain={item.photo.contain} corner={item.photo.corner} extra={item.photo.extra} /> : <Cover src={item.screen} name={item.name} shape={shape} drift />}
+                    </span>
+                  </span>
+                  <span aria-hidden="true" className="pointer-events-none absolute inset-0 z-10 hidden place-items-center opacity-0 transition-opacity duration-[650ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:opacity-100 group-hover:delay-100 group-hover:duration-[900ms] group-focus-visible:opacity-100 md:grid">
+                    <MagneticCircle />
                   </span>
                 </span>
                 <span className="mt-[clamp(0.75rem,1.1vw,1rem)] flex flex-wrap items-center justify-between gap-x-4 gap-y-2.5">
