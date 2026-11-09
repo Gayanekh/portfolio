@@ -95,14 +95,16 @@ export default function Design() {
                 {/* The template is a picture here, not a page: it does not take the scroll (or clicks) from the page; the pickers restyle it. */}
                 <div className="relative w-full text-[#16171a]">
                   <PreviewFrame template={template} device={wide ? "desktop" : "mobile"} palette={palette} font={font} fill fillPhone still height={wide ? fit.previewDesktop : fit.previewHeight} />
-                  <StyleChips palette={palette} font={font} onPalette={setPalette} onFont={setFont} accent={signature(activePalette)} />
                 </div>
               </div>
-              <div className="absolute right-0 top-1/2 z-10 hidden w-[21rem] origin-right -translate-y-1/2 scale-[var(--s,1)] flex-col gap-4 text-[#16171a] xl:flex">
+              <div className="absolute right-0 top-1/2 z-10 hidden w-[21rem] origin-right -translate-y-1/2 scale-[calc(var(--s,1)*0.8)] flex-col gap-4 text-[#16171a] xl:flex">
                 <PaletteCard value={palette} onChange={setPalette} mark="tl-design-palette" />
                 <FontCard value={font} onChange={setFont} accent={signature(activePalette)} mark="tl-design-font" />
               </div>
             </div>
+
+            {/* Below xl (phones) the chips sit under the template, not over it (the user asked). */}
+            <StyleChips below palette={palette} font={font} onPalette={setPalette} onFont={setFont} accent={signature(activePalette)} />
 
             {/* The foot: what the template is showing now, and the buttons. */}
             <div className="mt-8 flex flex-col gap-5 border-0 border-t border-solid border-[var(--line)] pt-6 sm:flex-row sm:items-center sm:justify-between">

@@ -57,7 +57,9 @@ export function useStageScale() {
 // palette's five colours, or "Aa" in the font) with its name. A chip opens
 // its full card over the template, under the chips; the choice restyles the
 // template at once, and a click outside or Escape closes it.
-export function StyleChips({ palette, font, onPalette, onFont, accent }: { palette: string; font: string; onPalette: (id: string) => void; onFont: (id: string) => void; accent: string }) {
+// With `below` the chips are not over the template: they sit in the flow under it at the left, side by side, and the
+// opened card comes under them, also at the left (the user asked, for the landing page on phones).
+export function StyleChips({ palette, font, onPalette, onFont, accent, below = false }: { palette: string; font: string; onPalette: (id: string) => void; onFont: (id: string) => void; accent: string; below?: boolean }) {
   const [open, setOpen] = useState<"palette" | "font" | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -85,13 +87,13 @@ export function StyleChips({ palette, font, onPalette, onFont, accent }: { palet
       {specimen}
       <span className="flex min-w-0 flex-col">
         <span className="text-[0.5625rem] uppercase leading-tight tracking-[0.18em] text-foreground/45">{label}</span>
-        <span className="truncate text-[0.8125rem] font-medium leading-tight text-foreground">{name}</span>
+        <span className={`truncate ${below ? "text-[0.6875rem]" : "text-[0.8125rem]"} font-medium leading-tight text-foreground`}>{name}</span>
       </span>
     </button>
   );
   return (
-    <div ref={ref} className="xl:hidden">
-      <div className="absolute right-2.5 top-[2.875rem] z-20 flex gap-1.5">
+    <div ref={ref} className={below ? "mt-3 xl:hidden" : "xl:hidden"}>
+      <div className={below ? "flex justify-start gap-1.5" : "absolute right-2.5 top-[2.875rem] z-20 flex gap-1.5"}>
         {chip(
           "palette",
           "Colours",
@@ -111,7 +113,7 @@ export function StyleChips({ palette, font, onPalette, onFont, accent }: { palet
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.98 }}
             transition={{ duration: 0.25, ease }}
-            className="absolute right-2.5 top-[6rem] z-20 w-[min(21rem,calc(100%-1.25rem))] origin-top-right"
+            className={below ? "relative mt-2 w-[min(21rem,100%)] origin-top-left" : "absolute right-2.5 top-[6rem] z-20 w-[min(21rem,calc(100%-1.25rem))] origin-top-right"}
           >
             {open === "palette" ? <PaletteCard value={palette} onChange={onPalette} mark="styler-palette-pick" /> : <FontCard value={font} onChange={onFont} accent={accent} mark="styler-font-pick" />}
           </motion.div>

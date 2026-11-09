@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, type PointerEvent } from "react";
-import { AnimatePresence, motion, useMotionTemplate, useMotionValue, useReducedMotionConfig, useSpring, useTransform, type MotionValue } from "framer-motion";
+import { AnimatePresence, motion, useMotionTemplate, useMotionValue, useReducedMotionConfig, useSpring, useTransform, type MotionStyle, type MotionValue } from "framer-motion";
 import { themeFontVariables } from "@/components/template-detail/theme-options";
 import { TEMPLATES, TEMPLATE_IMAGE } from "@/components/landing/sample-portfolios";
 import { useStill } from "@/components/landing/scroll-fx";
@@ -40,6 +40,18 @@ const TILES: ({ src: string; name?: string } | null)[] = [
 // How far each tile floats in front of the wall (0 to 1): uneven, so the
 // tiles drift apart as the pointer moves and the wall reads as layered.
 const DEPTH = [0.35, 0.8, 0.5, 1, 0.9, 0.4, 0.7, 0.55, 0.6, 1, 0.3, 0.75];
+// With `pictures` (the landing page passes its templates section's covers) the wall is made of them: all but the featured slot,
+// in an order where no picture sits beside or under itself, each lit one named; the featured tile cycles through them.
+type Picture = { src: string; name: string };
+const thumb = (src: string) => `/_next/image?url=${encodeURIComponent(src)}&w=750&q=75`;
+const wallOf = (pictures: Picture[]) => {
+  let next = 0;
+  return TILES.map((tile) => {
+    if (!tile) return null;
+    const picture = pictures[((-5 * next++ % pictures.length) + pictures.length) % pictures.length];
+    return { src: thumb(picture.src), name: picture.name };
+  });
+};
 const CYCLE_MS = 2600;
 const spring = { stiffness: 140, damping: 22, mass: 0.8 };
 // Each line of the heading rising into place, the second after the first.
@@ -61,7 +73,12 @@ function WallTile({
   px,
   py,
   setRef,
+  featured,
+  light,
 }: {
+  featured: { name: string; image: string }[];
+  // A lighter wall: the tiles not lit are dimmed less.
+  light: boolean;
   index: number;
   tile: { src: string; name?: string } | null;
   on: boolean;
@@ -73,13 +90,13 @@ function WallTile({
   const depth = DEPTH[index];
   const x = useSpring(useTransform(px, (v) => v * -46 * depth), spring);
   const y = useSpring(useTransform(py, (v) => v * -34 * depth), spring);
-  const name = tile ? (tile.name ?? BROWSE.label) : FEATURED[shown].name;
+  const name = tile ? (tile.name ?? BROWSE.label) : featured[shown].name;
   return (
     <motion.div
       ref={setRef}
       style={{ x, y }}
       initial={false}
-      animate={{ opacity: on ? 1 : 0.35, scale: on ? 1.05 : 1, z: on ? 70 : depth * 24 }}
+      animate={{ opacity: on ? 1 : light ? 0.62 : 0.35, scale: on ? 1.05 : 1, z: on ? 70 : depth * 24 }}
       transition={{ duration: 0.55, ease }}
       className={`relative overflow-hidden rounded-xl transition-shadow duration-500 ${on ? "z-10 shadow-[0_0_0_1px_rgb(255_255_255/0.35),0_30px_70px_-20px_rgb(0_0_0/0.8)]" : "shadow-[0_0_0_1px_rgb(255_255_255/0.06)]"}`}
     >
@@ -90,7 +107,7 @@ function WallTile({
         <AnimatePresence initial={false}>
           <motion.img
             key={shown}
-            src={FEATURED[shown].image}
+            src={featured[shown].image}
             alt=""
             decoding="async"
             initial={{ opacity: 0, scale: 1.06 }}
@@ -122,6 +139,72 @@ function WallTile({
   );
 }
 
+// The landing page's wall (the user asked, after samrichmond.framer.website's gallery): four vertical
+// tickers turned 5 degrees as one block, each moving at 30px/s measured on a 500px column (so it
+// scales with the column's width), the second one the other way. The hover is the wall's own: the
+// lean, the light, each column drifting by its depth, and the tile under the pointer lifting out, named.
+const TICK_SPEED = 0.06;
+const COLUMN_DEPTH = [0.45, 0.9, 0.65, 1];
+
+function TickerTile({ picture, on, setRef }: { picture: Picture; on: boolean; setRef: (element: HTMLDivElement | null) => void }) {
+  return (
+    <motion.div
+      ref={setRef}
+      initial={false}
+      animate={{ opacity: on ? 1 : 0.62, scale: on ? 1.05 : 1, z: on ? 70 : 0 }}
+      transition={{ duration: 0.55, ease }}
+      className={`relative aspect-[2000/1870] w-full flex-none overflow-hidden rounded-xl transition-shadow duration-500 ${on ? "z-10 shadow-[0_0_0_1px_rgb(255_255_255/0.35),0_30px_70px_-20px_rgb(0_0_0/0.8)]" : "shadow-[0_0_0_1px_rgb(255_255_255/0.06)]"}`}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element -- optimised thumbnail address */}
+      <img src={thumb(picture.src)} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
+      <div className="absolute inset-x-0 bottom-0 hidden justify-center p-3 md:flex">
+        <AnimatePresence mode="wait" initial={false}>
+          {on && (
+            <motion.span key={picture.name} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.35, ease }} className="whitespace-nowrap rounded-full bg-[rgb(11_5_29/0.35)] px-3 py-2 text-xs font-bold leading-none text-[#f9f8f5] backdrop-blur-md">
+              {picture.name}
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </div>
+    </motion.div>
+  );
+}
+
+function TickerColumn({ order, column, reverse, offset, still, hovered, px, py, setRef }: { order: Picture[]; column: number; reverse: boolean; offset: number; still: boolean; hovered: number | null; px: MotionValue<number>; py: MotionValue<number>; setRef: (index: number, element: HTMLDivElement | null) => void }) {
+  const copy = useRef<HTMLDivElement>(null);
+  const [seconds, setSeconds] = useState(0);
+  const depth = COLUMN_DEPTH[column % COLUMN_DEPTH.length];
+  const x = useSpring(useTransform(px, (v) => v * -46 * depth), spring);
+  const y = useSpring(useTransform(py, (v) => v * -34 * depth), spring);
+  useEffect(() => {
+    const el = copy.current;
+    if (!el) return;
+    // One copy's height over the column's width gives the time of one slide at a steady speed.
+    const measure = () => {
+      if (el.offsetWidth) setSeconds(el.offsetHeight / (el.offsetWidth * TICK_SPEED));
+    };
+    measure();
+    const watcher = new ResizeObserver(measure);
+    watcher.observe(el);
+    return () => watcher.disconnect();
+  }, []);
+  const size = order.length;
+  return (
+    <motion.div style={{ x, y }} className="relative min-w-0 flex-1 [transform-style:preserve-3d]">
+      <div style={{ animationName: seconds ? "wall-tick" : "none", animationDuration: `${seconds}s`, animationTimingFunction: "linear", animationDelay: `${-seconds * offset}s`, animationIterationCount: "infinite", animationDirection: reverse ? "reverse" : "normal", animationPlayState: still ? "paused" : "running" }} className="flex flex-col will-change-transform [transform-style:preserve-3d]">
+        {[0, 1].map((n) => (
+          <div key={n} ref={n === 0 ? copy : undefined} className="flex flex-col gap-[var(--wall-gap)] pb-[var(--wall-gap)] [transform-style:preserve-3d]">
+            {order.map((picture, i) => {
+              const index = column * size * 2 + n * size + i;
+              return <TickerTile key={i} picture={picture} on={hovered === index} setRef={(element) => setRef(index, element)} />;
+            })}
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
 // The closing band: a wall of templates across the full width, about a screen
 // tall, running on into the dark footer below, with one large line over its middle;
 // the whole band links to the gallery. The featured tile keeps changing.
@@ -135,8 +218,10 @@ function WallTile({
 //
 // Elsewhere it can say other words (`lead`, `name`) and, `compact`, fill the
 // box it is put in (a footer's picture) rather than standing as a band.
-export default function FinalCTA({ reveal, lead = BROWSE.lead, name = BROWSE.name, compact = false, leadFont = "font-[family-name:var(--tf-fraunces)] font-light" }: { reveal?: MotionValue<number>; lead?: string; name?: string; compact?: boolean; leadFont?: string } = {}) {
+export default function FinalCTA({ reveal, lead = BROWSE.lead, name = BROWSE.name, compact = false, leadFont = "font-[family-name:var(--tf-fraunces)] font-light", pictures }: { reveal?: MotionValue<number>; lead?: string; name?: string; compact?: boolean; leadFont?: string; pictures?: Picture[] } = {}) {
   const reduced = useReducedMotionConfig();
+  const featured = pictures?.length ? pictures.map((picture) => ({ name: picture.name, image: thumb(picture.src) })) : FEATURED;
+  const tiles = pictures?.length ? wallOf(pictures) : TILES;
   const [shown, setShown] = useState(0);
   // The tile under the pointer, the only one lit (none without a pointer).
   const [hovered, setHovered] = useState<number | null>(null);
@@ -166,24 +251,40 @@ export default function FinalCTA({ reveal, lead = BROWSE.lead, name = BROWSE.nam
 
   useEffect(() => {
     if (reduced) return;
-    const timer = setInterval(() => setShown((i) => (i + 1) % FEATURED.length), CYCLE_MS);
+    const timer = setInterval(() => setShown((i) => (i + 1) % featured.length), CYCLE_MS);
     return () => clearInterval(timer);
-  }, [reduced]);
+  }, [reduced, featured.length]);
 
+  // The wall sits under the link that covers the band, so find the tile by position.
+  const pointer = useRef<{ x: number; y: number } | null>(null);
+  const pick = () => {
+    const at = pointer.current;
+    if (!at) return;
+    const found = tileRefs.current.findIndex((tile) => {
+      const rect = tile?.getBoundingClientRect();
+      return !!rect && at.x >= rect.left && at.x <= rect.right && at.y >= rect.top && at.y <= rect.bottom;
+    });
+    setHovered(found < 0 ? null : found);
+  };
+  // The tickers move under a still pointer, so the lit tile is looked for again as they go.
+  const ticker = Boolean(pictures?.length);
+  useEffect(() => {
+    if (!ticker || reduced) return;
+    const timer = setInterval(pick, 120);
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- pick only reads refs and sets state
+  }, [ticker, reduced]);
   const lean = (event: PointerEvent<HTMLDivElement>) => {
     if (reduced || event.pointerType !== "mouse") return;
     const box = event.currentTarget.getBoundingClientRect();
     px.set((event.clientX - box.left) / box.width - 0.5);
     py.set((event.clientY - box.top) / box.height - 0.5);
     over.set(1);
-    // The wall sits under the link that covers the band, so find the tile by position.
-    const at = tileRefs.current.findIndex((tile) => {
-      const rect = tile?.getBoundingClientRect();
-      return !!rect && event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
-    });
-    setHovered(at < 0 ? null : at);
+    pointer.current = { x: event.clientX, y: event.clientY };
+    pick();
   };
   const rest = () => {
+    pointer.current = null;
     px.set(0);
     py.set(0);
     over.set(0);
@@ -201,14 +302,37 @@ export default function FinalCTA({ reveal, lead = BROWSE.lead, name = BROWSE.nam
         {/* The wall, leaning with the pointer. It runs past the band's edges, so the outer tiles are cut off.
             A mask fades the tiles themselves in from the section above and out into the footer; the
             perspective sits inside the mask, so the wall keeps its depth. */}
-        <motion.div aria-hidden="true" style={{ maskImage: WALL_MASK, WebkitMaskImage: WALL_MASK, scale: settle }} className="absolute inset-0 -z-10 [perspective:1400px]">
+        <motion.div aria-hidden="true" style={{ maskImage: WALL_MASK, WebkitMaskImage: WALL_MASK, scale: settle, ...(pictures?.length ? { "--wall-edge": 0.22, "--wall-core": 0.45 } : { "--wall-edge": 0.4, "--wall-core": 0.62 }) } as MotionStyle} className="absolute inset-0 -z-10 [perspective:1400px]">
           <motion.div
             style={{ rotateX, rotateY, scale: wallScale }}
-            className="absolute -inset-x-[6%] -inset-y-[8%] grid grid-cols-4 grid-rows-3 gap-[clamp(0.75rem,calc(0.432rem_+_1.183vw),1rem)] [transform-style:preserve-3d]"
+            className={`absolute -inset-x-[6%] -inset-y-[8%] [transform-style:preserve-3d] ${ticker ? "[--wall-gap:clamp(0.5rem,1vw,1rem)]" : "grid grid-cols-4 grid-rows-3 gap-[clamp(0.75rem,calc(0.432rem_+_1.183vw),1rem)]"}`}
           >
-            {TILES.map((tile, i) => (
+            {ticker && pictures ? (
+              <div className="absolute -top-[14%] left-[-3%] flex w-[106%] rotate-[5deg] gap-[var(--wall-gap)] [transform-style:preserve-3d]">
+                {[0, 1, 2, 3].map((column) => (
+                  <TickerColumn
+                    key={column}
+                    order={pictures}
+                    column={column}
+                    reverse={column === 1}
+                    // Where each column starts, as a share of its loop (0, 2.5, 4.5 and 1.5 tiles of six; the reversed one counts from the other end): found by searching for the start and the run where the same cover is farthest from itself.
+                    offset={[0, 0.5833, 0.75, 0.25][column]}
+                    still={Boolean(reduced)}
+                    hovered={hovered}
+                    px={px}
+                    py={py}
+                    setRef={(index, element) => {
+                      tileRefs.current[index] = element;
+                    }}
+                  />
+                ))}
+              </div>
+            ) : null}
+            {(ticker ? [] : tiles).map((tile, i) => (
               <WallTile
                 key={i}
+                featured={featured}
+                light={Boolean(pictures?.length)}
                 index={i}
                 tile={tile}
                 on={i === hovered}
@@ -224,8 +348,8 @@ export default function FinalCTA({ reveal, lead = BROWSE.lead, name = BROWSE.nam
           {/* The light following the pointer. */}
           <motion.div style={{ backgroundImage: light, opacity: lightOpacity }} className="pointer-events-none absolute inset-0" />
           {/* Darken the wall's sides, and its middle behind the heading; inside the mask, so it fades out at the top and foot too and leaves no seam. */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,transparent_40%,rgb(0_0_0/0.4)_100%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_42%_36%_at_50%_50%,rgb(0_0_0/0.62),transparent_100%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,transparent_40%,rgb(0_0_0/var(--wall-edge))_100%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_42%_36%_at_50%_50%,rgb(0_0_0/var(--wall-core)),transparent_100%)]" />
         </motion.div>
 
         {/* The whole band opens the gallery. */}

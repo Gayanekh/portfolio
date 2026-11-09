@@ -17,6 +17,10 @@ import FinalCTA from "@/components/landing/FinalCTA";
 import MinimalFooter from "@/components/minimal-landing/Footer";
 import { sans as minimalSans } from "@/components/minimal-landing/ui";
 import { fonts, themes } from "@/components/template-landing/ui";
+import { GRID } from "@/components/template-landing/content";
+
+// The footer wall's pictures: the templates section's own covers (the user asked).
+const COVERS = GRID.items.flatMap((item) => (item.photo ? [{ src: item.photo.src, name: item.name }] : []));
 
 // /template-landing: the Portory home page's content (its hero, templates,
 // features, Make it yours, How it works and FAQ) in the
@@ -72,7 +76,7 @@ export default function TemplateLanding() {
               footer's fonts (the footer's own Geist, Playfair and Outfit were removed). */}
           <div className={`${minimalSans} [--ml-sans:var(--el-sans)] [--ml-serif:var(--el-serif)] [--ml-logo:var(--el-sans)]`}>
             {/* In the picture's place: the home page's wall of templates, saying Browse templates. */}
-            <MinimalFooter close={false} mark={false} logo={<FooterMark />} aside={<FinalCTA compact lead="Browse" name="templates" leadFont="font-[family-name:var(--el-serif)] italic" />} />
+            <MinimalFooter close={false} mark={false} logo={<FooterMark />} aside={<FinalCTA compact pictures={COVERS} lead="Browse" name="templates" leadFont="font-[family-name:var(--el-serif)] italic" />} />
           </div>
         </div>
       </div>
