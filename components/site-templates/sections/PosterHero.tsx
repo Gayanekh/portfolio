@@ -1,7 +1,8 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { useStillAfterHydration } from "../core/motion";
 import { ArrowButton, Reveal } from "../core/blocks";
 import { useField, useSectionId, useTemplate } from "../core/context";
 
@@ -49,7 +50,7 @@ function FieldValue({ field }: { field: string }) {
 
 // Comes in once it is in view, after `delay` seconds.
 function Enter({ delay, from, className, children }: { delay: number; from: Record<string, number | string>; className?: string; children?: ReactNode }) {
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   return (
     <motion.div
       className={className}
@@ -96,7 +97,7 @@ export default function PosterHero({ tags, moreTarget }: { tags: number[]; moreT
   const { navigate } = useTemplate();
   const name = useField("name").value;
   const portrait = useField("portrait").value;
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   const [first, ...rest] = tags;
 
   return (

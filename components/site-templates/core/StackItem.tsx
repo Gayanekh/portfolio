@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode } from "react";
-import { motion, useMotionValue, useReducedMotion, useTransform } from "framer-motion";
+import { motion, useMotionValue, useTransform } from "framer-motion";
+import { useStillAfterHydration } from "./motion";
 import { scrollParent, viewOf } from "./scroll";
 
 // How far a covered section sinks, as a share of the screen's height.
@@ -18,7 +19,7 @@ export default function StackItem({ id, last, children }: { id: string; last: bo
   const ref = useRef<HTMLDivElement>(null);
   const covered = useMotionValue(0);
   const sink = useMotionValue(0);
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useStillAfterHydration();
   const opacity = useTransform(covered, [0, 1], [1, 0.6]);
 
   useEffect(() => {

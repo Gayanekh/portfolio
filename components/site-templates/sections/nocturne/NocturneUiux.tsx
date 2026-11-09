@@ -1,9 +1,9 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { DashboardMock, PhoneMock, SystemMock } from "./mocks";
-import { FieldValue, Frame, gutter, In, Label, soft, SplitTitle, Tilt, type } from "./kit";
+import { FieldValue, Frame, gutter, In, Label, soft, SplitTitle, Tilt, type, useStillAfterHydration } from "./kit";
 
 // UI/UX design: the title and a few words, the process in four steps (a line
 // filling across them once in view), then the case studies, one per row,
@@ -20,7 +20,7 @@ const MOCKS = [() => <PhoneMock imageField="case1Image" />, DashboardMock, Syste
 export default function NocturneUiux({ steps, cases, stats }: { steps: number[]; cases: number[]; stats: number[] }) {
   const lineRef = useRef<HTMLDivElement>(null);
   const seen = useInView(lineRef, { once: true, margin: "0px 0px -15% 0px" });
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
 
   return (
     <Frame>

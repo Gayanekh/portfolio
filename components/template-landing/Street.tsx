@@ -22,7 +22,7 @@ const SOFT = "rgb(239 239 237 / 0.45)";
 // The primary colour, from the page's themes (ui.ts): this band takes the dark
 // theme, so it is the shade lighter that reads on black.
 const ORANGE = "var(--accent)";
-const DARK = "#141414";
+const DARK = "#16171a";
 
 // Window frames along the street (x, width); the fifth is the filled one.
 const UNITS = [
@@ -154,7 +154,7 @@ export default function Street() {
   CURSOR.push({ ...REST, t: REST.t + 1 }, { x: REST.x + 4, y: REST.y + 2, t: REST.t + 2.6 });
 
   return (
-    <div ref={ref} aria-hidden="true" className={`relative z-10 overflow-hidden bg-[#0f0f0f] py-[clamp(1.25rem,2.5vw,2.25rem)] ${themes.dark}`}>
+    <div ref={ref} aria-hidden="true" className={`relative z-10 overflow-hidden bg-[#16171a] py-[clamp(1.25rem,2.5vw,2.25rem)] ${themes.dark}`}>
       {/* On phones the whole drawing shows (windows 01 to 05, the user asked), its empty margins trimmed so it is as large as the width allows. */}
       <svg viewBox="0 0 1440 400" className="mx-auto block h-auto w-full max-w-[64rem] max-md:w-[117%] max-md:max-w-none max-md:-translate-x-[8%]">
         {/* The ruler along the top, its ticks at each window's edges. */}
@@ -241,7 +241,7 @@ export default function Street() {
             animate={on ? { x: CURSOR.map((p) => p.x), y: CURSOR.map((p) => p.y), opacity: CURSOR.map((_, k) => (k === 0 || k === CURSOR.length - 1 ? 0 : 1)) } : undefined}
             transition={{ duration: CURSOR[CURSOR.length - 1].t - CURSOR[0].t, times: CURSOR.map((p) => (p.t - CURSOR[0].t) / (CURSOR[CURSOR.length - 1].t - CURSOR[0].t)), ease: "easeInOut", delay: CURSOR[0].t }}
           >
-            <path d="M0 0 l0 26 l7 -6 l5.5 11.5 l4.5 -2.2 l-5.5 -11.5 l9.5 0 z" fill={INK} stroke="#0f0f0f" strokeWidth={1.4} strokeLinejoin="round" />
+            <path d="M0 0 l0 26 l7 -6 l5.5 11.5 l4.5 -2.2 l-5.5 -11.5 l9.5 0 z" fill={INK} stroke="#16171a" strokeWidth={1.4} strokeLinejoin="round" />
           </motion.g>
         )}
       </svg>

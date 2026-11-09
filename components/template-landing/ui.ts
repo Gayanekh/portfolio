@@ -21,8 +21,8 @@ export const pad = (n: number) => String(n).padStart(2, "0");
 // hairlines, --card a raised surface, --dot the halftone, --accent one signal
 // colour, --warm the warm off-white some sections sit on.
 export const themes = {
-  light: "[--bg:#ffffff] [--warm:#ffffff] [--fg:#0d0d0d] [--dim:#6b6b6b] [--line:rgb(13_13_13/0.11)] [--card:#e8e8e7] [--dot:rgb(13_13_13/0.28)] [--accent:#bb4e1c]",
-  dark: "[--bg:#0f0f0f] [--warm:#161616] [--fg:#efefed] [--dim:#7d7d7d] [--line:rgb(239_239_237/0.12)] [--card:#191919] [--dot:rgb(239_239_237/0.22)] [--accent:#d96a3a]",
+  light: "[--bg:#ffffff] [--warm:#ffffff] [--fg:#16171a] [--dim:#6b6b6b] [--line:rgb(22_23_26/0.11)] [--card:#e8e8e7] [--dot:rgb(22_23_26/0.28)] [--accent:#bb4e1c]",
+  dark: "[--bg:#16171a] [--warm:#16171a] [--fg:#efefed] [--dim:#7d7d7d] [--line:rgb(239_239_237/0.12)] [--card:#1f2024] [--dot:rgb(239_239_237/0.22)] [--accent:#d96a3a]",
 };
 
 // The page's frame: up to 1440px wide, centred, with a margin either side

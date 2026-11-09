@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { motion, useInView, useMotionValue, useReducedMotion, useSpring, type MotionValue } from "framer-motion";
+import { motion, useInView, useMotionValue, useSpring, type MotionValue } from "framer-motion";
 import { useField, useSectionId, useTemplate } from "../../core/context";
-import { FieldValue, number, pageSections } from "../panel-kit";
+import { FieldValue, number, pageSections, useStillAfterHydration } from "../panel-kit";
 
 // The shared look of the Nocturne sections: a near-black page with a fine
 // film grain, warm off-white text, one accent, a serif display face (with
@@ -65,7 +65,7 @@ export function Label({ field }: { field: string }) {
   const n = useNumber();
   const ref = useRef<HTMLDivElement>(null);
   const seen = useInView(ref, { once: true });
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   return (
     <div ref={ref} className={`flex items-center gap-4 ${type.label}`}>
       <span className="text-primary">[{n}]</span>
@@ -83,6 +83,8 @@ export function Label({ field }: { field: string }) {
   );
 }
 
+export { useStillAfterHydration };
+
 /* ---------- Type in motion ---------- */
 
 // Words between * and * set in the serif's italic, in the accent.
@@ -94,7 +96,7 @@ export function SplitTitle({ field, className = type.title, as: Tag = "h2", dela
   const { value, editing, node } = useField(field);
   const ref = useRef<HTMLHeadingElement>(null);
   const seen = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   if (editing) return <Tag className={`m-0 ${className}`}>{node}</Tag>;
   let i = 0;
   return (
@@ -128,7 +130,7 @@ export function SplitTitle({ field, className = type.title, as: Tag = "h2", dela
 
 // Fades up into place once in view.
 export function In({ delay = 0, y = 24, className, children }: { delay?: number; y?: number; className?: string; children: ReactNode }) {
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   return (
     <motion.div
       className={className}
@@ -150,7 +152,7 @@ export { useScrollProgress, useWide } from "../../core/viewport";
 
 // Tilts its content in 3D towards the pointer, a soft light following it.
 export function Tilt({ children, className = "", max = 8 }: { children: ReactNode; className?: string; max?: number }) {
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   const rx = useSpring(0, { stiffness: 150, damping: 18 });
   const ry = useSpring(0, { stiffness: 150, damping: 18 });
   const lx = useMotionValue(50);
@@ -211,7 +213,7 @@ function Shine({ x, y, on }: { x: MotionValue<number>; y: MotionValue<number>; o
 // Its content pulled a little towards the pointer while it is near, springing
 // back when it leaves.
 export function Magnetic({ children, strength = 0.35 }: { children: ReactNode; strength?: number }) {
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   const x = useSpring(0, { stiffness: 180, damping: 14 });
   const y = useSpring(0, { stiffness: 180, damping: 14 });
   return (

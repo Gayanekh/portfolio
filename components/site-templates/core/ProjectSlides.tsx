@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { motion, useInView, useMotionValue, useReducedMotion, useSpring, useTransform, useVelocity, type MotionValue } from "framer-motion";
+import { motion, useInView, useMotionValue, useSpring, useTransform, useVelocity, type MotionValue } from "framer-motion";
+import { useStillAfterHydration } from "./motion";
 import { ArrowButton } from "./blocks";
 import { useField } from "./context";
 import { scrollParent, viewOf } from "./scroll";
@@ -316,7 +317,7 @@ export function ProjectSlide({ fields, side = "start", shape }: { fields: string
   const ref = useRef<HTMLElement>(null);
   const { progress, top } = useViewPosition(ref);
   const inView = useInView(ref, { amount: 0.45 });
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useStillAfterHydration();
   const still = Boolean(reduceMotion);
   const shown = still || inView;
   // The image stays revealed while any of the project is on screen, and

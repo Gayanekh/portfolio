@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { useStillAfterHydration } from "../../core/motion";
 import { ArrowUpRight } from "lucide-react";
 import { FieldPicture } from "../../core/blocks";
 import { useField, useTemplate } from "../../core/context";
@@ -126,7 +127,7 @@ export default function ShowcaseWork({ projects }: { projects: number[] }) {
 
 // The pictures of every project stacked, the one in focus shown.
 function Viewfinder({ projects, active }: { projects: number[]; active: number }) {
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   return (
     <div className="relative aspect-[4/5] overflow-hidden rounded-[4px] bg-foreground/10">
       {projects.map((n, i) => (

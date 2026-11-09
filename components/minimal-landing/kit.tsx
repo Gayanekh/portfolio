@@ -50,7 +50,7 @@ export function Reveal({ children, className, delay = 0 }: { children: ReactNode
 export function Title({ italic, word: big, id, tone = "ink" }: { italic: string; word: string; id?: string; tone?: "ink" | "paper" }) {
   return (
     <Reveal className="text-center">
-      <h2 id={id} className={`m-0 flex flex-col items-center ${tone === "ink" ? "text-[#0f0f0f]" : "text-[#f8f7f6]"}`}>
+      <h2 id={id} className={`m-0 flex flex-col items-center ${tone === "ink" ? "text-[#16171a]" : "text-[#f8f7f6]"}`}>
         <span className={`${serif} text-[clamp(3rem,6vw,4.25rem)] leading-[0.9] tracking-[-0.04em]`}>{italic}</span>
         <span className={`${caps} text-[clamp(3rem,6vw,4rem)] leading-[1.1]`}>{big}</span>
       </h2>

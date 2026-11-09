@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useMotionValue, useReducedMotion, useSpring, useTransform, type MotionValue } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform, type MotionValue } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { FieldPicture } from "../../core/blocks";
 import { useField, useTemplate } from "../../core/context";
-import { FieldValue, Frame, gutter, Label, SplitTitle, type, useScrollProgress, useWide } from "./kit";
+import { FieldValue, Frame, gutter, Label, SplitTitle, type, useScrollProgress, useWide, useStillAfterHydration } from "./kit";
 
 // Selected work: a horizontal gallery pinned while the page scrolls. The
 // introduction first, then one tall card per project sliding in from the
@@ -23,7 +23,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
 
 export default function NocturneWork({ works }: { works: number[] }) {
   const { edit } = useTemplate();
-  const still = Boolean(useReducedMotion());
+  const still = Boolean(useStillAfterHydration());
   const ref = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const wide = useWide(ref);

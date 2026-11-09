@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Shuffle } from "lucide-react";
 import { StyleChips, other, useStageScale } from "@/components/landing/Styler";
@@ -13,20 +13,7 @@ import { DESIGN } from "@/components/template-landing/content";
 import Label from "@/components/template-landing/Label";
 import Button from "@/components/template-landing/Button";
 import { ease, frame, serif } from "@/components/template-landing/ui";
-
-// Wide screens preview the template's desktop layout; phones its phone layout.
-const WIDE = "(min-width: 1024px)";
-const subscribeWide = (onChange: () => void) => {
-  const query = window.matchMedia(WIDE);
-  query.addEventListener("change", onChange);
-  return () => query.removeEventListener("change", onChange);
-};
-const useWide = () =>
-  useSyncExternalStore(
-    subscribeWide,
-    () => window.matchMedia(WIDE).matches,
-    () => true,
-  );
+import useWide from "@/components/template-landing/useWide";
 
 // The heading, in Features' manner: two lines, the last word in the serif italic.
 const TITLE = [
@@ -44,6 +31,7 @@ const TITLE = [
 export default function Design() {
   const [palette, setPalette] = useState(COLOR_PALETTES[0].id);
   const [font, setFont] = useState(FONT_PACKS[0].id);
+  // Wide screens preview the template's desktop layout; phones its phone layout.
   const wide = useWide();
   const stageRef = useStageScale();
   const template = getTemplateDetail(DESIGN.template);
@@ -105,12 +93,12 @@ export default function Design() {
                 <span aria-hidden="true" className="absolute inset-x-[14%] top-0 -z-10 hidden h-8 -translate-y-1/3 rounded-full bg-black/[0.05] blur-2xl lg:block" />
                 <span aria-hidden="true" className="absolute inset-x-[12%] bottom-0 -z-10 hidden h-10 translate-y-1/3 rounded-full bg-black/[0.09] blur-2xl lg:block" />
                 {/* The template is a picture here, not a page: it does not take the scroll (or clicks) from the page; the pickers restyle it. */}
-                <div className="relative w-full text-[#1a1a1a]">
+                <div className="relative w-full text-[#16171a]">
                   <PreviewFrame template={template} device={wide ? "desktop" : "mobile"} palette={palette} font={font} fill fillPhone still height={wide ? fit.previewDesktop : fit.previewHeight} />
                   <StyleChips palette={palette} font={font} onPalette={setPalette} onFont={setFont} accent={signature(activePalette)} />
                 </div>
               </div>
-              <div className="absolute right-0 top-1/2 z-10 hidden w-[21rem] origin-right -translate-y-1/2 scale-[var(--s,1)] flex-col gap-4 text-[#1a1a1a] xl:flex">
+              <div className="absolute right-0 top-1/2 z-10 hidden w-[21rem] origin-right -translate-y-1/2 scale-[var(--s,1)] flex-col gap-4 text-[#16171a] xl:flex">
                 <PaletteCard value={palette} onChange={setPalette} mark="tl-design-palette" />
                 <FontCard value={font} onChange={setFont} accent={signature(activePalette)} mark="tl-design-font" />
               </div>

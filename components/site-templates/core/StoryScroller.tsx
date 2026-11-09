@@ -1,7 +1,8 @@
 "use client";
 
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { useStillAfterHydration } from "./motion";
 import { glideTo, scrollParent, viewOf } from "./scroll";
 
 // A story in one screen: the media on the right never moves, and the text on
@@ -42,7 +43,7 @@ export default function StoryScroller({ panels, media }: { panels: StoryPanel[];
   const [inPlace, setInPlace] = useState(false);
   // Panels move into place without animation until the first change asked for.
   const [moving, setMoving] = useState(false);
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useStillAfterHydration();
 
   // Show a panel; below the desktop layout, also glide down to it.
   const show = (index: number) => {

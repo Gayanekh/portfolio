@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, type ReactNode } from "react";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
+import { useStillAfterHydration } from "../../core/motion";
 import { FieldPicture } from "../../core/blocks";
 import { useField, useSectionId, useTemplate } from "../../core/context";
 import { ease, FieldValue, number, pageSections, Rise } from "../panel-kit";
@@ -105,7 +106,7 @@ export function Title({ field, as: Tag = "h2", className = type.title, delay = 0
   const { value, editing, node } = useField(field);
   const ref = useRef<HTMLHeadingElement>(null);
   const seen = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
-  const still = Boolean(useReducedMotion());
+  const still = Boolean(useStillAfterHydration());
   if (editing) return <Tag className={`m-0 ${className}`}>{node}</Tag>;
   const shown = seen || still;
   const total = value.split(/\s+/).length;
@@ -152,7 +153,7 @@ export function Letters({ field, className = "", delay = 0 }: { field: string; c
   const { value, editing, node } = useField(field);
   const ref = useRef<HTMLSpanElement>(null);
   const seen = useInView(ref, { once: true, margin: "0px 0px -5% 0px" });
-  const still = Boolean(useReducedMotion());
+  const still = Boolean(useStillAfterHydration());
   if (editing) return <span className={className}>{node}</span>;
   return (
     <span ref={ref} aria-hidden="true" className={`-mb-[0.1em] overflow-hidden pb-[0.1em] ${className}`}>
@@ -195,7 +196,7 @@ export function Roll({ children }: { children: ReactNode }) {
 // and for reduced motion, it is simply there.
 export function Window({ field, alt = "", className = "", priority, children }: { field: string; alt?: string; className?: string; priority?: boolean; children?: ReactNode }) {
   const { edit } = useTemplate();
-  const still = Boolean(useReducedMotion()) || Boolean(edit);
+  const still = Boolean(useStillAfterHydration()) || Boolean(edit);
   const viewport = { once: true, margin: "0px 0px -12% 0px" };
   return (
     <motion.div

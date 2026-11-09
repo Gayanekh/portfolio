@@ -163,7 +163,7 @@ export default function Header({ base = "", sections = true, width = frame }: { 
       <AnimatePresence>
         {open && (
           <>
-            <motion.div key="veil" aria-hidden="true" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5, ease }} onClick={() => setOpen(false)} className="fixed inset-0 z-[60] bg-[rgb(13_13_13/0.12)]" />
+            <motion.div key="veil" aria-hidden="true" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5, ease }} onClick={() => setOpen(false)} className="fixed inset-0 z-[60] bg-[rgb(22_23_26/0.12)]" />
             <motion.nav
               key="panel"
               id="template-landing-menu"
@@ -172,21 +172,21 @@ export default function Header({ base = "", sections = true, width = frame }: { 
               animate={{ x: "0%" }}
               exit={{ x: "100%" }}
               transition={{ duration: 0.6, ease: [0.76, 0, 0.24, 1] }}
-              className="fixed inset-y-0 right-0 z-[70] flex w-full max-w-[24rem] flex-col border-0 border-l border-solid border-[rgb(13_13_13/0.08)] bg-[#f3f3f1] px-8 pb-8 pt-8 text-[#0d0d0d] shadow-[-24px_0_60px_-30px_rgb(0_0_0/0.25)] max-sm:px-6"
+              className="fixed inset-y-0 right-0 z-[70] flex w-full max-w-[24rem] flex-col border-0 border-l border-solid border-[rgb(22_23_26/0.08)] bg-[#f3f3f1] px-8 pb-8 pt-8 text-[#16171a] shadow-[-24px_0_60px_-30px_rgb(0_0_0/0.25)] max-sm:px-6"
             >
               <div className="flex items-center justify-between">
                 <Link href="/" aria-label="Portory home" onClick={() => setOpen(false)} className={`${focusRing} rounded-[4px]`}>
-                  <Logo className="h-7 w-auto !text-[#0d0d0d]" title={null} />
+                  <Logo className="h-7 w-auto !text-[#16171a]" title={null} />
                 </Link>
-                <button type="button" aria-label="Close menu" onClick={() => setOpen(false)} className={`${focusRing} grid size-10 cursor-pointer place-items-center rounded-[4px] border-0 bg-transparent p-0 text-[#0d0d0d]`}>
+                <button type="button" aria-label="Close menu" onClick={() => setOpen(false)} className={`${focusRing} grid size-10 cursor-pointer place-items-center rounded-[4px] border-0 bg-transparent p-0 text-[#16171a]`}>
                   <X aria-hidden="true" className="size-5" strokeWidth={1.5} />
                 </button>
               </div>
 
               <ul className="m-0 mt-auto flex list-none flex-col p-0">
                 {NAV.map((link, i) => (
-                  <motion.li key={link.href} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease, delay: 0.25 + i * 0.05 }} className="border-0 border-t border-solid border-[rgb(13_13_13/0.11)] last:border-b">
-                    <a href={base + link.href} onClick={() => setOpen(false)} className={`${focusRing} group block rounded-[4px] py-3 text-[clamp(1.625rem,2vw,1.875rem)] font-normal leading-[1.2] tracking-[-0.03em] text-[#0d0d0d] no-underline`}>
+                  <motion.li key={link.href} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease, delay: 0.25 + i * 0.05 }} className="border-0 border-t border-solid border-[rgb(22_23_26/0.11)] last:border-b">
+                    <a href={base + link.href} onClick={() => setOpen(false)} className={`${focusRing} group block rounded-[4px] py-3 text-[clamp(1.625rem,2vw,1.875rem)] font-normal leading-[1.2] tracking-[-0.03em] text-[#16171a] no-underline`}>
                       <Roll text={link.label} />
                     </a>
                   </motion.li>
@@ -197,13 +197,13 @@ export default function Header({ base = "", sections = true, width = frame }: { 
                 <Link
                   href={START.href}
                   onClick={() => setOpen(false)}
-                  className={`${focusRing} grid h-12 place-items-center rounded-[10px] border border-solid border-[#0d0d0d] bg-transparent text-[1rem] font-medium text-[#0d0d0d] no-underline transition-colors duration-300 hover:bg-[#0d0d0d] hover:text-[#f3f3f1]`}
+                  className={`${focusRing} grid h-12 place-items-center rounded-[10px] border border-solid border-[#16171a] bg-transparent text-[1rem] font-medium text-[#16171a] no-underline transition-colors duration-300 hover:bg-[#16171a] hover:text-[#f3f3f1]`}
                 >
                   {START.label}
                 </Link>
               </motion.div>
 
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, ease, delay: 0.5 }} className="mt-auto pt-10 text-[0.9375rem] [--dim:#6b6b6b] [--fg:#0d0d0d]">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, ease, delay: 0.5 }} className="mt-auto pt-10 text-[0.9375rem] [--dim:#6b6b6b] [--fg:#16171a]">
                 <Account menu onPick={() => setOpen(false)} />
               </motion.div>
             </motion.nav>

@@ -1,13 +1,6 @@
-import type { Metadata } from "next";
-import { ContactSection, Faq } from "@/components/gayane/sections";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Contact" };
-
-export default function GayaneContactPage() {
-  return (
-    <div className="pt-[clamp(4.5rem,7vw,6rem)]">
-      <ContactSection />
-      <Faq />
-    </div>
-  );
+// The portfolio is one page now (the Nocturne template); earlier links land on it.
+export default function GayaneSubPage() {
+  redirect("/gayane-khachatryan");
 }

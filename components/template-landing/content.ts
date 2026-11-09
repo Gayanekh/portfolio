@@ -49,13 +49,19 @@ const COVER_PHOTOS: Record<string, { src: string; ground: string; focus: string;
   // `ground`: the picture's own side-edge colour (shown while it loads). The user's covers are
   // all made at 2000 × 1870, the cards' own shape, so each fills its card edge to
   // edge (`fill`), uncropped where the card is that shape.
-  gallery: { src: "/images/landing-covers/gallery-cover.webp", ground: "#e3e5e6", focus: "50% 50%", fill: true },
-  signature: { src: "/images/landing-covers/minimal-cover.webp", ground: "#f3f3f3", focus: "50% 50%", fill: true },
-  nocturne: { src: "/images/landing-covers/nocturne-cover.webp", ground: "#a0a0a0", focus: "50% 50%", fill: true },
-  showcase: { src: "/images/landing-covers/showcase-cover-d.webp", ground: "#eeeeec", focus: "50% 50%", fill: true },
-  exhibition: { src: "/images/landing-covers/exhibition-cover.webp", ground: "#ecedea", focus: "50% 50%", fill: true },
+  // Gallery's cover, like Showcase's and Nocturne's, has room around its frame for the stronger 20% movement.
+  gallery: { src: "/images/landing-covers/gallery-cover-c.webp", ground: "#9e6266", focus: "50% 50%", fill: true, extra: 20 },
+  // Minimal's cover takes the stronger 20% movement too, as the other new covers.
+  signature: { src: "/images/landing-covers/minimal-cover-c.webp", ground: "#efede9", focus: "50% 50%", fill: true, extra: 20 },
+  // Nocturne's cover, like Showcase's, has room around its frame for the stronger 20% movement (the user asked).
+  nocturne: { src: "/images/landing-covers/nocturne-cover-b.webp", ground: "#161616", focus: "50% 50%", fill: true, extra: 20 },
+  // Showcase's cover has room around its window for the stronger 20% movement (the user asked).
+  showcase: { src: "/images/landing-covers/showcase-cover-e.webp", ground: "#182c57", focus: "50% 50%", fill: true, extra: 20 },
+  // Exhibition's cover takes the stronger 20% movement too, as the other new covers.
+  exhibition: { src: "/images/landing-covers/exhibition-cover-b.webp", ground: "#1c2f3c", focus: "50% 50%", fill: true, extra: 20 },
   // Persona's cover is the user's earlier one, near square like the cards (filled too).
-  persona: { src: "/images/landing-covers/persona-2026-11c.webp", ground: "#d6d2cf", focus: "50% 50%", fill: true },
+  // Persona's cover takes the stronger 20% movement too, as Showcase's, Nocturne's and Gallery's.
+  persona: { src: "/images/landing-covers/persona-cover-c.webp", ground: "#7d7d7d", focus: "50% 50%", fill: true, extra: 20 },
 };
 
 export const GRID = {

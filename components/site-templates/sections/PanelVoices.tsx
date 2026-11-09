@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { AnimatePresence, motion, useAnimationFrame, useMotionValue, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useAnimationFrame, useMotionValue } from "framer-motion";
+import { useStillAfterHydration } from "../core/motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { FieldPicture } from "../core/blocks";
 import { useTemplate } from "../core/context";
@@ -38,7 +39,7 @@ const place = {
 
 export default function PanelVoices({ voices }: { voices: number[] }) {
   const { edit } = useTemplate();
-  const still = Boolean(useReducedMotion());
+  const still = Boolean(useStillAfterHydration());
   const auto = !still && !edit;
   const [{ index, direction }, setState] = useState({ index: 0, direction: 1 });
   const [paused, setPaused] = useState(false);

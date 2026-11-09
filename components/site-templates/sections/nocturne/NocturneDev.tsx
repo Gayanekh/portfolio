@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useInView, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useInView } from "framer-motion";
 import { Check, LoaderCircle } from "lucide-react";
-import { ease, FieldValue, Frame, gutter, In, Label, SplitTitle, type } from "./kit";
+import { ease, FieldValue, Frame, gutter, In, Label, SplitTitle, type, useStillAfterHydration } from "./kit";
 
 // Development: the title, a few words and the principles; beside them a code
 // editor that types a component out line by line once in view (its words in
@@ -43,7 +43,7 @@ const STATES = ["idle", "loading", "done"] as const;
 function Editor() {
   const ref = useRef<HTMLDivElement>(null);
   const seen = useInView(ref, { once: true, margin: "0px 0px -20% 0px" });
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   const [state, setState] = useState(0);
   useEffect(() => {
     if (still) return;

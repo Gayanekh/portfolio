@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion, useTransform } from "framer-motion";
+import { AnimatePresence, motion, useTransform } from "framer-motion";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { FieldPicture } from "../../core/blocks";
 import { readField } from "../../core/content";
 import { useSectionId, useTemplate } from "../../core/context";
 import { plainText } from "../../core/rich-format";
-import { ease, FieldValue, Frame, gutter, In, Label, soft, SplitTitle, type, useScrollProgress, useWide } from "./kit";
+import { ease, FieldValue, Frame, gutter, In, Label, soft, SplitTitle, type, useScrollProgress, useWide, useStillAfterHydration } from "./kit";
 
 // Photography, as a contact sheet: the title and a few words beside two
 // figures, then the photographs in three columns that drift at different
@@ -26,7 +26,7 @@ const SHAPES = ["aspect-[4/5]", "aspect-[3/4]", "aspect-square", "aspect-[3/4]",
 export default function NocturnePhoto({ photos }: { photos: number[] }) {
   const { content, edit } = useTemplate();
   const section = useSectionId();
-  const still = Boolean(useReducedMotion());
+  const still = Boolean(useStillAfterHydration());
   const ref = useRef<HTMLDivElement>(null);
   const wide = useWide(ref);
   const moving = wide && !still && !edit;

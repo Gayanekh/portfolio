@@ -2,7 +2,8 @@
 
 import { useRef, useState, type ButtonHTMLAttributes, type MouseEvent, type ReactNode } from "react";
 import { cva, type VariantProps } from "class-variance-authority";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
+import { useStillAfterHydration } from "./motion";
 import { Plus, X } from "lucide-react";
 import Tooltip from "@/components/ui/tooltip";
 import { Moved } from "./Arranged";
@@ -261,7 +262,7 @@ export function Reveal({ effect = "rise", delay = 0, children }: { effect?: "ris
   // The frame is watched, not the content: content hidden behind the mask
   // edge never counts as in view.
   const frameInView = useInView(frameRef, { once: true });
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useStillAfterHydration();
   if (reduceMotion) return <div>{children}</div>;
 
   if (effect === "mask") {
@@ -496,7 +497,7 @@ export function Band({ children, tone, height }: { children: ReactNode } & Varia
 // "Have a project in mind? ——→ Say hello". The link's address is the field
 // `hrefField`, through `href` if given (such as an email into a mail link).
 export function ArrowLead({ field, linkField, hrefField, href: toHref }: { field: string; linkField: string; hrefField: string; href?: (value: string) => string }) {
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   const lead = useField(field).node;
   const { node, editing } = useField(linkField);
   const target = useField(hrefField).value;
@@ -545,7 +546,7 @@ export function RoundLink({ field, labelField, hrefField }: { field: string; lab
 // A thin line between items. With `draw`, it draws itself from the left
 // once it comes into view.
 export function Rule({ draw = false }: { draw?: boolean }) {
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   if (!draw || still) return <hr className="m-0 border-0 border-t border-foreground/10" />;
   return (
     <motion.hr
@@ -573,7 +574,7 @@ const accentBand = cva("relative", {
 // The PosterHero's accent band, as a closing mark: it sweeps in from the
 // right once in view, a small black square at its start.
 export function AccentBand(variants: VariantProps<typeof accentBand>) {
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   const inset = variants.reach === "inset";
   return (
     <div aria-hidden="true" className={accentBand(variants)}>

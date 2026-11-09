@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
-import { AnimatePresence, motion, useAnimationFrame, useInView, useMotionValue, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useAnimationFrame, useInView, useMotionValue } from "framer-motion";
+import { useStillAfterHydration } from "../core/motion";
+export { useStillAfterHydration };
 import { Menu } from "../core/blocks";
 import { inMenu } from "../core/content";
 import { useField, useSectionId, useTemplate } from "../core/context";
@@ -94,7 +96,7 @@ const titleSize = {
 export function PanelTitle({ field, size = "section", delay = 0 }: { field: string; size?: keyof typeof titleSize; delay?: number }) {
   const ref = useRef<HTMLDivElement>(null);
   const seen = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   return (
     <div ref={ref} className="-mb-[0.1em] overflow-hidden pb-[0.1em]">
       <motion.h2
@@ -111,7 +113,7 @@ export function PanelTitle({ field, size = "section", delay = 0 }: { field: stri
 
 // Fades and drifts in once in view: up by default, or in from a side (`x`).
 export function Rise({ delay = 0, x = 0, className, children }: { delay?: number; x?: number; className?: string; children: ReactNode }) {
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   return (
     <motion.div
       className={className}
@@ -130,7 +132,7 @@ export function Rise({ delay = 0, x = 0, className, children }: { delay?: number
 export function Sweep({ from = "bottom", delay = 0, className = "", children }: { from?: "bottom" | "right" | "left"; delay?: number; className?: string; children: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const seen = useInView(ref, { once: true, margin: "0px 0px -12% 0px" });
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   const closed = { bottom: "inset(100% 0% 0% 0%)", right: "inset(0% 0% 0% 100%)", left: "inset(0% 100% 0% 0%)" }[from];
   const open = seen || still;
   return (
@@ -139,9 +141,9 @@ export function Sweep({ from = "bottom", delay = 0, className = "", children }: 
         className="absolute inset-0 overflow-hidden"
         initial={still ? false : { clipPath: closed }}
         animate={{ clipPath: open ? "inset(0% 0% 0% 0%)" : closed }}
-        transition={{ duration: 1.2, ease: soft, delay }}
+        transition={still ? { duration: 0 } : { duration: 1.2, ease: soft, delay }}
       >
-        <motion.div className="absolute inset-0" initial={still ? false : { scale: 1.15 }} animate={{ scale: open ? 1 : 1.15 }} transition={{ duration: 1.8, ease, delay }}>
+        <motion.div className="absolute inset-0" initial={still ? false : { scale: 1.15 }} animate={{ scale: open ? 1 : 1.15 }} transition={still ? { duration: 0 } : { duration: 1.8, ease, delay }}>
           {children}
         </motion.div>
       </motion.div>
@@ -189,7 +191,7 @@ export function CountUp({ field, className }: { field: string; className: string
   const ref = useRef<HTMLSpanElement>(null);
   const { value, editing, node } = useField(field);
   const seen = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   const [shown, setShown] = useState<string | null>(null);
   const match = value.match(/^(\D*)(\d+)(.*)$/);
 
@@ -233,7 +235,7 @@ export function Marquee({ children, speed = 50, className = "" }: { children: Re
   const x = useMotionValue(0);
   const rate = useRef(1);
   const [hovered, setHovered] = useState(false);
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   const editing = Boolean(useTemplate().edit);
   const moving = !still && !editing;
   // Off the screen it does nothing: reading its width every frame slows the page around it.

@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useReducedMotion, useTransform } from "framer-motion";
+import { motion, useTransform } from "framer-motion";
+import { useStillAfterHydration } from "../../core/motion";
 import { FieldPicture } from "../../core/blocks";
 import { useField, useTemplate } from "../../core/context";
 import { useScrollProgress } from "../../core/viewport";
@@ -19,7 +20,7 @@ import { Aside, Dot, FieldValue, Frame, gutter, Letters, Rise, Title, type } fro
 
 export default function ShowcaseHero({ roles }: { roles: number[] }) {
   const { edit } = useTemplate();
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   const first = useField("first").value;
   const last = useField("last").value;
   const windowRef = useRef<HTMLDivElement>(null);

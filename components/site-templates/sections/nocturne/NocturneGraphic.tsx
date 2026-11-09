@@ -1,8 +1,8 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { FieldPicture } from "../../core/blocks";
-import { FieldValue, Frame, gutter, In, Label, SplitTitle, Tilt, type } from "./kit";
+import { FieldValue, Frame, gutter, In, Label, SplitTitle, Tilt, type, useStillAfterHydration } from "./kit";
 
 // Graphic design: the title and a few words, then four pieces made in code,
 // in a staggered grid, each tilting towards the pointer with a sheen: a
@@ -18,7 +18,7 @@ const art = "relative h-full w-full overflow-hidden rounded-[3px]";
 
 // A festival poster: the accent, rings, a huge italic word and print details.
 function Poster() {
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   return (
     <div className={`${art} bg-primary text-card`}>
       {[78, 58, 38].map((size, i) => (

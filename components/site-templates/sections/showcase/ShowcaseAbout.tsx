@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useReducedMotion, useTransform } from "framer-motion";
+import { motion, useTransform } from "framer-motion";
+import { useStillAfterHydration } from "../../core/motion";
 import { useField, useTemplate } from "../../core/context";
 import { useScrollProgress } from "../../core/viewport";
 import { Aside, FieldValue, Frame, gutter, Label, Rise, space, Title, type, Window } from "./kit";
@@ -61,7 +62,7 @@ export default function ShowcaseAbout({ facts, jobs }: { facts: number[]; jobs: 
 // The jobs, newest first, along a line drawing itself down with the scroll.
 function Timeline({ jobs }: { jobs: number[] }) {
   const { edit } = useTemplate();
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   const ref = useRef<HTMLOListElement>(null);
   const progress = useScrollProgress(ref);
   const drawn = useTransform(progress, [0.2, 0.65], [0, 1]);
