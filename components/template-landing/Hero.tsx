@@ -1,8 +1,9 @@
 "use client";
 
 import { MotionConfig, motion } from "motion/react";
-import { HERO, TEMPLATES } from "@/components/new-landing/content";
-import Cover from "@/components/other-landing/Cover";
+import { HERO } from "@/components/new-landing/content";
+import { GRID } from "@/components/template-landing/content";
+import HeroCrossfade from "@/components/template-landing/HeroCrossfade";
 import Button from "@/components/template-landing/Button";
 import { ease, frame, serif } from "@/components/template-landing/ui";
 
@@ -12,8 +13,13 @@ const LINE = "Your website, already designed.";
 const WORDS = { lead: "Your website,", top: "already", bottom: "designed." };
 const SENTENCE = "Pick a template made for your kind of work, make it yours and publish it at portory.net/you.";
 const START_LINK = HERO.primary;
-// The picture: the Exhibition template's cover (/other-landing's design).
-const PICTURE = TEMPLATES.find((template) => template.id === "exhibition") ?? TEMPLATES[0];
+// The picture: the templates section's cover pictures in a crossfade (the user asked; see HeroCrossfade).
+// In the user's order: Exhibition, Gallery, Nocturne, Showcase, Persona, Minimal.
+const ORDER = ["exhibition", "gallery", "nocturne", "showcase", "persona", "signature"];
+const SLIDES = ORDER.flatMap((id) => {
+  const item = GRID.items.find((entry) => entry.id === id);
+  return item?.photo ? [{ src: item.photo.src, name: item.name, ground: item.photo.ground, focus: item.photo.focus }] : [];
+});
 // When the hero's words come in (the loading screen before them was removed).
 const START = 0.15;
 
@@ -84,8 +90,8 @@ export default function Hero() {
               (the user asked that it never look stretched): it grows with the row's
               width up to 42% of the screen's height, then stays that size at the right. */}
           {/* It wipes open from the bottom up (the user asked). */}
-          <motion.span initial={{ clipPath: "inset(100% 0 0 0 round 10px)" }} animate={{ clipPath: "inset(0% 0 0 0 round 10px)" }} transition={{ duration: 1.2, ease, delay: AT.picture }} className="relative block aspect-[12/5] w-full overflow-hidden rounded-[10px] [--cover-zoom:1.45] md:ml-auto md:max-h-[42svh] md:w-auto md:max-w-[calc(42svh*2.4)] md:flex-1">
-            <Cover src={PICTURE.image} name={PICTURE.name} shape="fill" drift />
+          <motion.span initial={{ clipPath: "inset(100% 0 0 0 round 10px)" }} animate={{ clipPath: "inset(0% 0 0 0 round 10px)" }} transition={{ duration: 1.2, ease, delay: AT.picture }} className="relative block aspect-[12/5] w-full overflow-hidden rounded-[10px] md:ml-auto md:max-h-[42svh] md:w-auto md:max-w-[calc(42svh*2.4)] md:flex-1">
+            <HeroCrossfade slides={SLIDES} />
           </motion.span>
         </span>
       </h1>
