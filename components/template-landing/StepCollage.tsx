@@ -34,9 +34,9 @@ const LAYOUTS = [
 // (the highlight; the user asked, as white vanished on the white page), the
 // page's grey card, and dark.
 const SKINS = [
-  "bg-[color-mix(in_srgb,var(--accent)_10%,#fff)] text-[#0d0d0d]",
-  "bg-[var(--card)] text-[#0d0d0d]",
-  "bg-[#141414] text-[#efefed]",
+  "bg-[color-mix(in_srgb,var(--accent)_10%,#fff)] text-[#16171a]",
+  "bg-[var(--card)] text-[#16171a]",
+  "bg-[#16171a] text-[#efefed]",
 ];
 
 export default function StepCollage({ step, className = "" }: { step: number; className?: string }) {

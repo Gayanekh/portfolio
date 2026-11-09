@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
+import { useStillAfterHydration } from "../../core/motion";
 import { useField, useSectionId, useTemplate } from "../../core/context";
 import { FieldValue, number, pageSections } from "../panel-kit";
 
@@ -68,7 +69,7 @@ export function Label({ field }: { field: string }) {
   const n = useNumber();
   const ref = useRef<HTMLDivElement>(null);
   const seen = useInView(ref, { once: true });
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   return (
     <div ref={ref} className={`flex items-center gap-3 ${type.label}`}>
       <span className="grid h-6 min-w-6 place-items-center rounded-full bg-foreground px-1.5 text-[10px] text-card">{n}</span>
@@ -91,7 +92,7 @@ export function Label({ field }: { field: string }) {
 function Marked({ children, delay }: { children: ReactNode; delay: number }) {
   const ref = useRef<HTMLSpanElement>(null);
   const seen = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   return (
     <span ref={ref} className="relative inline-block whitespace-nowrap text-primary">
       {children}
@@ -117,7 +118,7 @@ export function Title({ field, className = type.title, as: Tag = "h2" }: { field
   const { value, editing, node } = useField(field);
   const ref = useRef<HTMLHeadingElement>(null);
   const seen = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   if (editing) return <Tag className={`m-0 ${className}`}>{node}</Tag>;
   let at = 0;
   const word = (text: string, key: string) => {
@@ -155,7 +156,7 @@ export function Title({ field, className = type.title, as: Tag = "h2" }: { field
 
 // Fades up into place once in view.
 export function In({ delay = 0, y = 22, className, children }: { delay?: number; y?: number; className?: string; children: ReactNode }) {
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   return (
     <motion.div
       className={className}

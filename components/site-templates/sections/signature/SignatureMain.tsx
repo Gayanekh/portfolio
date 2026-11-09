@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { useStillAfterHydration } from "../../core/motion";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { FieldPicture } from "../../core/blocks";
 import { useField, useSectionId, useTemplate } from "../../core/context";
@@ -31,7 +32,7 @@ const FAN = [
 export function Intro({ fan, workTarget, contactTarget }: { fan: number[]; workTarget: string; contactTarget: string }) {
   const id = useSectionId();
   const { navigate } = useTemplate();
-  const still = Boolean(useReducedMotion());
+  const still = Boolean(useStillAfterHydration());
   const [open, setOpen] = useState(false);
   return (
     <section data-section={id} className={`relative overflow-x-clip bg-card text-foreground ${side}`}>
@@ -110,7 +111,7 @@ export function Intro({ fan, workTarget, contactTarget }: { fan: number[]; workT
 export function About({ stats }: { stats: number[] }) {
   const id = useSectionId();
   const { edit } = useTemplate();
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   const ref = useRef<HTMLDivElement>(null);
   const progress = useScrollProgress(ref);
   const y = useTransform(progress, [0, 1], still || edit ? ["0%", "0%"] : ["-10%", "10%"]);

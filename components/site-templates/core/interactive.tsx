@@ -1,7 +1,8 @@
 "use client";
 
 import { Children, useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
-import { AnimatePresence, motion, useAnimationFrame, useMotionValue, useReducedMotion, useSpring, useTransform, type MotionValue } from "framer-motion";
+import { AnimatePresence, motion, useAnimationFrame, useMotionValue, useSpring, useTransform, type MotionValue } from "framer-motion";
+import { useStillAfterHydration } from "./motion";
 import { FieldPicture } from "./blocks";
 import { useField, useMediaMeta, useTemplate } from "./context";
 import { scrollParent, viewOf } from "./scroll";
@@ -80,7 +81,7 @@ export function ScrollText({ field }: { field: string }) {
   const ref = useRef<HTMLParagraphElement>(null);
   const { value, editing, node } = useField(field);
   const progress = useReadProgress(ref);
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   const words = markedWords(value);
   const plain = words.map(({ word }) => word).join(" ");
   return (
@@ -115,7 +116,7 @@ function ExpandRow({ item, index, open, onToggle, editing }: { item: ExpandItem;
   const note = useField(item.note).node;
   const date = useField(item.date).node;
   const text = useField(item.text).node;
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   const id = `${item.title}-panel`;
   const line = (
     <>
@@ -188,7 +189,7 @@ export function Marquee({ children, speed = 60 }: { children: ReactNode; speed?:
   const trackRef = useRef<HTMLDivElement>(null);
   const x = useMotionValue(0);
   const [hovered, setHovered] = useState(false);
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   const editing = Boolean(useTemplate().edit);
   const moving = !still && !editing;
   const rate = useRef(1);
@@ -296,7 +297,7 @@ function Service({ card, index }: { card: ServiceCard; index: number }) {
   const name = useField(card.name);
   const imageHidden = useMediaMeta(card.image)?.hidden;
   const text = useField(card.text).node;
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   const ended = !name.value || /[.!?]$/.test(name.value);
   return (
     <motion.li
@@ -361,7 +362,7 @@ export function Stat({ field, labelField }: { field: string; labelField: string 
   const ref = useRef<HTMLDivElement>(null);
   const { value, editing, node } = useField(field);
   const label = useField(labelField).node;
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   const [shown, setShown] = useState<string | null>(null);
   const match = value.match(/^(\D*)(\d+)(.*)$/);
 
@@ -491,7 +492,7 @@ function IndexRow({
 // reduced motion, the rows simply follow one another.
 export function PinnedIndex({ heading, items }: { heading: ReactNode; items: IndexItem[] }) {
   const ref = useRef<HTMLDivElement>(null);
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   const editing = Boolean(useTemplate().edit);
   const desktop = useDesktop(ref);
   const moving = desktop && !still && !editing;
@@ -552,7 +553,7 @@ export function PinnedIndex({ heading, items }: { heading: ReactNode; items: Ind
 
 function NoteTile({ field, index }: { field: string; index: number }) {
   const text = useField(field).node;
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   return (
     <motion.li
       initial={still ? false : { opacity: 0, y: 36 }}

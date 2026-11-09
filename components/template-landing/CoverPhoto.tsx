@@ -67,7 +67,7 @@ export default function CoverPhoto({ src, name, shape, ground, focus, fit = fals
       fill
       sizes="(min-width: 768px) 60vw, 100vw"
       style={{ objectPosition: whole || (shape === "square" && !fit) ? focus : "50% 50%" }}
-      className={whole ? "relative object-cover" : contain ? `object-contain ${corner ? "!inset-y-[6%] !h-[88%] drop-shadow-[0_14px_24px_rgb(0_0_0/0.16)]" : ""}` : fit ? `object-contain ${shape === "banner" ? "[mask-image:linear-gradient(90deg,transparent_16%,black_27%,black_73%,transparent_84%)]" : "[mask-image:linear-gradient(transparent_19%,black_28%,black_72%,transparent_81%)]"}` : `object-cover ${shape === "wide" ? "scale-[1.06]" : ""}`}
+      className={whole ? "relative object-cover cover-zoom" : contain ? `object-contain ${corner ? "!inset-y-[6%] !h-[88%] drop-shadow-[0_14px_24px_rgb(0_0_0/0.16)]" : ""}` : fit ? `object-contain ${shape === "banner" ? "[mask-image:linear-gradient(90deg,transparent_16%,black_27%,black_73%,transparent_84%)]" : "[mask-image:linear-gradient(transparent_19%,black_28%,black_72%,transparent_81%)]"}` : `object-cover ${shape === "wide" ? "scale-[1.06]" : ""}`}
     />
   );
   // With `contain`, the band left of the picture is its own left edge stretched

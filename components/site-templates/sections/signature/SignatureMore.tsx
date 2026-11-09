@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useMotionValue, useReducedMotion, useTransform } from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, useTransform } from "framer-motion";
+import { useStillAfterHydration } from "../../core/motion";
 import { ArrowUp, ArrowUpRight, Check, Copy, Plus, Star } from "lucide-react";
 import { FieldPicture } from "../../core/blocks";
 import { readField } from "../../core/content";
@@ -38,7 +39,7 @@ export function Services({ services, items }: { services: number[]; items: numbe
   const { content, edit } = useTemplate();
   const section = useSectionId();
   const [open, setOpen] = useState(0);
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   return (
     <Frame>
       <Head label="label" title="title" intro="intro" />
@@ -157,7 +158,7 @@ export function Stack({ tools }: { tools: number[] }) {
 export function Experience({ jobs }: { jobs: number[] }) {
   const ref = useRef<HTMLOListElement>(null);
   const progress = useScrollProgress(ref);
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   const fill = useTransform(progress, [0.15, 0.75], [still ? 1 : 0, 1]);
   return (
     <Frame>

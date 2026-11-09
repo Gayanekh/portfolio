@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { ArrowDownRight } from "lucide-react";
 import { FieldPicture } from "../../core/blocks";
 import { useField, useTemplate } from "../../core/context";
-import { ease, FieldValue, Frame, type, useScrollProgress, useWide } from "./kit";
+import { ease, FieldValue, Frame, type, useScrollProgress, useStillAfterHydration, useWide } from "./kit";
 
 // The Nocturne opening, a full screen:
 //
@@ -32,7 +32,7 @@ const ROLE_HOLD = 2.6;
 // lean is not clipped.
 function Letters({ field, className, delay }: { field: string; className: string; delay: number }) {
   const { value, editing, node } = useField(field);
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   if (editing || still) return <span className={className}>{node}</span>;
   return (
     <span aria-label={value} className={className}>
@@ -49,7 +49,7 @@ function Letters({ field, className, delay }: { field: string; className: string
 
 export default function NocturneHero({ roles, targets }: { roles: number[]; targets: string[] }) {
   const { edit, navigate } = useTemplate();
-  const still = Boolean(useReducedMotion());
+  const still = Boolean(useStillAfterHydration());
   const ref = useRef<HTMLDivElement>(null);
   const lensRef = useRef<HTMLDivElement>(null);
   const wide = useWide(ref);

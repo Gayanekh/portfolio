@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState, type ReactNode } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { useStillAfterHydration } from "../core/motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { FieldPicture, Menu } from "../core/blocks";
 import { useField, useSectionId } from "../core/context";
@@ -103,12 +104,12 @@ function Piece({ direction, className, children }: { direction: number; classNam
 }
 
 // The huge title, rising from behind an edge.
-function Title({ field }: { field: string }) {
+function Title({ field, photoBackdrop = false }: { field: string; photoBackdrop?: boolean }) {
   return (
     <div className="-mb-[0.1em] overflow-hidden pb-[0.1em]">
       <motion.h1
         variants={{ out: { y: "105%" }, in: { y: "0%", transition: { duration: 1.1, ease } } }}
-        className="m-0 -ml-[0.04em] whitespace-nowrap font-display text-[length:clamp(4.5rem,17cqw,16.5rem)] font-bold leading-[0.82] tracking-[-0.06em]"
+        className={`m-0 -ml-[0.04em] ${photoBackdrop ? "whitespace-normal text-[length:clamp(3.5rem,11vw,10rem)] @xl:text-[length:clamp(5rem,10cqw,12rem)]" : "whitespace-nowrap text-[length:clamp(4.5rem,17cqw,16.5rem)]"} font-display font-bold leading-[0.9] tracking-[-0.06em]`}
       >
         <FieldValue field={field} />
       </motion.h1>
@@ -118,10 +119,10 @@ function Title({ field }: { field: string }) {
 
 /* ---------- The slider ---------- */
 
-export default function PanelSlider({ slides, aside }: { slides: number[]; aside?: ReactNode }) {
+export default function PanelSlider({ slides, aside, photoBackdrop = false }: { slides: number[]; aside?: ReactNode; photoBackdrop?: boolean }) {
   const id = useSectionId();
   const siteTitle = useField("siteTitle");
-  const still = Boolean(useReducedMotion());
+  const still = Boolean(useStillAfterHydration());
   const [open, setOpen] = useState(false);
   // The menu marks the section in view (none while the hero is).
   const ref = useRef<HTMLElement>(null);
@@ -145,20 +146,20 @@ export default function PanelSlider({ slides, aside }: { slides: number[]; aside
   const closed = direction > 0 ? "inset(0% 0% 0% 100%)" : "inset(0% 100% 0% 0%)";
 
   return (
-    <section ref={ref} data-section={id} aria-roledescription="carousel" aria-label={siteTitle.value} className={grid}>
-      <div className={place.panel} />
-      <div className={place.divider} />
+    <section ref={ref} data-section={id} aria-roledescription="carousel" aria-label={siteTitle.value} className={`${grid} ${photoBackdrop ? "min-h-[44rem]" : ""}`}>
+      <div className={photoBackdrop ? "hidden" : place.panel} />
+      <div className={photoBackdrop ? "hidden" : place.divider} />
 
-      <div className={place.title}>
+      <div className={`${place.title} ${photoBackdrop ? "relative z-20 text-card" : ""}`}>
         <div className="font-display text-[15px] font-bold tracking-[0.01em]">{siteTitle.node}</div>
       </div>
 
-      <div className={place.menu}>
+      <div className={`${place.menu} ${photoBackdrop ? "relative z-20 text-card" : ""}`}>
         <Menu size="small" active={active} />
       </div>
 
       {/* The menu button, and the current number under a thin line */}
-      <div className={place.accentTop}>
+      <div className={`${place.accentTop} ${photoBackdrop ? "relative z-20" : ""}`}>
         <button
           type="button"
           aria-label={open ? "Close menu" : "Open menu"}
@@ -186,8 +187,10 @@ export default function PanelSlider({ slides, aside }: { slides: number[]; aside
       </div>
 
       {/* The image: the last one under the new one sweeping over it */}
-      <div className={place.image}>
-        {moved && <Picture key={`under-${previous}`} field={`${prefix(previous)}Image`} label="" />}
+      <div className={photoBackdrop ? "absolute inset-0 z-0 overflow-hidden bg-foreground/[0.07]" : place.image}>
+        {moved && (photoBackdrop
+          ? <div className="absolute inset-[-4px] blur-[2px]"><Picture key={`under-${previous}`} field={`${prefix(previous)}Image`} label="" /></div>
+          : <Picture key={`under-${previous}`} field={`${prefix(previous)}Image`} label="" />)}
         <motion.div
           key={index}
           className="absolute inset-0 overflow-hidden"
@@ -201,13 +204,17 @@ export default function PanelSlider({ slides, aside }: { slides: number[]; aside
             animate={{ scale: 1 }}
             transition={TIMING.zoom}
           >
-            <Picture field={`${prefix(index)}Image`} label={title} />
+            <div className={photoBackdrop ? "absolute inset-[-4px] blur-[2px]" : "absolute inset-0"}>
+              <Picture field={`${prefix(index)}Image`} label={title} />
+            </div>
           </motion.div>
         </motion.div>
       </div>
 
+      {photoBackdrop && <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-[1] bg-black/30" />}
+
       {/* Back and next; on phones also where we are */}
-      <div className={place.controls}>
+      <div className={`${place.controls} ${photoBackdrop ? "relative z-20 text-card" : ""}`}>
         <span className="font-display text-sm font-bold @xl:hidden">
           <span className="text-primary">{number(index)}</span>
           <span className="text-muted-foreground"> / {number(count - 1)}</span>
@@ -223,7 +230,7 @@ export default function PanelSlider({ slides, aside }: { slides: number[]; aside
       </div>
 
       {/* The other numbers */}
-      <div className={place.accentBottom}>
+      <div className={`${place.accentBottom} ${photoBackdrop ? "relative z-20" : ""}`}>
         {slides.map((_, at) =>
           at === index ? null : (
             <button
@@ -240,34 +247,34 @@ export default function PanelSlider({ slides, aside }: { slides: number[]; aside
       </div>
 
       {/* The eyebrow and the huge title, across the panel and the middle */}
-      <div className={place.heading} aria-live="polite">
+      <div className={photoBackdrop ? "absolute left-1/2 top-[40%] z-10 w-full -translate-x-1/2 -translate-y-1/2 px-5 text-center text-card drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)] @xl:max-w-[88vw]" : place.heading} aria-live="polite">
         <SlideText index={index} direction={direction} moved={moved} still={still}>
           <Piece direction={direction}>
-            <div className="text-[length:clamp(0.8rem,1.1cqw,1rem)] uppercase tracking-[0.02em] text-muted-foreground">
+            <div className={`text-[length:clamp(0.8rem,1.1cqw,1rem)] uppercase tracking-[0.02em] ${photoBackdrop ? "text-card/85" : "text-muted-foreground"}`}>
               <FieldValue field={`${prefix(index)}Eyebrow`} />
             </div>
           </Piece>
-          <Title field={`${prefix(index)}Title`} />
+          <Title field={`${prefix(index)}Title`} photoBackdrop={photoBackdrop} />
         </SlideText>
       </div>
 
       {/* The subtitle, in the accent colour, and the text */}
-      <div className={place.body}>
+      <div className={photoBackdrop ? "absolute left-1/2 top-[calc(40%+clamp(5.5rem,12vw,10rem))] z-10 w-full max-w-[42rem] -translate-x-1/2 px-6 text-center text-card drop-shadow-[0_1px_8px_rgba(0,0,0,0.4)]" : place.body}>
         <SlideText index={index} direction={direction} moved={moved} still={still}>
           <Piece direction={direction}>
-            <div className="text-[length:clamp(1.25rem,1.6cqw,1.6rem)] font-medium leading-tight tracking-[-0.02em] text-primary">
+            <div className={`text-[length:clamp(1.25rem,1.6cqw,1.6rem)] font-medium leading-tight tracking-[-0.02em] ${photoBackdrop ? "text-card" : "text-primary"}`}>
               <FieldValue field={`${prefix(index)}Subtitle`} />
             </div>
           </Piece>
           <Piece direction={direction} className="mt-[5svh]">
-            <div className="max-w-[22rem] text-[15px] leading-[1.4]">
+            <div className={`${photoBackdrop ? "mx-auto max-w-[34rem]" : "max-w-[22rem]"} text-[15px] leading-[1.4]`}>
               <FieldValue field={`${prefix(index)}Text`} />
             </div>
           </Piece>
         </SlideText>
       </div>
 
-      {aside && <div className={place.aside}>{aside}</div>}
+      {aside && <div className={`${place.aside} ${photoBackdrop ? "relative z-20 text-card" : ""}`}>{aside}</div>}
 
       {/* The menu, opening over the screen from the accent column */}
       <MenuPanel id={`${id}-menu`} open={open} title={siteTitle.value} active={active} onClose={() => setOpen(false)} className="absolute inset-0" />

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring, useTransform, type MotionValue } from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, useSpring, useTransform, type MotionValue } from "framer-motion";
+import { useStillAfterHydration } from "../../core/motion";
 import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 import { FieldPicture, Menu } from "../../core/blocks";
 import { inMenu, menuName } from "../../core/content";
@@ -102,7 +103,7 @@ function Ring({ onFollow, still }: { onFollow: () => void; still: boolean }) {
 export default function SignatureProfile({ stickers }: { stickers: number[] }) {
   const id = useSectionId();
   const { template, content, navigate } = useTemplate();
-  const still = Boolean(useReducedMotion());
+  const still = Boolean(useStillAfterHydration());
   const ref = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const split = useSplit(ref);

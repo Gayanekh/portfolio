@@ -1,11 +1,11 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useReducedMotion, useTransform, type MotionValue } from "framer-motion";
+import { motion, useTransform, type MotionValue } from "framer-motion";
 import { FieldPicture } from "../../core/blocks";
 import { useField, useTemplate } from "../../core/context";
 import { Sweep } from "../panel-kit";
-import { FieldValue, Frame, gutter, In, Label, type, useScrollProgress, useWide } from "./kit";
+import { FieldValue, Frame, gutter, In, Label, type, useScrollProgress, useStillAfterHydration, useWide } from "./kit";
 
 // About: a portrait in duotone (grey, warmed by the accent) sweeping open
 // and drifting slower than the page, beside a statement in the serif whose
@@ -34,7 +34,7 @@ function Statement() {
   const ref = useRef<HTMLParagraphElement>(null);
   const { value, editing, node } = useField("statement");
   const progress = useScrollProgress(ref);
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   const words: { word: string; marked: boolean }[] = [];
   value.split("*").forEach((part, i) => part.split(/\s+/).filter(Boolean).forEach((word) => words.push({ word, marked: i % 2 === 1 })));
   return (
@@ -48,7 +48,7 @@ export default function NocturnePath({ jobs, schools }: { jobs: number[]; school
   const { edit } = useTemplate();
   const ref = useRef<HTMLDivElement>(null);
   const wide = useWide(ref);
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   const progress = useScrollProgress(ref);
   const y = useTransform(progress, [0, 1], wide && !still && !edit ? ["-8%", "8%"] : ["0%", "0%"]);
 

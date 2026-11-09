@@ -10,14 +10,15 @@ const line = "border border-solid border-[color-mix(in_srgb,var(--fg)_28%,transp
 const fill = "bg-[color-mix(in_srgb,var(--fg)_6%,transparent)]";
 const bar = "block h-1.5 rounded-full bg-[color-mix(in_srgb,var(--fg)_18%,transparent)]";
 
-// A tiny page: a few bars, the first a little brighter.
-function Page({ className = "" }: { className?: string }) {
+// A tiny page: a few bars, the first in the accent colour, over a tinted picture
+// (`plain` leaves it grey, beside a coloured one).
+function Page({ className = "", plain = false }: { className?: string; plain?: boolean }) {
   return (
     <span className={`flex flex-col gap-1.5 p-2.5 ${className}`}>
-      <span className={`${bar} w-1/2 bg-[color-mix(in_srgb,var(--fg)_35%,transparent)]`} />
+      <span className={`${bar} w-1/2 ${plain ? "bg-[color-mix(in_srgb,var(--fg)_35%,transparent)]" : "!bg-[var(--accent)]"}`} />
       <span className={`${bar} w-full`} />
       <span className={`${bar} w-4/5`} />
-      <span className="mt-1 block h-6 rounded-[3px] bg-[color-mix(in_srgb,var(--fg)_12%,transparent)]" />
+      <span className={`mt-1 block h-6 rounded-[3px] ${plain ? "bg-[color-mix(in_srgb,var(--fg)_12%,transparent)]" : "bg-[color-mix(in_srgb,var(--accent)_45%,transparent)]"}`} />
     </span>
   );
 }
@@ -42,9 +43,9 @@ function Switch() {
   return (
     <span className="flex items-center gap-3">
       <span className={`block h-[5rem] w-[6.5rem] rounded-[5px] ${line} ${fill}`}>
-        <Page />
+        <Page plain />
       </span>
-      <span className="grid size-9 place-items-center rounded-full bg-[var(--accent)] text-[#0f0f0f]">
+      <span className="grid size-9 place-items-center rounded-full bg-[var(--accent)] text-[#16171a]">
         <Repeat className="size-4" strokeWidth={2.25} />
       </span>
       <span className={`block h-[5rem] w-[6.5rem] rounded-[5px] ${line} bg-[color-mix(in_srgb,var(--accent)_14%,transparent)]`}>
@@ -63,7 +64,7 @@ function Address() {
             <span key={i} className="block size-1.5 rounded-full bg-[color-mix(in_srgb,var(--fg)_30%,transparent)]" />
           ))}
         </span>
-        <Link2 className="ml-1 size-3.5 text-[color-mix(in_srgb,var(--fg)_60%,transparent)]" />
+        <Link2 className="ml-1 size-3.5 text-[var(--accent)]" />
         <span className="font-mono text-[0.75rem] text-[var(--fg)]">portory.net/you</span>
       </span>
       <span className="ml-3 flex items-center gap-1.5 rounded-full bg-[color-mix(in_srgb,#3ccf7e_16%,transparent)] px-2.5 py-1 font-mono text-[0.6875rem] text-[#7fe0a8]">
@@ -82,9 +83,9 @@ function Edit() {
         Mara Voss
         <motion.span aria-hidden="true" animate={still ? undefined : { opacity: [1, 1, 0, 0] }} transition={{ duration: 1.1, repeat: Infinity, times: [0, 0.5, 0.5, 1] }} className="ml-0.5 block h-5 w-[2px] bg-[var(--accent)]" />
       </span>
-      <span className={`${bar} w-full`} />
+      <span className={`${bar} w-full !bg-[color-mix(in_srgb,var(--accent)_55%,transparent)]`} />
       <span className={`${bar} w-3/4`} />
-      <MousePointer2 className="absolute -bottom-3 right-6 size-6 fill-[var(--fg)] text-[#0f0f0f]" strokeWidth={1.5} />
+      <MousePointer2 className="absolute -bottom-3 right-6 size-6 fill-[var(--accent)] text-[#16171a]" strokeWidth={1.5} />
     </span>
   );
 }
@@ -98,7 +99,7 @@ function Draft() {
           Draft · only you
         </span>
       </span>
-      <span className={`${bar} w-full`} />
+      <span className={`${bar} w-full !bg-[color-mix(in_srgb,var(--accent)_55%,transparent)]`} />
       <span className={`${bar} w-2/3`} />
       <span className="mt-1 block w-fit rounded-[4px] border border-dashed border-[color-mix(in_srgb,var(--fg)_30%,transparent)] px-2.5 py-1 text-[0.75rem] text-[color-mix(in_srgb,var(--fg)_45%,transparent)]">Publish changes</span>
     </span>

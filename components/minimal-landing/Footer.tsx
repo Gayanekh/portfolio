@@ -30,10 +30,10 @@ export default function Footer({ aside, close = true, mark = true, logo }: { asi
   return (
     <footer>
       {close && (
-      <div className="border-0 border-y border-solid border-[#0f0f0f]/15">
+      <div className="border-0 border-y border-solid border-[#16171a]/15">
         <div className="mx-auto grid max-w-[90rem] md:grid-cols-[1fr_minmax(0,25.5rem)_minmax(0,25.5rem)_1fr]">
           <span className="hidden md:block" />
-          <div className="flex flex-col items-center gap-12 border-0 border-solid border-[#0f0f0f]/15 px-6 py-12 text-center md:border-x">
+          <div className="flex flex-col items-center gap-12 border-0 border-solid border-[#16171a]/15 px-6 py-12 text-center md:border-x">
             <p className="m-0 flex items-center gap-2 text-[1.125rem]">
               {FOOTER.route.from}
               <MoveRight aria-hidden="true" strokeWidth={1.25} className="size-10" />
@@ -49,7 +49,7 @@ export default function Footer({ aside, close = true, mark = true, logo }: { asi
               {FOOTER.action.label}
             </Link>
           </div>
-          <div className="flex items-center border-0 border-t border-solid border-[#0f0f0f]/15 px-10 py-12 md:border-r md:border-t-0">
+          <div className="flex items-center border-0 border-t border-solid border-[#16171a]/15 px-10 py-12 md:border-r md:border-t-0">
             <Words text={FOOTER.quote} className="text-center font-[family-name:var(--ml-serif)] text-[2.1rem] leading-[1.3] tracking-[-0.01em]" />
           </div>
           <span className="hidden md:block" />
@@ -57,7 +57,7 @@ export default function Footer({ aside, close = true, mark = true, logo }: { asi
       </div>
       )}
 
-      <div className="grid bg-[#0f0f0f] text-[#f8f7f6] lg:grid-cols-[1fr_minmax(0,34rem)]">
+      <div className="grid bg-[#16171a] text-[#f8f7f6] lg:grid-cols-[1fr_minmax(0,34rem)]">
         {/* The footer's own part (redesigned at the user's request): the logo and
             tagline, then the site's links in a labelled column and where your
             site lives; under a hairline the year. The

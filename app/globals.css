@@ -125,30 +125,67 @@
   }
 }
 
-/* /gayane-khachatryan's scroll motion, driven by the browser's own scrolling: a
-   heading's letters slide in from the right and appear one after another as it
-   enters the screen (.gk-letter, each with its index in --i), and cards sharpen,
-   rise and grow into place (.gk-stack). Without scroll timelines they simply show. */
+/* A template cover zooming in slowly and gently under the pointer (or keyboard focus)
+   and easing back when it leaves: the landing page's Templates cards (the user asked;
+   not on /templates). Transform only, so it runs on the GPU; still for reduced motion. */
+.cover-zoom {
+  transition: transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.group:hover .cover-zoom,
+.group:focus-visible .cover-zoom {
+  transform: scale(1.05);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cover-zoom {
+    transition: none;
+  }
+  .group:hover .cover-zoom,
+  .group:focus-visible .cover-zoom {
+    transform: none;
+  }
+}
+
+/* /gayane-khachatryan's titles, driven by the browser's own scrolling: their letters
+   slide in from the right and appear one after another as they enter the screen
+   (.gk-letter, each with its index in --i). The Nocturne titles' own word rise is
+   held at rest there, so the letters alone bring them in. Without scroll timelines
+   they simply show. */
 .gk-letter {
   display: inline-block;
+  white-space: pre;
+}
+.gk-titles :is(h2, h3) .inline-block {
+  transform: none !important;
+}
+/* Her type on Nocturne's layout: Space Grotesk has no italic, so the italic words
+   (the first name, the rolling roles, the accented words) are in Instrument Serif;
+   section titles a little smaller, as Space Grotesk is wider than Nocturne's serif,
+   and larger again on big screens; the About photo without its green tint. */
+.gk-titles .italic {
+  font-family: var(--el-serif);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+.gk-titles h2[class*="7.2cqw"] {
+  font-size: clamp(2.5rem, 5.6cqw, 9rem);
+}
+/* The hero portrait fading out at its foot, so it melts into the page below instead of
+   ending on a hard line (the user asked); Nocturne's own portrait is dark enough not to show it. */
+.gk-titles [data-section="hero"] .order-first {
+  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 62%, transparent 100%);
 }
 @keyframes gk-letter {
-  from { opacity: 0; transform: translateX(calc(0.5em + var(--i) * 0.04em)); }
+  from { opacity: 0; transform: translateX(calc(0.3em + var(--i) * 0.01em)); }
 }
-@keyframes gk-stack {
-  from { opacity: 0.15; filter: blur(6px); transform: translateY(3rem) scale(0.95); }
-}
+/* Each letter starts a little after the one before and is in place by the time its
+   title is a third of the way up the screen, however long the title. */
 @media (prefers-reduced-motion: no-preference) {
   @supports (animation-timeline: view()) {
     .gk-letter {
       animation: gk-letter linear both;
       animation-timeline: view();
-      animation-range: entry calc(20% + var(--i) * 3%) cover calc(28% + var(--i) * 3%);
-    }
-    .gk-stack {
-      animation: gk-stack linear both;
-      animation-timeline: view();
-      animation-range: entry 0% cover 32%;
+      animation-range: cover calc(4% + var(--i) * 0.5%) cover calc(18% + var(--i) * 0.5%);
     }
   }
 }
@@ -222,4 +259,13 @@ html:has([data-preview-frame]) {
 }
 html:has([data-preview-frame])::-webkit-scrollbar {
   display: none;
+}
+
+/* The tilted wall of pictures (template-landing/TemplateWall, after samrichmond.framer.website's
+   gallery): each column is a vertical ticker, two copies of its pictures
+   sliding up by one copy, over and over. The duration is set by the component
+   from the column's height, for a steady speed. */
+@keyframes wall-tick {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(0, -50%, 0); }
 }

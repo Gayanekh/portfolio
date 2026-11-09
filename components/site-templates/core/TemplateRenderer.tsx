@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState, type ReactNode } from "react";
+import { MotionConfig } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { findFontPack, findPalette, themeFontVariables } from "@/components/template-detail/theme-options";
 import { SectionFrame } from "./Arranged";
@@ -62,6 +63,8 @@ export default function TemplateRenderer({ template, content, palette, font, edi
     <div data-template-font className={cn(themeFontVariables, template.theme, "min-h-full")}>
       <div ref={rootRef} data-site-template className={cn(findPalette(palette).className, findFontPack(font).className, "@container relative min-h-full bg-card font-sans text-foreground")}>
         <TemplateProvider value={state}>
+          {/* Motion follows the visitor's reduced-motion setting: then things fade into place without moving. */}
+          <MotionConfig reducedMotion="user">
           <Provider>
             {sections.map(({ id, Component, stack }, index) => {
               const frame = (
@@ -88,6 +91,7 @@ export default function TemplateRenderer({ template, content, palette, font, edi
               );
             })}
           </Provider>
+          </MotionConfig>
         </TemplateProvider>
       </div>
     </div>

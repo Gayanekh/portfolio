@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { useStillAfterHydration } from "../core/motion";
 import { ChevronDown, ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
 import { FieldPicture } from "../core/blocks";
 import { readField } from "../core/content";
@@ -52,7 +53,7 @@ export default function PanelWork({ works: numbers }: { works: number[] }) {
   const { content, edit } = useTemplate();
   const section = useSectionId();
   const read = (field: string) => plainText(readField(content, section, field));
-  const still = Boolean(useReducedMotion());
+  const still = Boolean(useStillAfterHydration());
 
   const works: Work[] = numbers
     .map((n) => ({ n, title: read(`work${n}Title`), category: read(`work${n}Category`), year: read(`work${n}Year`) }))

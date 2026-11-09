@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { Bell, Check, ChevronRight, LayoutGrid, Search, Star, Users } from "lucide-react";
 import { FieldPicture } from "../../core/blocks";
-import { ease } from "./kit";
+import { ease, useStillAfterHydration } from "./kit";
 
 // Interfaces drawn in code for the UI/UX case studies: a phone booking flow,
 // an admin dashboard and a design-system sheet. They are artwork (their words
@@ -16,7 +16,7 @@ const sheet = { hidden: {}, shown: { transition: { staggerChildren: 0.07, delayC
 const piece = { hidden: { opacity: 0, y: 14 }, shown: { opacity: 1, y: 0, transition: { duration: 0.7, ease } } };
 
 function Build({ children, className }: { children: ReactNode; className?: string }) {
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   return (
     <motion.div className={className} variants={sheet} initial={still ? false : "hidden"} whileInView="shown" viewport={{ once: true, margin: "0px 0px -15% 0px" }}>
       {children}
@@ -121,7 +121,7 @@ const ROWS = [
 ];
 
 export function DashboardMock() {
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   return (
     <div className={`w-full overflow-hidden shadow-[0_40px_80px_-30px_rgb(0_0_0/0.8)] ${screen}`}>
       <div className="flex items-center gap-2 border-0 border-b border-solid border-border px-4 py-2.5">
@@ -196,7 +196,7 @@ export function DashboardMock() {
 /* ---------- A design-system sheet ---------- */
 
 export function SystemMock() {
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   const [on, setOn] = useState(true);
   useEffect(() => {
     if (still) return;

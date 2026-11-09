@@ -25,7 +25,7 @@ export function Header() {
 // The opening screen: the site title and menu over a slider of series, with
 // a short About peek in the grey panel's corner.
 export function Hero() {
-  return <PanelSlider slides={SLIDES} aside={<AboutPeek images={PEEK} target="about" />} />;
+  return <PanelSlider slides={SLIDES} aside={<AboutPeek images={PEEK} target="about" />} photoBackdrop />;
 }
 
 export function About() {

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { useStillAfterHydration } from "../core/motion";
 import { ArrowRight } from "lucide-react";
 import { FieldPicture } from "../core/blocks";
 import { useTemplate } from "../core/context";
@@ -35,7 +36,7 @@ const place = {
 
 export default function PanelServices({ services, ctaTarget }: { services: number[]; ctaTarget: string }) {
   const { navigate } = useTemplate();
-  const still = Boolean(useReducedMotion());
+  const still = Boolean(useStillAfterHydration());
   const [{ active, previous, direction }, setState] = useState({ active: 0, previous: null as number | null, direction: 1 });
   const pick = (to: number) => {
     if (to === active) return;

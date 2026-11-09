@@ -27,7 +27,7 @@ import { fonts, themes } from "@/components/template-landing/ui";
 // white rounded square, leading home.
 function FooterMark() {
   return (
-    <Link href="/" aria-label="Portory home" className="grid size-10 place-items-center rounded-xl bg-white outline-none transition-transform duration-300 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0f0f]">
+    <Link href="/" aria-label="Portory home" className="grid size-10 place-items-center rounded-xl bg-white outline-none transition-transform duration-300 hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#16171a]">
       <LogoMark className="size-7" title={null} />
     </Link>
   );
@@ -36,7 +36,7 @@ function FooterMark() {
 export default function TemplateLanding() {
   return (
     <MotionConfig reducedMotion="user">
-      <div data-site-scale className={`relative min-h-screen overflow-x-clip ${fonts} bg-[var(--bg)] text-[var(--fg)] antialiased transition-colors duration-500 ${themes.light}`}>
+      <div data-site-scale className={`relative min-h-screen overflow-x-clip [--foreground:#16171a] ${fonts} bg-[var(--bg)] text-[var(--fg)] antialiased transition-colors duration-500 ${themes.light}`}>
 
         <Header />
         <main className="relative z-10">
@@ -67,7 +67,7 @@ export default function TemplateLanding() {
         <BackToTop />
 
         {/* The close and footer of /minimal-landing, on this page's own ground. */}
-        <div data-caption="end" className="relative z-10 text-[#0f0f0f]">
+        <div data-caption="end" className="relative z-10 text-[#16171a]">
           {/* In this page's type (the user asked for it): its sans and serif are the
               footer's fonts (the footer's own Geist, Playfair and Outfit were removed). */}
           <div className={`${minimalSans} [--ml-sans:var(--el-sans)] [--ml-serif:var(--el-serif)] [--ml-logo:var(--el-sans)]`}>

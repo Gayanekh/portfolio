@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { AnimatePresence, motion, useAnimationFrame, useMotionValue, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useAnimationFrame, useMotionValue } from "framer-motion";
+import { useStillAfterHydration } from "../../core/motion";
 import { useField, useTemplate } from "../../core/context";
 import { ease, FieldValue, Frame, gutter, Label, space, Title, type } from "./kit";
 
@@ -18,7 +19,7 @@ const HOLD = 7000;
 
 export default function ShowcaseVoices({ voices }: { voices: number[] }) {
   const { edit } = useTemplate();
-  const still = useReducedMotion();
+  const still = useStillAfterHydration();
   const [at, setAt] = useState(0);
   const paused = useRef(false);
   const elapsed = useMotionValue(0);

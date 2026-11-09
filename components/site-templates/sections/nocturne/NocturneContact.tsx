@@ -1,13 +1,13 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUp, ArrowUpRight, Check, Copy } from "lucide-react";
 import { readField } from "../../core/content";
 import { useField, useSectionId, useTemplate } from "../../core/context";
 import { plainText } from "../../core/rich-format";
 import { pageSections } from "../panel-kit";
-import { ease, FieldValue, Frame, gutter, In, Label, Magnetic, SplitTitle, type } from "./kit";
+import { ease, FieldValue, Frame, gutter, In, Label, Magnetic, SplitTitle, type, useStillAfterHydration } from "./kit";
 
 // Contact, the last page: an ember glow following the pointer behind a huge
 // line ("Let's make something *remarkable*."), a round accent button pulled
@@ -21,7 +21,7 @@ import { ease, FieldValue, Frame, gutter, In, Label, Magnetic, SplitTitle, type 
 export default function NocturneContact({ details }: { details: number[] }) {
   const { template, layout, content, edit, navigate } = useTemplate();
   const section = useSectionId();
-  const still = Boolean(useReducedMotion());
+  const still = Boolean(useStillAfterHydration());
   const email = useField("email").value;
   const glowRef = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);

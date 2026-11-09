@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, useAnimationFrame, useMotionValue, useReducedMotion } from "framer-motion";
+import { motion, useAnimationFrame, useMotionValue } from "framer-motion";
+import { useStillAfterHydration } from "../core/motion";
 import { ArrowRight } from "lucide-react";
 import { FieldPicture } from "../core/blocks";
 import { useField, useTemplate } from "../core/context";
@@ -21,7 +22,7 @@ const HOLD = 4.5;
 
 export default function AboutPeek({ images, target }: { images: number[]; target: string }) {
   const { edit, navigate } = useTemplate();
-  const still = Boolean(useReducedMotion());
+  const still = Boolean(useStillAfterHydration());
   const auto = !still && !edit;
   const [index, setIndex] = useState(0);
   const [previous, setPrevious] = useState<number | null>(null);
