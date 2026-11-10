@@ -2,10 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { MotionConfig, motion } from "framer-motion";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
-import { CASES, caseUrl, type Case } from "@/components/gayane/cases";
+import { CASES, caseUrl, isTodo, type Case, type CaseSection } from "@/components/gayane/cases";
+import type { Shots } from "@/components/gayane/shots";
 
 // One project's page. It takes its animation from samrichmond.framer.website's case pages
 // (read from their code): every block rises 40px out of nothing on a spring with no bounce
@@ -14,6 +15,14 @@ import { CASES, caseUrl, type Case } from "@/components/gayane/cases";
 // have a small label on the left and the text on the right, the figures, and the next
 // project. The pictures are laid out as on Pulvinar's project pages (the user asked): one
 // big picture with a phone beside it, then the pictures she adds, one wide and then in pairs.
+// TODO placeholders (see cases.ts) show in development and are left out of the production build.
+const SHOW_TODO = process.env.NODE_ENV !== "production";
+const todoBox = "rounded-[4px] border border-dashed border-[#c6f36b]/50 p-3 !text-[#c6f36b]/80";
+
+// A section as shown: its title, its lines of text (or a list), and pictures or slots for them.
+type Block = { title: string; list: boolean; lines: string[]; items?: { lead?: string; text: string }[]; images?: string[]; slots?: number; screens?: boolean; video?: NonNullable<Case["video"]> };
+const blockOf = (section: CaseSection): Block => ({ title: section.title, list: false, lines: section.text ?? [], items: section.items, images: section.images, slots: section.slots });
+
 const SPRING = { type: "spring", bounce: 0, duration: 1.2 } as const;
 const wrap = "mx-auto w-full max-w-[1240px] px-[clamp(1.25rem,4vw,3rem)]";
 const label = "m-0 font-[family-name:var(--font-ui)] text-[11px] font-medium uppercase tracking-[0.14em] text-[#9a9a96]";
@@ -91,6 +100,46 @@ function Media({ item }: { item: Case }) {
   );
 }
 
+// A template's screens, under About: the page on a desktop and a phone together, each alone side by side, and then the
+// whole page in a frame of fixed height that scrolls on its own (the page's smooth scroller leaves it alone:
+// data-lenis-prevent). Each picture has its real size, so nothing shifts as it loads.
+function Screens({ title, shots }: { title: string; shots: Shots }) {
+  const both = shots["desktop-mobile"];
+  const desktop = shots.desktop;
+  const mobile = shots.mobile;
+  const full = shots["full-page"];
+  return (
+    <div className="flex flex-col gap-4">
+      {both && (
+        <Reveal>
+          <Image src={both.src} width={both.width} height={both.height} alt={`${title} template on desktop and phone`} sizes="(min-width: 768px) 66vw, 100vw" className="h-auto w-full rounded-[1.25rem]" />
+        </Reveal>
+      )}
+      {(desktop || mobile) && (
+        <div className={`grid items-center gap-4 ${desktop && mobile ? "md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]" : ""}`}>
+          {desktop && (
+            <Reveal>
+              <Image src={desktop.src} width={desktop.width} height={desktop.height} alt={`${title} template on desktop`} sizes="(min-width: 768px) 44vw, 100vw" className="h-auto w-full rounded-[1.25rem]" />
+            </Reveal>
+          )}
+          {mobile && (
+            <Reveal delay={0.08} className="mx-auto w-full max-w-[18rem]">
+              <Image src={mobile.src} width={mobile.width} height={mobile.height} alt={`${title} template on a phone`} sizes="288px" className="h-auto w-full rounded-[1.25rem]" />
+            </Reveal>
+          )}
+        </div>
+      )}
+      {full && (
+        <Reveal>
+          <div tabIndex={0} role="region" aria-label={`Full page of the ${title} template (scrolls)`} data-lenis-prevent className="h-[min(70svh,42rem)] overflow-y-auto overscroll-contain rounded-[1.25rem] border border-solid border-[rgb(239_239_237/0.14)] bg-[#1f2024] [scrollbar-color:rgb(239_239_237/0.3)_transparent] [scrollbar-width:thin]">
+            <Image src={full.src} width={full.width} height={full.height} alt={`${title} template, the whole page (scroll to see it all)`} sizes="(min-width: 768px) 66vw, 100vw" className="block h-auto w-full" />
+          </div>
+        </Reveal>
+      )}
+    </div>
+  );
+}
+
 function Section({ index, title, children }: { index: string; title: string; children: ReactNode }) {
   return (
     <section className="grid gap-5 border-0 border-t border-solid border-[rgb(239_239_237/0.14)] py-[clamp(2rem,4vw,3.5rem)] md:grid-cols-12 md:gap-8">
@@ -105,8 +154,12 @@ function Section({ index, title, children }: { index: string; title: string; chi
   );
 }
 
-export default function CaseStudy({ item }: { item: Case }) {
+export default function CaseStudy({ item, shots }: { item: Case; shots?: Shots }) {
   const at = CASES.findIndex((entry) => entry.slug === item.slug);
+  // Each project page opens at its top, also when it is reached from the bottom of another.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [item.slug]);
   const next = CASES[(at + 1) % CASES.length];
   const meta = [
     { label: "Type", value: item.kind },
@@ -114,7 +167,22 @@ export default function CaseStudy({ item }: { item: Case }) {
     { label: "Year", value: item.year },
     { label: "Tags", value: item.tags },
   ];
-  const more = item.images ?? [];
+  // Three to five pictures under the sections; empty slots (development only) stand in for the missing ones.
+  const pictures = (item.images ?? []).slice(0, 5);
+  // The sections, numbered in the order they show: a section left with nothing (all TODO, in production) is not shown.
+  const sections: Block[] = [
+    { title: "About", list: false, lines: item.about },
+    ...(shots && Object.keys(shots).length > 0 ? [{ title: "Screens", list: false, lines: [], screens: true }] : []),
+    ...(item.video ? [{ title: item.video.title, list: false, lines: [], video: item.video }] : []),
+    ...(item.afterAbout ?? []).map(blockOf),
+    { title: "Where it comes from", list: false, lines: item.origin },
+    { title: "What is inside", list: true, lines: item.inside },
+    ...(item.status ? [{ title: "Status", list: false, lines: item.status }] : []),
+    ...(item.sections ?? []).map(blockOf),
+  ]
+    .map((section): Block => ({ ...section, lines: section.lines.filter((line) => SHOW_TODO || !isTodo(line)) }))
+    .filter((section) => section.screens || section.video || section.lines.length > 0 || (section.items?.length ?? 0) > 0 || (section.images?.length ?? 0) > 0);
+  const columns = { 2: "grid-cols-2", 3: "grid-cols-1 md:grid-cols-3", 4: "grid-cols-2 md:grid-cols-4" }[Math.min(4, Math.max(2, item.facts.length)) as 2 | 3 | 4];
 
   return (
     <MotionConfig reducedMotion="user">
@@ -169,47 +237,74 @@ export default function CaseStudy({ item }: { item: Case }) {
 
         {/* Sections: a small label on the left, the text on the right. */}
         <div className={`${wrap} mt-[clamp(3rem,7vw,6rem)]`}>
-          <Section index="01" title="About">
-            {item.about.map((paragraph, i) => (
-              <Reveal key={i} delay={i * 0.06}>
-                <p className={`${body} m-0`}>{paragraph}</p>
-              </Reveal>
-            ))}
-          </Section>
-          <Section index="02" title="Where it comes from">
-            {item.origin.map((paragraph, i) => (
-              <Reveal key={i} delay={i * 0.06}>
-                <p className={`${body} m-0`}>{paragraph}</p>
-              </Reveal>
-            ))}
-          </Section>
-          <Section index="03" title="What is inside">
-            <ul className="m-0 flex list-none flex-col gap-4 p-0">
-              {item.inside.map((line, i) => (
-                <Reveal key={i} delay={i * 0.06}>
-                  <li className={`${body} flex gap-3`}>
-                    <span aria-hidden="true" className="mt-[0.7em] size-1.5 shrink-0 rounded-full bg-[#c6f36b]" />
-                    {line}
-                  </li>
+          {sections.map((section, at) => (
+            <Section key={section.title} index={String(at + 1).padStart(2, "0")} title={section.title}>
+              {section.video ? (
+                <Reveal>
+                  {/* A silent walk-through: not loaded until played, the poster shows meanwhile. */}
+                  <video controls playsInline muted preload="none" poster={section.video.poster} width={section.video.width} height={section.video.height} aria-label={section.video.label} className="block h-auto w-full rounded-[1.25rem] bg-[#1f2024]">
+                    <source src={section.video.webm} type="video/webm" />
+                    <source src={section.video.mp4} type="video/mp4" />
+                  </video>
                 </Reveal>
-              ))}
-            </ul>
-          </Section>
-          {item.status && (
-            <Section index="04" title="Status">
-              {item.status.map((paragraph, i) => (
-                <Reveal key={i} delay={i * 0.06}>
-                  <p className={`${body} m-0`}>{paragraph}</p>
-                </Reveal>
-              ))}
+              ) : section.screens && shots ? (
+                <Screens title={item.title} shots={shots} />
+              ) : section.items ? (
+                <ul className="m-0 flex list-none flex-col gap-4 p-0">
+                  {section.items.map((entry, i) => (
+                    <Reveal key={i} delay={i * 0.06}>
+                      <li className={`${body} flex gap-3`}>
+                        <span aria-hidden="true" className="mt-[0.7em] size-1.5 shrink-0 rounded-full bg-[#c6f36b]" />
+                        <span>
+                          {entry.lead && <strong className="font-medium text-[#efefed]">{entry.lead} </strong>}
+                          {entry.text}
+                        </span>
+                      </li>
+                    </Reveal>
+                  ))}
+                </ul>
+              ) : section.list ? (
+                <ul className="m-0 flex list-none flex-col gap-4 p-0">
+                  {section.lines.map((line, i) => (
+                    <Reveal key={i} delay={i * 0.06}>
+                      <li className={`${body} flex gap-3`}>
+                        <span aria-hidden="true" className="mt-[0.7em] size-1.5 shrink-0 rounded-full bg-[#c6f36b]" />
+                        {line}
+                      </li>
+                    </Reveal>
+                  ))}
+                </ul>
+              ) : (
+                section.lines.map((line, i) => (
+                  <Reveal key={i} delay={i * 0.06}>
+                    <p className={`${body} m-0 ${isTodo(line) ? todoBox : ""}`}>{line}</p>
+                  </Reveal>
+                ))
+              )}
+              {section.images?.length || (SHOW_TODO && section.slots) ? (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {(section.images ?? []).map((src, i) => (
+                    <div key={src} className={`relative aspect-[4/3] overflow-hidden rounded-[6px] bg-[#1f2024] ${(section.images?.length ?? 0) === 1 ? "sm:col-span-2" : ""}`}>
+                      <Image src={src} alt={`${item.title}: ${section.title}, picture ${i + 1}`} fill sizes="(min-width: 768px) 30vw, 100vw" className="object-cover" />
+                    </div>
+                  ))}
+                  {SHOW_TODO && !section.images?.length
+                    ? Array.from({ length: section.slots ?? 0 }, (_, i) => (
+                        <div key={i} className={`grid aspect-[4/3] place-items-center text-center font-mono text-[11px] uppercase tracking-[0.1em] ${todoBox}`}>
+                          TODO: picture {i + 1} of {section.title.toLowerCase()}
+                        </div>
+                      ))
+                    : null}
+                </div>
+              ) : null}
             </Section>
-          )}
+          ))}
         </div>
 
-        {/* The pictures she adds: one wide, then in pairs. */}
-        {more.length > 0 && (
+        {/* Three to five pictures: one wide, then in pairs; in development, empty slots show where the missing ones go. */}
+        {pictures.length > 0 && (
           <div className={`${wrap} mt-[clamp(2rem,4vw,3rem)] grid gap-4 md:grid-cols-2`}>
-            {more.map((src, i) => (
+            {pictures.map((src, i) => (
               <Reveal key={src} className={i === 0 ? "md:col-span-2" : ""}>
                 <div className={`relative w-full overflow-hidden rounded-[6px] bg-[#1f2024] ${i === 0 ? "aspect-[16/9]" : "aspect-[4/3]"}`}>
                   <Image src={src} alt={`${item.title}, picture ${i + 1}`} fill sizes={i === 0 ? "100vw" : "50vw"} className="object-cover" />
@@ -221,7 +316,7 @@ export default function CaseStudy({ item }: { item: Case }) {
 
         {/* The figures. */}
         <div className={`${wrap} mt-[clamp(2.5rem,5vw,4rem)]`}>
-          <div className="grid grid-cols-2 gap-px overflow-hidden rounded-[6px] bg-[rgb(239_239_237/0.14)] md:grid-cols-4">
+          <div className={`grid gap-px overflow-hidden rounded-[6px] bg-[rgb(239_239_237/0.14)] ${columns}`}>
             {item.facts.map((fact, i) => (
               <Reveal key={fact.label} delay={i * 0.06} className="bg-[#16171a] p-[clamp(1.25rem,2.4vw,2rem)]">
                 <p className={`m-0 font-[family-name:var(--gk-display)] text-[clamp(1.5rem,2.8vw,2.5rem)] font-light leading-none tracking-[-0.04em] ${/^[0-9]/.test(fact.value) ? "text-[#c6f36b]" : "text-[#efefed]"}`}>{fact.value}</p>
