@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import AccountPage from "@/components/account/AccountPage";
+import { realAvatar } from "@/lib/auth-routing";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Your account | Portory" };
@@ -26,7 +27,7 @@ export default async function Account() {
       memberSince={user.created_at}
       firstName={profile?.first_name ?? String(user.user_metadata?.first_name ?? "")}
       lastName={profile?.last_name ?? String(user.user_metadata?.last_name ?? "")}
-      avatarUrl={profile?.avatar_url ?? null}
+      avatarUrl={realAvatar(profile?.avatar_url)}
       hasPassword={providers.includes("email")}
       withGoogle={providers.includes("google")}
     />

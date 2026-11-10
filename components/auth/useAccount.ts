@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
-import { getInitials } from "@/lib/auth-routing";
+import { avatarColor, getInitials, GOOGLE_BLUE, realAvatar } from "@/lib/auth-routing";
 
 type Profile = {
   first_name: string;
@@ -22,6 +22,8 @@ export interface Account {
   email: string;
   initials: string;
   avatarUrl: string | null;
+  // The colour of its initials disc (a Tailwind class), from its name.
+  color: string;
 }
 
 // The signed-in account (its name from the profile, else the sign-up details,
@@ -72,8 +74,12 @@ export function useAccount() {
     const email = user.email || "";
     const emailName = email.split("@")[0] || "Account";
     const emailParts = emailName.split(/[^a-zA-Z0-9]+/).filter(Boolean);
+    const fullName = [firstName, lastName].filter(Boolean).join(" ") || emailName;
+    const avatarUrl = realAvatar(profile?.avatar_url);
+    const withGoogle = (user.identities ?? []).some((identity) => identity.provider === "google") || user.app_metadata?.provider === "google";
     account = {
-      fullName: [firstName, lastName].filter(Boolean).join(" ") || emailName,
+      fullName,
+      color: withGoogle && !avatarUrl ? GOOGLE_BLUE : avatarColor(fullName),
       email,
       initials:
         firstName || lastName
@@ -81,7 +87,7 @@ export function useAccount() {
           : emailParts.length > 1
             ? `${emailParts[0][0]}${emailParts[1][0]}`.toUpperCase()
             : emailName.slice(0, 2).toUpperCase(),
-      avatarUrl: profile?.avatar_url ?? null,
+      avatarUrl,
     };
   }
 

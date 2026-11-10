@@ -19,13 +19,15 @@ const startButton =
   "group inline-flex h-10 items-center gap-1.5 rounded bg-foreground pl-4 pr-3.5 text-sm font-medium text-white transition-colors hover:bg-foreground/85";
 const startArrow = <MoveRight aria-hidden="true" className="size-5 transition-transform duration-300 group-hover:translate-x-1" />;
 
-// The account's photo, or its initials on a disc in the brand colour.
-function Avatar({ account, size }: { account: Account; size: "sm" | "lg" }) {
+// The account's photo, or its initials in white on a disc in the colour its name gives it (as Google's letter
+// avatars do; the landing page's chip, with a photo, sits on the page's own white).
+function Avatar({ account, size }: { account: Account; size: "chip" | "sm" | "lg" }) {
+  const tone = account.avatarUrl && size === "chip" ? "bg-[var(--bg)] text-[var(--fg)]" : `${account.color} text-white`;
   return (
     <span
       aria-hidden="true"
-      className={`grid shrink-0 place-items-center overflow-hidden rounded-full bg-primary font-semibold text-white ${
-        size === "sm" ? "size-9 text-xs" : "size-11 text-sm"
+      className={`grid shrink-0 place-items-center overflow-hidden rounded-full font-semibold ${tone} ${
+        size === "chip" ? "size-9 text-xs shadow-[0_0_0_1px_rgb(22_23_26/0.07),0_1px_1px_rgb(22_23_26/0.06),0_4px_8px_-2px_rgb(22_23_26/0.12),0_12px_24px_-8px_rgb(22_23_26/0.22),0_0_0_4px_rgb(22_23_26/0.025)] transition-[box-shadow,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover/avatar:-translate-y-0.5 group-hover/avatar:shadow-[0_0_0_1px_rgb(22_23_26/0.1),0_2px_2px_rgb(22_23_26/0.06),0_8px_16px_-4px_rgb(22_23_26/0.18),0_20px_36px_-10px_rgb(22_23_26/0.3),0_0_0_5px_rgb(22_23_26/0.04)] group-aria-expanded/avatar:-translate-y-0.5 group-aria-expanded/avatar:shadow-[0_0_0_1px_rgb(22_23_26/0.1),0_2px_2px_rgb(22_23_26/0.06),0_8px_16px_-4px_rgb(22_23_26/0.18),0_20px_36px_-10px_rgb(22_23_26/0.3),0_0_0_5px_rgb(22_23_26/0.04)]" : size === "sm" ? "size-9 text-xs" : "size-11 text-sm"
       }`}
     >
       {account.avatarUrl ? (
@@ -42,8 +44,11 @@ function Avatar({ account, size }: { account: Account; size: "sm" | "lg" }) {
 // first name, opening a menu with who is signed in, Profile and Log
 // out on hover, click or Arrow Down) and Get started. `start={false}` leaves Get started out
 // (where another button already leads to the templates); `avatarOnly` shows
-// the account as its avatar alone (in tight spots, like the compact nav bar).
-export default function AuthControls({ start = true, avatarOnly = false }: { start?: boolean; avatarOnly?: boolean }) {
+// the account as its avatar alone (in tight spots, like the compact nav bar); `chip` shows it as a small
+// avatar alone, with no background of its own: a white disc (the page's --bg, its initials in --fg) lifted by
+// a layered shadow (an edge ring, a close soft shadow, a wide lifted one and a faint halo) that deepens
+// as the pointer comes or the menu opens (no colour in it, the user asked).
+export default function AuthControls({ start = true, avatarOnly = false, chip = false }: { start?: boolean; avatarOnly?: boolean; chip?: boolean }) {
   const accountTriggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -111,11 +116,13 @@ export default function AuthControls({ start = true, avatarOnly = false }: { sta
             aria-expanded={isMenuOpen}
             onClick={() => (isMenuOpen ? setIsMenuOpen(false) : openMenu())}
             className={`flex h-10 cursor-pointer items-center gap-2 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-foreground/20 ${
-              avatarOnly ? "w-10 justify-center rounded-full" : `rounded pl-1.5 pr-2.5 ${isMenuOpen ? "bg-foreground/[0.06]" : "hover:bg-foreground/[0.05]"}`
+              chip
+                ? "group/avatar w-10 justify-center rounded-full"
+                : avatarOnly ? "w-10 justify-center rounded-full" : `rounded pl-1.5 pr-2.5 ${isMenuOpen ? "bg-foreground/[0.06]" : "hover:bg-foreground/[0.05]"}`
             }`}
           >
-            <Avatar account={account} size="sm" />
-            {!avatarOnly && (
+            <Avatar account={account} size={chip ? "chip" : "sm"} />
+            {!avatarOnly && !chip && (
               <>
                 <span className="max-w-[8rem] truncate text-sm font-medium text-foreground">{firstName}</span>
                 <ChevronDown aria-hidden="true" className={`size-4 text-foreground/45 transition-transform duration-300 ${isMenuOpen ? "rotate-180" : ""}`} />

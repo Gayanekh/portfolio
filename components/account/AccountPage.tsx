@@ -7,10 +7,12 @@ import { Camera, Check, Eye, EyeOff, ImageUp, KeyRound, LayoutTemplate, type Luc
 import Link from "next/link";
 import { announceProfileChange } from "@/components/auth/useAccount";
 import { MIN_PASSWORD_LENGTH } from "@/components/auth/LoginExperience";
-import LandingHeader from "@/components/landing/LandingHeader";
-import { focusRing, fluidText } from "@/components/landing/landing-ui";
+import Header from "@/components/template-landing/Header";
+import Label from "@/components/template-landing/Label";
+import { focusRing, fonts, frame, serif, themes } from "@/components/template-landing/ui";
+import { fluidText } from "@/components/landing/landing-ui";
 import Modal from "@/components/ui/modal";
-import { getInitials } from "@/lib/auth-routing";
+import { avatarColor, getInitials, GOOGLE_BLUE } from "@/lib/auth-routing";
 import { ACCEPTED_IMAGE_TYPES, uploadPortfolioImage, validatePortfolioImage } from "@/lib/portfolio-images";
 import { createClient } from "@/lib/supabase/client";
 import { loadPortfolio, type SavedPortfolio } from "@/lib/portfolio-client";
@@ -19,18 +21,47 @@ import { getSiteTemplate, siteTemplateContinueHref } from "@/components/site-tem
 const IMAGES_BUCKET = "portfolio-images";
 const ease = [0.22, 1, 0.36, 1] as const;
 
-// Controls: 4px corners; outlined by default (the brand colour for the main
-// one), dark for saving a form, red only for deleting the account.
-// Fields focus quietly: a brand-colour border and a faint halo, no outline.
-const field = "h-11 w-full rounded border border-foreground/[0.14] bg-white px-3.5 text-[0.9375rem] text-foreground outline-none transition-[border-color,box-shadow] placeholder:text-foreground/40 hover:border-foreground/25 focus:border-primary/60 focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--primary),transparent_88%)]";
-const label = "mb-1.5 block text-[0.8125rem] text-foreground/55";
-const outline = `${focusRing} inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded border border-foreground/15 bg-white px-5 text-sm font-medium text-foreground shadow-[0_2px_6px_-3px_rgb(0_0_0/0.12)] transition-colors hover:border-foreground/40 disabled:cursor-default disabled:opacity-40`;
-const brandOutline = `${focusRing} inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded border border-primary/70 bg-white px-5 text-sm font-medium text-foreground shadow-[0_2px_6px_-3px_rgb(0_0_0/0.12)] transition-colors hover:bg-primary hover:text-white disabled:cursor-default disabled:opacity-40`;
-const solid = `${focusRing} inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded bg-neutral-900 px-4 text-sm font-medium text-white transition-colors hover:bg-neutral-700 disabled:cursor-default disabled:opacity-30 disabled:hover:bg-neutral-900`;
-const quiet = `${focusRing} inline-flex h-10 cursor-pointer items-center justify-center rounded px-4 text-sm font-medium text-foreground/60 transition-colors hover:bg-foreground/[0.05] hover:text-foreground disabled:opacity-40`;
-const small = `${focusRing} inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded border border-foreground/15 bg-white px-3.5 text-[0.8125rem] font-medium text-foreground transition-colors hover:border-primary hover:text-primary disabled:cursor-default disabled:opacity-40`;
-const smallDanger = `${focusRing} inline-flex h-9 cursor-pointer items-center justify-center gap-2 rounded border border-red-200 bg-white px-3.5 text-[0.8125rem] font-medium text-red-600 transition-colors hover:border-red-600 hover:bg-red-600 hover:text-white`;
-const danger = `${focusRing} inline-flex h-11 cursor-pointer items-center justify-center gap-2 rounded bg-red-600 px-5 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:cursor-default disabled:opacity-40 disabled:hover:bg-red-600`;
+// Controls, in the landing page's style (its ink, card grey and hairlines, read from the page's
+// --fg, --bg, --card, --dim and --line): 4px corners; light (the card grey) by default, the ink for the
+// main one and for saving a form, red only for deleting the account. Fields focus quietly: the ink
+// border and a faint halo.
+const field = "h-11 w-full rounded-[4px] border border-solid border-[color-mix(in_srgb,var(--fg)_20%,transparent)] bg-[var(--bg)] px-3.5 text-[0.9375rem] tracking-[-0.01em] text-[var(--fg)] outline-none transition-[border-color,box-shadow] placeholder:text-[var(--dim)] hover:border-[color-mix(in_srgb,var(--fg)_45%,transparent)] focus:border-[var(--fg)] focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--fg)_10%,transparent)]";
+const label = "mb-1.5 block text-[0.8125rem] text-[var(--dim)]";
+const button = `${focusRing} inline-flex cursor-pointer items-center justify-center gap-2 rounded-[4px] border-0 font-medium tracking-[-0.01em] transition-colors duration-300 disabled:cursor-default disabled:opacity-40`;
+const light = "bg-[var(--card)] text-[var(--fg)] hover:bg-[var(--fg)] hover:text-[var(--bg)]";
+const ink = "bg-[var(--fg)] text-[var(--bg)] hover:bg-[color-mix(in_srgb,var(--fg)_82%,var(--bg))]";
+const outline = `${button} ${light} h-11 px-5 text-[0.9375rem]`;
+const brandOutline = `${button} ${ink} h-11 px-5 text-[0.9375rem]`;
+const solid = `${button} ${ink} h-11 px-5 text-[0.9375rem] disabled:opacity-30`;
+const quiet = `${button} h-11 px-4 text-[0.9375rem] text-[var(--dim)] hover:bg-[var(--card)] hover:text-[var(--fg)]`;
+const small = `${button} ${light} h-9 px-3.5 text-[0.8125rem]`;
+const smallDanger = `${button} h-9 border border-solid border-red-300 bg-transparent px-3.5 text-[0.8125rem] text-red-600 hover:border-red-600 hover:bg-red-600 hover:text-white`;
+const danger = `${button} h-11 bg-red-600 px-5 text-[0.9375rem] text-white hover:bg-red-700 disabled:hover:bg-red-600`;
+// How the page comes in: each block rises 16px out of nothing, the rows one after another. It is CSS
+// (not a script), so the page is on screen, with its data, as it is sent, and moves from there; the
+// rows' delays are listed in full because Tailwind needs whole class names.
+const enter = "animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both [animation-timing-function:cubic-bezier(0.22,1,0.36,1)] motion-reduce:animate-none";
+const after = ["[animation-delay:0ms]", "[animation-delay:120ms]", "[animation-delay:200ms]", "[animation-delay:270ms]", "[animation-delay:340ms]", "[animation-delay:410ms]", "[animation-delay:480ms]", "[animation-delay:550ms]", "[animation-delay:620ms]"];
+
+// A value that changes (a new name, a new photo) swaps in softly: the old one lifts away, blurring, and
+// the new one settles. `id` is what identifies the value; it plays when it changes, not on the first show.
+function Swap({ id, block = false, children }: { id: string; block?: boolean; children: ReactNode }) {
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.span
+        key={id}
+        initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
+        transition={{ duration: 0.35, ease }}
+        className={block ? "block" : "inline-block"}
+      >
+        {children}
+      </motion.span>
+    </AnimatePresence>
+  );
+}
+
 const spinner = <span aria-hidden="true" className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />;
 
 type Editing = "name" | "password" | null;
@@ -66,7 +97,18 @@ function YourPage() {
       live = false;
     };
   }, []);
-  if (portfolio === undefined) return null;
+  if (portfolio === undefined)
+    return (
+      <Section title="Your page" text="The page you saved, to keep editing or share." step={2}>
+        <div aria-hidden="true" className="flex animate-pulse items-center gap-5 py-6">
+          <span className="size-5 rounded-[4px] bg-[var(--card)]" />
+          <div className="grid flex-1 gap-2.5">
+            <span className="h-4 w-40 max-w-full rounded-[4px] bg-[var(--card)]" />
+            <span className="h-3.5 w-72 max-w-full rounded-[4px] bg-[var(--card)]" />
+          </div>
+        </div>
+      </Section>
+    );
   const template = portfolio ? getSiteTemplate(portfolio.template_id) : undefined;
   const data = portfolio?.portfolio_data as { name?: unknown } | null | undefined;
   // Minimal and Bold, the earlier templates, open their saved page in their own builder.
@@ -74,10 +116,11 @@ function YourPage() {
   const continueHref = portfolio ? (template ? siteTemplateContinueHref(template.id) : `/templates/editor/${portfolio.template_id}`) : "/templates";
   const name = typeof data?.name === "string" && data.name ? data.name : templateName;
   return (
-    <Section title="Your page" text="The page you saved, to keep editing or share.">
+    <Section title="Your page" text="The page you saved, to keep editing or share." step={2}>
       {portfolio ? (
         <Item
           Icon={LayoutTemplate}
+          step={3}
           title={name ?? "Your page"}
           value={
             <>
@@ -101,6 +144,7 @@ function YourPage() {
       ) : (
         <Item
           Icon={LayoutTemplate}
+          step={3}
           title="No page yet"
           value="Choose a template, make it yours and save it to see it here."
           action={
@@ -114,19 +158,20 @@ function YourPage() {
   );
 }
 
-// The settings: a small heading with a short brand-colour rule and a line
-// about it, then its rows as one list, hairlines between them.
-function Section({ title, text, children }: { title: string; text: string; children: ReactNode }) {
+// A group of settings, laid out as the landing page's sections are: on the left, in the
+// landing's label (a small square and the name in mono capitals) with a short line under it; on the
+// right, its rows as one list with hairlines between them. The title is also a heading for screen readers.
+function Section({ title, text, step = 0, children }: { title: string; text: string; step?: number; children: ReactNode }) {
   return (
-    <section className="grid gap-8">
-      <div>
-        <h2 className="m-0 w-fit text-[1.375rem] font-semibold tracking-[-0.015em]">
-          {title}
-          <span aria-hidden="true" className="mt-2.5 block h-0.5 w-7 rounded-full bg-primary" />
-        </h2>
-        <p className="m-0 mt-4 text-[0.9375rem] text-foreground/55">{text}</p>
+    <section className="grid gap-8 border-0 border-t border-solid border-[var(--line)] pt-10 lg:grid-cols-4 lg:gap-0">
+      <div className={`flex flex-col gap-6 lg:pr-[clamp(1rem,2vw,2.5rem)] ${enter} ${after[step]}`}>
+        <h2 className="sr-only">{title}</h2>
+        <div aria-hidden="true">
+          <Label>{title}</Label>
+        </div>
+        <p className="m-0 max-w-[21rem] text-[0.875rem] leading-[1.5] tracking-[-0.005em] text-[var(--dim)]">{text}</p>
       </div>
-      <div className="divide-y divide-foreground/[0.08] border-y border-foreground/[0.08]">{children}</div>
+      <div className="divide-y divide-solid divide-[var(--line)] border-0 border-b border-solid border-[var(--line)] lg:col-span-3">{children}</div>
     </section>
   );
 }
@@ -141,6 +186,7 @@ function Item({
   action,
   open = false,
   tone = "default",
+  step = 0,
   children,
 }: {
   Icon: LucideIcon;
@@ -149,18 +195,20 @@ function Item({
   action?: ReactNode;
   open?: boolean;
   tone?: "default" | "danger";
+  // Which step of the entrance it comes in at (see `after`).
+  step?: number;
   children?: ReactNode;
 }) {
   const red = tone === "danger";
   return (
-    <div className="py-6">
+    <div className={`py-6 ${enter} ${after[step]}`}>
       <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-5 gap-y-4 sm:grid-cols-[auto_minmax(0,1fr)_auto]">
-        <span aria-hidden="true" className={`grid size-11 place-items-center rounded-xl ${red ? "bg-red-50" : "bg-[#f4f2ef]"}`}>
-          <Icon className={`size-5 ${red ? "text-red-500" : "text-primary"}`} strokeWidth={1.75} />
+        <span aria-hidden="true" className="grid place-items-center">
+          <Icon className={`size-5 ${red ? "text-red-500" : "text-[var(--dim)]"}`} strokeWidth={1.5} />
         </span>
         <div className="min-w-0">
-          <h3 className={`m-0 text-[1rem] font-semibold tracking-[-0.01em] ${red ? "text-red-600" : "text-foreground"}`}>{title}</h3>
-          {value && <div className="mt-1 break-words text-sm leading-relaxed text-foreground/60">{value}</div>}
+          <h3 className={`m-0 text-[1.0625rem] font-medium tracking-[-0.02em] ${red ? "text-red-600" : "text-[var(--fg)]"}`}>{title}</h3>
+          {value && <div className="mt-1 break-words text-[0.875rem] leading-[1.5] tracking-[-0.005em] text-[var(--dim)]">{value}</div>}
         </div>
         {action && <div className="col-start-2 sm:col-start-auto sm:justify-self-end">{action}</div>}
       </div>
@@ -168,7 +216,7 @@ function Item({
         {open && children && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.35, ease }} className="overflow-hidden">
             {/* Under the title; room around it so its fields' focus halo is never clipped */}
-            <div className="-mx-1 max-w-2xl px-1 pb-1 pt-5 sm:pl-[calc(2.75rem+1.25rem+0.25rem)]">{children}</div>
+            <div className="-mx-1 max-w-2xl px-1 pb-1 pt-5 sm:pl-[calc(1.25rem+1.25rem+0.25rem)]">{children}</div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -400,72 +448,94 @@ export default function AccountPage(props: {
     setDeleteError("");
   };
 
-  const rise = (delay: number) => ({ initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.6, ease, delay } });
-
   return (
-    <div className="relative min-h-screen bg-white text-foreground">
-      <LandingHeader links={false} />
+    <div className={`${fonts} ${themes.light} relative min-h-screen bg-[var(--bg)] text-[var(--fg)]`}>
+      {/* The landing page's header (the user asked), without its section links, and the page in its type and colours. */}
+      <Header sections={false} />
 
-      <main data-site-scale className="mx-auto w-content-width pb-28 pt-[clamp(8rem,calc(5.456rem_+_9.467vw),10rem)]">
+      <main data-site-scale className={`${frame} pb-28 pt-[clamp(7rem,calc(4.456rem_+_9.467vw),9rem)]`}>
         <input ref={fileRef} type="file" accept={ACCEPTED_IMAGE_TYPES} hidden onChange={(event) => pickPhoto(event.target.files?.[0])} />
 
-        {/* The profile: photo in a ringed circle beside the name */}
-        <motion.header {...rise(0)} className="grid items-center gap-[clamp(2.5rem,calc(0.592rem_+_7.101vw),4rem)] md:grid-cols-[auto_minmax(0,1fr)]">
-          <div className="mx-auto rounded-full bg-white p-3 shadow-[0_18px_50px_-18px_rgb(0_0_0/0.28)] ring-1 ring-black/[0.04] md:mx-0">
+        {/* The profile, as a landing section: its label on the left; on the right the photo in a plain circle
+            beside the name (the landing's title type), your email, since when, and the photo buttons. */}
+        <header className={`grid gap-10 lg:grid-cols-4 lg:gap-0 ${enter} ${after[0]}`}>
+          <div className="lg:pr-[clamp(1rem,2vw,2.5rem)]">
+            <Label>Your account</Label>
+          </div>
+          <div className="flex flex-col items-start gap-8 sm:flex-row sm:items-center sm:gap-[clamp(2rem,4vw,3.5rem)] lg:col-span-3">
             <button
               type="button"
               onClick={choosePhoto}
               disabled={photoBusy}
               aria-label={photo ? "Change your photo" : "Add a photo"}
-              className={`${focusRing} group relative grid size-[clamp(13rem,calc(10.456rem_+_9.467vw),15rem)] cursor-pointer place-items-center overflow-hidden rounded-full bg-primary text-white`}
+              className={`${focusRing} group relative grid size-[clamp(7.5rem,calc(5.5rem_+_6vw),10rem)] shrink-0 cursor-pointer place-items-center overflow-hidden rounded-full text-white ${props.withGoogle && !photo ? GOOGLE_BLUE : avatarColor(fullName || email.split("@")[0])}`}
             >
-              {photo ? (
-                // eslint-disable-next-line @next/next/no-img-element -- the user's photo from storage or Google
-                <img src={photo} alt="" className="h-full w-full object-cover" />
-              ) : (
-                <span aria-hidden="true" className="text-6xl font-light tracking-[-0.03em]">
-                  {initials}
-                </span>
-              )}
-              <span aria-hidden="true" className={`absolute inset-0 grid place-items-center bg-black/40 transition-opacity ${photoBusy ? "opacity-100" : "opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100"}`}>
+              <AnimatePresence initial={false}>
+                <motion.span key={photo ?? "initials"} initial={{ opacity: 0, scale: 1.06 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.5, ease }} className="absolute inset-0 grid place-items-center">
+                  {photo ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- the user's photo from storage or Google
+                    <img src={photo} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    <span aria-hidden="true" className="text-5xl font-light tracking-[-0.04em]">
+                      {initials}
+                    </span>
+                  )}
+                </motion.span>
+              </AnimatePresence>
+              <span aria-hidden="true" className={`absolute inset-0 grid place-items-center bg-black/40 text-white transition-opacity ${photoBusy ? "opacity-100" : "opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100"}`}>
                 {photoBusy ? <span className="size-7 animate-spin rounded-full border-2 border-white border-t-transparent" /> : <Camera className="size-7" strokeWidth={1.5} />}
               </span>
             </button>
-          </div>
 
-          <div className="text-center md:text-left">
-            <p className="m-0 text-[0.9375rem] font-light text-foreground/50">Your account</p>
-            <h1 className={`m-0 mt-2 ${fluidText.profileName} font-semibold leading-[1.05] tracking-[-0.035em]`}>{fullName || "Welcome"}</h1>
-            <p className="m-0 mx-auto mt-4 max-w-md text-[0.9375rem] leading-relaxed text-foreground/60 md:mx-0">
-              {email}
-              <br />
-              Member of Portory since {since}.
-            </p>
-            <div className="mt-7 flex flex-wrap justify-center gap-3 md:justify-start">
-              <button type="button" onClick={choosePhoto} disabled={photoBusy} className={brandOutline}>
-                {photoBusy ? spinner : <ImageUp aria-hidden="true" className="size-4" />}
-                {photo ? "Change photo" : "Add a photo"}
-              </button>
-              {photo && (
-                <button type="button" onClick={removePhoto} disabled={photoBusy} className={outline}>
-                  Remove
+            <div className="min-w-0">
+              <h1 className="m-0 text-[length:clamp(2.25rem,calc(1.6rem_+_2.2vw),3.5rem)] font-medium leading-[0.96] tracking-[-0.055em]">
+                <Swap id={fullName || "welcome"} block>
+                {fullName ? (
+                  <>
+                    {fullName.split(" ").slice(0, -1).join(" ")}{" "}
+                    <span className={`${serif} tracking-[-0.03em]`}>{fullName.split(" ").slice(-1)[0]}</span>
+                  </>
+                ) : (
+                  "Welcome"
+                )}
+              </Swap>
+              </h1>
+              <p className="m-0 mt-4 max-w-md text-[0.875rem] leading-[1.5] tracking-[-0.005em] text-[var(--dim)]">
+                {email}
+                <br />
+                Member of Portory since {since}.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <button type="button" onClick={choosePhoto} disabled={photoBusy} className={brandOutline}>
+                  {photoBusy ? spinner : <ImageUp aria-hidden="true" className="size-4" />}
+                  {photo ? "Change photo" : "Add a photo"}
                 </button>
+                {photo && (
+                  <button type="button" onClick={removePhoto} disabled={photoBusy} className={outline}>
+                    Remove
+                  </button>
+                )}
+              </div>
+              {photoError && (
+                <div className="mt-3">
+                  <ErrorText text={photoError} />
+                </div>
               )}
             </div>
-            {photoError && <div className="mt-3"><ErrorText text={photoError} /></div>}
           </div>
-        </motion.header>
+        </header>
 
-        <motion.div {...rise(0.1)} className="mt-20">
+        <div className="mt-[clamp(4rem,7vw,6rem)]">
           <YourPage />
-        </motion.div>
+        </div>
 
-        <motion.div {...rise(0.12)} className="mt-20">
-          <Section title="Account settings" text="Your name, how you sign in, and your account, all in one place.">
+        <div className="mt-[clamp(4rem,7vw,6rem)]">
+          <Section title="Account settings" text="Your name, how you sign in, and your account, all in one place." step={4}>
             <Item
               Icon={UserRound}
+              step={5}
               title="Name"
-              value={fullName || "Not set"}
+              value={<Swap id={fullName || "none"}>{fullName || "Not set"}</Swap>}
               open={editing === "name"}
               action={
                 editing !== "name" && (
@@ -502,9 +572,10 @@ export default function AccountPage(props: {
                 </div>
               </form>
             </Item>
-            <Item Icon={Mail} title="Email" value={email} action={<span className="inline-flex h-9 items-center rounded border border-dashed border-foreground/15 px-3.5 text-[0.8125rem] text-foreground/45">Changing email · coming soon</span>} />
+            <Item Icon={Mail} step={6} title="Email" value={email} action={<span className="inline-flex h-9 items-center rounded border border-dashed border-[var(--line)] px-3.5 text-[0.8125rem] text-[var(--dim)]">Changing email · coming soon</span>} />
             <Item
               Icon={KeyRound}
+              step={7}
               title="Password"
               value={hasPassword ? "Set. Change it any time." : "Not set yet. You log in with Google."}
               open={editing === "password"}
@@ -540,8 +611,8 @@ export default function AccountPage(props: {
                   </div>
                 </div>
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="m-0 text-[0.8125rem] text-foreground/45">{MIN_PASSWORD_LENGTH} or more letters, numbers and symbols.</p>
-                  <button type="button" aria-pressed={showPasswords} onClick={() => setShowPasswords((value) => !value)} className={`${focusRing} inline-flex cursor-pointer items-center gap-1.5 rounded text-[0.8125rem] text-foreground/55 transition-colors hover:text-foreground`}>
+                  <p className="m-0 text-[0.8125rem] text-[var(--dim)]">{MIN_PASSWORD_LENGTH} or more letters, numbers and symbols.</p>
+                  <button type="button" aria-pressed={showPasswords} onClick={() => setShowPasswords((value) => !value)} className={`${focusRing} inline-flex cursor-pointer items-center gap-1.5 rounded-[4px] text-[0.8125rem] text-[var(--dim)] transition-colors hover:text-[var(--fg)]`}>
                     {showPasswords ? <EyeOff aria-hidden="true" className="size-4" /> : <Eye aria-hidden="true" className="size-4" />}
                     {showPasswords ? "Hide" : "Show"}
                   </button>
@@ -560,17 +631,19 @@ export default function AccountPage(props: {
             </Item>
             <Item
               Icon={ShieldCheck}
+              step={8}
               title="Sign-in methods"
               value={hasPassword ? "You log in with your email and password." : "You log in with your Google account."}
               action={
                 <span className="flex flex-wrap gap-1.5">
-                  {hasPassword && <span className="rounded-md bg-white px-2.5 py-1 text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-foreground/70 ring-1 ring-black/[0.06]">Email</span>}
-                  {props.withGoogle && <span className="rounded-md bg-white px-2.5 py-1 text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-foreground/70 ring-1 ring-black/[0.06]">Google</span>}
+                  {hasPassword && <span className="rounded-[4px] border border-solid border-[var(--line)] px-2.5 py-1 font-mono text-[0.6875rem] uppercase tracking-[0.04em] text-[var(--dim)]">Email</span>}
+                  {props.withGoogle && <span className="rounded-[4px] border border-solid border-[var(--line)] px-2.5 py-1 font-mono text-[0.6875rem] uppercase tracking-[0.04em] text-[var(--dim)]">Google</span>}
                 </span>
               }
             />
             <Item
               Icon={LogOut}
+              step={8}
               title="Sessions"
               value="Signed in on a shared or lost device? Sign out of Portory everywhere, this device included."
               action={
@@ -585,6 +658,7 @@ export default function AccountPage(props: {
             />
             <Item
               Icon={Trash2}
+              step={8}
               tone="danger"
               title="Delete account"
               value="Deletes your account, your portfolio and your images for good."
@@ -595,7 +669,7 @@ export default function AccountPage(props: {
               }
             />
           </Section>
-        </motion.div>
+        </div>
       </main>
 
       {/* "Saved" and the like, sliding up at the bottom */}
@@ -608,7 +682,7 @@ export default function AccountPage(props: {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 8, scale: 0.98 }}
               transition={{ duration: 0.3, ease }}
-              className="flex items-center gap-2 rounded-xl bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white shadow-[0_12px_32px_-12px_rgb(0_0_0/0.5)]"
+              className="flex items-center gap-2 rounded-[4px] bg-[var(--fg)] px-4 py-2.5 text-sm font-medium tracking-[-0.01em] text-[var(--bg)] shadow-[0_12px_32px_-12px_rgb(0_0_0/0.5)]"
             >
               <Check aria-hidden="true" className="size-4 text-emerald-400" strokeWidth={2.5} />
               {toast}
@@ -619,12 +693,12 @@ export default function AccountPage(props: {
 
       {/* Deleting, confirmed by typing DELETE */}
       <Modal open={confirmOpen} onClose={closeConfirm} labelledBy="delete-confirm-title" describedBy="delete-confirm-text" alert>
-        <form onSubmit={deleteAccount}>
-          <h2 id="delete-confirm-title" className="m-0 pr-8 text-[1.625rem] font-medium leading-tight tracking-[-0.02em]">
+        <form onSubmit={deleteAccount} className={`${fonts} ${themes.light} text-[var(--fg)]`}>
+          <h2 id="delete-confirm-title" className="m-0 pr-8 text-[1.625rem] font-medium leading-tight tracking-[-0.04em]">
             Delete your account?
           </h2>
-          <p id="delete-confirm-text" className="m-0 mt-3 text-sm leading-relaxed text-neutral-600">
-            Your account, your portfolio and your images will be deleted for good. Type <strong className="font-semibold text-neutral-950">DELETE</strong> to confirm.
+          <p id="delete-confirm-text" className="m-0 mt-3 text-[0.875rem] leading-[1.5] tracking-[-0.005em] text-[var(--dim)]">
+            Your account, your portfolio and your images will be deleted for good. Type <strong className="font-semibold text-[var(--fg)]">DELETE</strong> to confirm.
           </p>
           <label htmlFor="confirm-delete" className="sr-only">
             Type DELETE to confirm

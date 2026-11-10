@@ -11,18 +11,21 @@ import { LOGIN, NAV, REGISTER, START } from "@/components/template-landing/conte
 import { ease, focusRing, frame, type } from "@/components/template-landing/ui";
 
 // Signed out: Log in (and, in the menu, Create an account). Signed in: the
-// account itself with its menu, as everywhere on Portory, in this page's ink.
+// account as a white pill with a small grey avatar and the name as "Sophia C." (the user showed it), with its menu on hover or click, in this page's ink.
 function Account({ menu = false, onPick }: { menu?: boolean; onPick?: () => void }) {
-  const { account } = useAccount();
+  const { account, loading } = useAccount();
+  // While it is being checked who is signed in, nothing stands here (it showed Log in first, to a signed-in visitor);
+  // then whichever it is fades in.
+  if (loading) return <span aria-hidden="true" className="block h-10 w-10" />;
   if (account)
     return (
-      <div className="[--foreground:var(--fg)]">
-        <AuthControls start={false} />
+      <div className="animate-in fade-in zoom-in-90 duration-500 [--foreground:var(--fg)]">
+        <AuthControls start={false} chip />
       </div>
     );
   const quiet = `${focusRing} rounded-[4px] ${menu ? type.body : "block text-[0.9375rem] leading-[1.3] tracking-[-0.01em]"} text-[var(--dim)] no-underline transition-colors duration-300 hover:text-[var(--fg)]`;
   return (
-    <div className={`flex items-center ${menu ? "gap-6" : "gap-[clamp(1rem,2vw,2rem)]"}`}>
+    <div className={`flex animate-in fade-in duration-500 items-center ${menu ? "gap-6" : "gap-[clamp(1rem,2vw,2rem)]"}`}>
       <Link href={LOGIN.href} onClick={onPick} className={quiet}>
         {LOGIN.label}
       </Link>
