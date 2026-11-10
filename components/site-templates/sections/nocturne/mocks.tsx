@@ -51,7 +51,7 @@ export function PhoneMock({ imageField }: { imageField: string }) {
               <FieldPicture field={imageField} className="absolute inset-0 block h-full w-full object-cover" />
             </span>
             <span className="flex min-w-0 flex-col gap-0.5">
-              <span className="text-[11px] font-semibold text-foreground">Dr. Ani Petrosyan</span>
+              <span className="text-[11px] font-semibold text-foreground">Dr. Elena Rowe</span>
               <span className="text-muted-foreground">Cardiologist · 14 yrs</span>
               <span className="flex items-center gap-1 text-foreground">
                 <Star className="size-2.5 fill-primary text-primary" /> 4.9 <span className="text-muted-foreground">(212)</span>

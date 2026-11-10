@@ -32,7 +32,8 @@ const TEXT: Record<string, SectionContent> = {
     index3: "Graphic Design",
   },
   work: {
-    intro: "Platforms, products and systems for web and mobile. One way of working: understand the people first, then make it precise.",
+    // Hers, in her words: what is shown here is her own work, and why her client work is not.
+    intro: "These are my own projects. I can't show my client work: I don't have permission to share it, and the websites and apps are still in development.",
     work1Title: "Portory",
     work1Category: "Product",
     work1Year: "2026",
@@ -78,6 +79,8 @@ const TEXT: Record<string, SectionContent> = {
     work11Url: "/gayane-khachatryan/work/exhibition",
   },
   uiux: {
+    // Hers, in her words: what she has designed, and in which fields.
+    intro: "I've designed dashboards, admin pages, forms and mobile experiences, on projects in tourism, healthcare, music, transportation and logistics, and fitness. They include websites for doctors and a music app with user sign‑in.",
     case1Stat1Value: "4",
     case1Stat1Label: "user roles",
     case1Stat2Value: "2",
