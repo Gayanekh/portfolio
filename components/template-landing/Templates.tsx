@@ -59,8 +59,8 @@ export default function Templates() {
             <motion.li key={item.id} initial={{ opacity: 0, transform: "translateY(24px)" }} whileInView={{ opacity: 1, transform: "translateY(0px)" }} viewport={{ once: true, margin: "0px 0px -5% 0px" }} transition={{ duration: 1, ease, delay: (i % 2) * 0.08, ...(reduced && { transform: { duration: 0 } }) }} className="md:even:mt-[clamp(3rem,7vw,6.25rem)]">
               <a href={item.href} target="_blank" rel="noopener noreferrer" className={`${focusRing} group block rounded-[10px] text-[var(--fg)] no-underline`}>
                 <span className="relative block">
-                  {/* After the igoro.framer.media works cards (the user asked, 1:1): on hover the picture blurs 10px and grows 3%, and a light circle with a dark arrow fades in at the centre and follows the cursor magnetically (MagneticCircle). */}
-                  <span className="block overflow-hidden rounded-[4px]">
+                  {/* After the igoro.framer.media works cards (the user asked, 1:1): on hover the picture blurs 10px and grows 3%, and a light circle with a dark arrow fades in at the centre (the clipping box is `overflow-clip`, not `overflow-hidden`: hidden makes it a scroller, which stops the cover's scroll-driven drift) and follows the cursor magnetically (MagneticCircle). */}
+                  <span className="block overflow-clip rounded-[4px]">
                     <span className="block origin-center transition-[filter,transform] duration-[650ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.03] group-hover:blur-[10px] group-hover:delay-100 group-hover:duration-[900ms] group-focus-visible:scale-[1.03] group-focus-visible:blur-[10px] motion-reduce:transition-none">
                       {item.photo ? <CoverPhoto src={item.photo.src} ground={item.photo.ground} focus={item.photo.focus} name={item.name} shape={shape} fit={!item.photo.fill && !item.photo.contain} whole={item.photo.fill} contain={item.photo.contain} corner={item.photo.corner} extra={item.photo.extra} /> : <Cover src={item.screen} name={item.name} shape={shape} drift />}
                     </span>
