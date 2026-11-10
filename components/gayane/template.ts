@@ -4,7 +4,7 @@ import type { SectionContent, TemplateDefinition } from "@/components/site-templ
 // Gayane's portfolio: the Nocturne template (its sections, untouched) in her own
 // look, the one /gayane-khachatryan had before: the #16171a page, light type, the
 // lime accent, Space Grotesk for display and Inter Tight for text (the user asked).
-// Only real facts from her CV: Nocturne's photography and graphic-design sections,
+// Only real facts from her CV: Nocturne's photography section,
 // its invented figures and its sample contact details are left out.
 
 const EMAIL = "gayane.khachatryan@hotmail.com";
@@ -29,6 +29,7 @@ const TEXT: Record<string, SectionContent> = {
     image: AVATAR,
     index1: "UI/UX Design",
     index2: "Development",
+    index3: "Graphic Design",
   },
   work: {
     intro: "Platforms, products and systems for web and mobile. One way of working: understand the people first, then make it precise.",
@@ -91,6 +92,25 @@ const TEXT: Record<string, SectionContent> = {
     case3Stat2Value: "3",
     case3Stat2Label: "code libraries",
   },
+  // Graphic design: only what she says of it, that she works with typography and colour. The four pieces are studies of both, drawn in code in her own lime, her mark (GK) and the italic face of her portfolio (Instrument Serif); no clients, projects or dates are claimed.
+  graphic: {
+    label: "Typography & colour",
+    title: "Graphic *design*",
+    intro: "I work with typography and colour. These pieces are studies of both: how type sets the hierarchy of a page, and how colour sets its mood.",
+    art1Title: "Colour study",
+    art1Meta: "Poster study",
+    art1Word: "Colour",
+    art1Detail: "Lime · C6F36B",
+    art2Title: "Colour & type pairing",
+    art2Meta: "Palette study",
+    art2Brand: "GK",
+    art3Title: "Type on image",
+    art3Meta: "Type study",
+    art3Words: "Type & colour",
+    art4Title: "Type specimen",
+    art4Meta: "Instrument Serif",
+    art4Font: "Instrument Serif",
+  },
   // About carries the contact too (the user merged the two sections).
   about: {
     image: AVATAR,
@@ -119,7 +139,7 @@ const TEXT: Record<string, SectionContent> = {
 };
 
 // Nocturne's sections that hold real content, and how many items of each to show.
-const KEEP = ["header", "hero", "work", "uiux", "development", "about"];
+const KEEP = ["header", "hero", "work", "uiux", "development", "graphic", "about"];
 
 export function gayaneTemplate(components: Record<string, TemplateDefinition["sections"][number]["Component"]>): TemplateDefinition {
   return {

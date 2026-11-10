@@ -12,7 +12,7 @@ import { gayaneTemplate } from "@/components/gayane/template";
 
 // The sections whose lists are shorter than Nocturne's: two disciplines, three
 // roles, seven projects (Portory and its six templates), two figures per case study. About carries the contact too (./AboutContact).
-const Hero = () => <NocturneHero roles={[1, 2, 3]} targets={["uiux", "development"]} />;
+const Hero = () => <NocturneHero roles={[1, 2, 3]} targets={["uiux", "development", "graphic"]} />;
 const Work = () => <NocturneWork works={[1, 6, 7, 8, 9, 10, 11]} />;
 const Uiux = () => <NocturneUiux steps={STEPS} cases={CASES} stats={[1, 2]} />;
 
