@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import Lenis from "lenis";
 import { usePathname } from "next/navigation";
 import { useReducedMotion } from "framer-motion";
@@ -12,11 +12,17 @@ interface LenisProviderProps {
 
 const LenisProvider = ({ children }: LenisProviderProps) => {
   const pathname = usePathname();
+  const lenisRef = useRef<InstanceType<typeof Lenis> | null>(null);
   const reducedMotion = useReducedMotion();
   const isAuthPage = ["/login", "/register", "/verify-email"].includes(pathname);
+  const native = isAuthPage;
+  // The portfolio and its project pages take their own menu and hash links (the portfolio's menu goes through the
+  // page's scroller, landing each section under its header); Lenis's own link handling would move the page too and the
+  // two would fight.
+  const ownLinks = pathname.startsWith("/gayane-khachatryan");
 
   useEffect(() => {
-    if (isAuthPage || reducedMotion) return;
+    if (native || reducedMotion) return;
     const lenis = new Lenis({
       smoothWheel: true,
       // Touch screens keep the phone's own scrolling: Lenis driving touch
@@ -27,9 +33,10 @@ const LenisProvider = ({ children }: LenisProviderProps) => {
       // instead of competing with the browser's native anchor jump. It stops
       // 6rem short of the target (the sections' scroll-mt-24), so a section
       // lands below the floating header rather than under it.
-      anchors: { offset: -96 },
+      anchors: ownLinks ? false : { offset: -96 },
     });
 
+    lenisRef.current = lenis;
     setPageScroller(lenis);
 
     let animationFrameId = 0;
@@ -63,9 +70,16 @@ const LenisProvider = ({ children }: LenisProviderProps) => {
       observer.disconnect();
       cancelAnimationFrame(animationFrameId);
       setPageScroller(null);
+      lenisRef.current = null;
       lenis.destroy();
     };
-  }, [isAuthPage, reducedMotion]);
+  }, [native, ownLinks, reducedMotion]);
+
+  // A new page opens at its top: Lenis keeps its own idea of where the page was, so it is told (an address with a
+  // section in it, #work, is left to that page to go to).
+  useEffect(() => {
+    if (!window.location.hash) lenisRef.current?.scrollTo(0, { immediate: true, force: true });
+  }, [pathname]);
 
   return <>{children}</>;
 };

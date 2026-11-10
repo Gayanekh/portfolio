@@ -57,10 +57,12 @@ export default function About() {
     <Frame>
       <div ref={ref} className={`pb-16 pt-24 @xl:pb-20 @xl:pt-36 ${gutter}`}>
         <div className="grid grid-cols-1 gap-12 @xl:grid-cols-[0.8fr_1.2fr] @xl:gap-[7cqw]">
-          <div className="flex flex-col gap-4">
-            <Sweep className="aspect-[4/5] rounded-[3px] bg-foreground/5 @xl:aspect-auto @xl:min-h-[28rem] @xl:flex-1">
+          {/* The photo keeps one rectangle, wide (5:4, as the user wanted), at every width, so its height follows its width smoothly (it used to stretch to the
+              height of the text beside it, a thin tall strip at some widths); beside the text it stays in view as the text scrolls. */}
+          <div className="flex flex-col gap-4 @xl:sticky @xl:top-28 @xl:self-start">
+            <Sweep className="aspect-[5/4] rounded-[3px] bg-foreground/5">
               <motion.div style={{ y }} className="absolute -inset-y-[10%] inset-x-0">
-                <FieldPicture field="image" className="absolute inset-0 block h-full w-full object-cover grayscale contrast-[1.05] brightness-[0.85]" />
+                <FieldPicture field="image" alt="Portrait of Gayane Khachatryan" className="absolute inset-0 block h-full w-full object-cover grayscale contrast-[1.05] brightness-[0.85]" />
               </motion.div>
             </Sweep>
             <span className={type.label}>

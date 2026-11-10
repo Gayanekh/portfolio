@@ -1,15 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
+import { scrollPageTo } from "@/lib/scroll";
 import { Menu } from "@/components/site-templates/core/blocks";
 import { useSectionId } from "@/components/site-templates/core/context";
 import { scrollParent } from "@/components/site-templates/core/scroll";
 import { useActiveSection } from "@/components/site-templates/sections/panel-kit";
 import { ease, soft } from "@/components/site-templates/sections/nocturne/kit";
 
-// Gayane's header, Nocturne's pinned bar as the user sketched it: no mark or name,
-// the menu moved to the right (the section in view marked), and, at the far right,
+// Gayane's header, Nocturne's pinned bar as the user sketched it: her initials "GK" at the left (back to the top,
+// as on the project pages), the menu moved to the right (the section in view marked), and, at the far right,
 // "Open to work" with a pulsing dot in place of the city and time. Clear over the
 // hero; once the page scrolls, a dark, blurred bar that moves away while the page
 // scrolls down and slides back, fixed at the top, as soon as it scrolls back up (the
@@ -48,9 +50,21 @@ export default function Header() {
       else if (last - y > 6) setAway(false);
       last = y;
     };
+    // At most once a frame (a scroll can fire several events in one).
+    let frame = 0;
+    const schedule = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        update();
+      });
+    };
     update();
-    scroller.addEventListener("scroll", update, { passive: true });
-    return () => scroller.removeEventListener("scroll", update);
+    scroller.addEventListener("scroll", schedule, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      scroller.removeEventListener("scroll", schedule);
+    };
   }, []);
 
   return (
@@ -60,6 +74,18 @@ export default function Header() {
           scrolled || open ? "border-0 border-b border-solid border-border bg-card/75 backdrop-blur-xl" : "border-0 border-b border-solid border-transparent"
         }`}
       >
+        {/* Her mark, as on the project pages: back to the top of the page */}
+        <Link
+          href="/gayane-khachatryan"
+          aria-label="Gayane Khachatryan, back to the top"
+          onClick={(event) => {
+            event.preventDefault();
+            scrollPageTo(0);
+          }}
+          className="mr-auto font-[family-name:var(--gk-display)] text-[1.125rem] font-medium tracking-[0.04em] text-foreground no-underline transition-colors duration-300 hover:text-primary"
+        >
+          GK
+        </Link>
         <div className="hidden @5xl:block">
           <Menu size="inline" active={active} />
         </div>
@@ -69,7 +95,7 @@ export default function Header() {
           aria-expanded={open}
           aria-controls={`${id}-menu`}
           onClick={() => setOpen((o) => !o)}
-          className="cursor-pointer rounded border border-solid border-foreground/25 bg-transparent px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-foreground @5xl:hidden"
+          className="relative cursor-pointer rounded border border-solid border-foreground/25 bg-transparent px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-foreground after:absolute after:-inset-2.5 after:content-[''] @5xl:hidden"
         >
           {open ? "Close" : "Menu"}
         </button>

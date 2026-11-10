@@ -53,7 +53,7 @@ function ContactRow() {
   };
 
   return (
-    <Frame>
+    <Frame sectionId="contact">
       <div className={`pb-20 @xl:pb-28 ${gutter}`}>
         <div className="grid grid-cols-1 @xl:grid-cols-[0.8fr_1.2fr] @xl:gap-[7cqw]">
           <span aria-hidden="true" className="hidden @xl:block" />
