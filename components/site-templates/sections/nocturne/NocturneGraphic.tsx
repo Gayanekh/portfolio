@@ -81,7 +81,7 @@ function Identity() {
 function TypePoster() {
   return (
     <div className={`${art} bg-foreground/10`}>
-      <FieldPicture field="art3Image" className="absolute inset-0 block h-full w-full object-cover" />
+      <FieldPicture field="art3Image" alt="Photograph behind the typographic poster" className="absolute inset-0 block h-full w-full object-cover" />
       <div className="absolute inset-0 bg-gradient-to-b from-card/10 via-transparent to-card/70" />
       <span className="absolute inset-x-[6%] top-[5%] text-[length:clamp(2.5rem,6cqw,6rem)] font-semibold uppercase leading-[0.82] tracking-[-0.05em] text-foreground mix-blend-difference">
         <FieldValue field="art3Words" />
@@ -103,12 +103,12 @@ function Specimen() {
         <span className="absolute inset-0 grid place-items-center font-display text-[length:clamp(7rem,17cqw,16rem)] font-light italic leading-none tracking-[-0.06em]">Ag</span>
         <span className="absolute left-4 top-3 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Cap · x-height · baseline</span>
       </div>
-      <div className="flex w-[42%] flex-col justify-between p-[4%]">
-        <span className="font-display text-[length:clamp(1.5rem,2.8cqw,2.6rem)] italic leading-none">
+      <div className="flex w-[42%] min-w-0 flex-col justify-between gap-3 p-[4%]">
+        <span className="font-display text-[length:clamp(1.15rem,2.8cqw,2.6rem)] italic leading-none [overflow-wrap:anywhere]">
           <FieldValue field="art4Font" />
         </span>
         <span className="break-all font-display text-[length:clamp(0.9rem,1.4cqw,1.3rem)] font-light leading-[1.5] text-foreground/70">ABCDEFGHIJKLM nopqrstuvwxyz 0123456789 &amp;?!@€</span>
-        <span className="flex gap-3 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+        <span className="flex flex-wrap gap-x-3 gap-y-1 font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground">
           <span>Light</span>
           <span className="italic">Italic</span>
           <span className="text-foreground">Regular</span>
@@ -149,7 +149,7 @@ export default function NocturneGraphic({ pieces }: { pieces: number[] }) {
                 <Tilt className={shape}>
                   <Art />
                 </Tilt>
-                <div className="flex items-baseline justify-between gap-4">
+                <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
                   <span className="font-display text-[length:clamp(1.15rem,1.6cqw,1.5rem)]">
                     <FieldValue field={`art${n}Title`} />
                   </span>

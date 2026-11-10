@@ -62,7 +62,7 @@ function Editor() {
           <FieldValue field="file" />
         </span>
       </div>
-      <pre className="m-0 overflow-x-auto px-0 py-4 font-mono text-[clamp(10.5px,0.95cqw,13px)] leading-[1.75]">
+      <pre tabIndex={0} aria-label="Code sample (scrolls sideways)" className="m-0 overflow-x-auto overscroll-x-contain px-0 py-4 [scrollbar-color:var(--border)_transparent] [scrollbar-width:thin] font-mono text-[clamp(10.5px,0.95cqw,13px)] leading-[1.75]">
         {CODE.map((line, i) => (
           <motion.div
             key={i}
@@ -112,7 +112,7 @@ export default function NocturneDev({ principles, stack }: { principles: number[
   return (
     <Frame>
       <div className={`flex flex-col gap-20 py-24 @xl:gap-28 @xl:py-36 ${gutter}`}>
-        <div className="grid grid-cols-1 gap-14 @xl:grid-cols-[1fr_1.25fr] @xl:gap-[6cqw]">
+        <div className="grid grid-cols-1 gap-14 @xl:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] @xl:gap-[6cqw]">
           <div className="flex flex-col gap-10">
             <div className="flex flex-col gap-8">
               <Label field="label" />

@@ -47,8 +47,20 @@ function Letters({ field, className, delay }: { field: string; className: string
   );
 }
 
+// Real spaces sit between the two name blocks and between "I" and the role (they take no room in a flex row), so the
+// text reads "Gayane Khachatryan" and "I design interfaces" when copied or scraped as plain text.
+// The tagline for assistive tech: every role, each with the lead-in, in plain words with real spaces
+// ("I design interfaces people trust. I write the code behind them. …"). The animated row is hidden from it.
+function RoleLine({ n }: { n: number }) {
+  const lead = useField("lead").value;
+  const role = useField(`role${n}`).value;
+  return <>{`${lead} ${role} `}</>;
+}
+
 export default function NocturneHero({ roles, targets }: { roles: number[]; targets: string[] }) {
   const { edit, navigate } = useTemplate();
+  const first = useField("first").value;
+  const last = useField("last").value;
   const still = Boolean(useStillAfterHydration());
   const ref = useRef<HTMLDivElement>(null);
   const lensRef = useRef<HTMLDivElement>(null);
@@ -138,18 +150,25 @@ export default function NocturneHero({ roles, targets }: { roles: number[]; targ
           <motion.div initial={still ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 0.2 }} className={`mb-6 ${type.label}`}>
             <FieldValue field="eyebrow" />
           </motion.div>
-          <h1 className="m-0 flex flex-col">
+          <h1 aria-label={`${first} ${last}`.trim()} className="m-0 flex flex-col">
             <Letters field="first" delay={0.25} className="block font-display text-[length:clamp(3.5rem,11cqw,10.5rem)] font-light italic leading-[0.85] tracking-[-0.045em]" />
+            {" "}
             <Letters
               field="last"
               delay={0.55}
               className="mt-[0.34em] block whitespace-nowrap pl-[0.06em] text-[length:clamp(1.75rem,5.6cqw,5.5rem)] font-semibold uppercase leading-[0.9] tracking-[-0.05em] @xl:pl-[9cqw]"
             />
           </h1>
-          <div className="mt-6 flex items-baseline gap-3 whitespace-nowrap font-display text-[length:clamp(1.05rem,2cqw,1.9rem)] font-light @xl:pl-[9cqw]">
+          <p className="sr-only">
+            {roles.map((n) => (
+              <RoleLine key={n} n={n} />
+            ))}
+          </p>
+          <div aria-hidden="true" className="mt-6 flex items-baseline gap-3 whitespace-nowrap font-display text-[length:clamp(1.05rem,2cqw,1.9rem)] font-light @xl:pl-[9cqw]">
             <span className="text-muted-foreground">
               <FieldValue field="lead" />
             </span>
+            {" "}
             <span className="relative inline-grid overflow-x-visible overflow-y-clip italic text-primary">
               <AnimatePresence mode="popLayout" initial={false}>
                 <motion.span key={role} initial={{ y: "100%", opacity: 0 }} animate={{ y: "0%", opacity: 1 }} exit={{ y: "-100%", opacity: 0 }} transition={{ duration: 0.7, ease }}>
@@ -161,7 +180,7 @@ export default function NocturneHero({ roles, targets }: { roles: number[]; targ
         </motion.div>
 
         {/* The intro and the scroll cue; the index of disciplines */}
-        <div className="relative z-10 flex flex-col gap-10 px-5 pb-14 pt-10 @xl:absolute @xl:inset-x-0 @xl:bottom-0 @xl:flex-row @xl:items-end @xl:justify-between @xl:px-[5cqw] @xl:pb-[5svh] @xl:pt-0">
+        <div className="relative z-10 flex flex-col gap-10 px-5 pb-14 pt-10 @xl:absolute @xl:inset-x-0 @xl:bottom-0 @xl:items-start @xl:gap-8 @xl:px-[5cqw] @xl:pb-[5svh] @xl:pt-0 @5xl:flex-row @5xl:items-end @5xl:justify-between @5xl:gap-10">
           <motion.div initial={still ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease, delay: 1.1 }} className="flex items-end gap-8">
             <div className="hidden flex-col items-center gap-3 @xl:flex">
               <span className={`${type.label} [writing-mode:vertical-rl]`}>
@@ -171,7 +190,7 @@ export default function NocturneHero({ roles, targets }: { roles: number[]; targ
                 <motion.span animate={still ? undefined : { y: ["-100%", "100%"] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }} className="absolute inset-0 bg-primary" />
               </span>
             </div>
-            <p className={`m-0 max-w-[24rem] ${type.body}`}>
+            <p className={`m-0 max-w-[24rem] @xl:max-w-[32rem] @5xl:max-w-[24rem] ${type.body}`}>
               <FieldValue field="intro" />
             </p>
           </motion.div>
@@ -183,7 +202,7 @@ export default function NocturneHero({ roles, targets }: { roles: number[]; targ
                   <button
                     type="button"
                     onClick={() => navigate(target)}
-                    className="group/index flex cursor-pointer items-center gap-2 border-0 bg-transparent p-0 text-left text-foreground"
+                    className="group/index relative flex cursor-pointer items-center gap-2 whitespace-nowrap border-0 bg-transparent p-0 text-left text-foreground after:absolute after:-inset-y-3 after:inset-x-0 after:content-['']"
                   >
                     <span className="font-mono text-[11px] text-primary">0{i + 1}</span>
                     <span className="relative text-[14px]">

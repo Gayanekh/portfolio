@@ -41,11 +41,13 @@ export function Grain() {
   return <div aria-hidden="true" className={`pointer-events-none absolute inset-0 z-[1] opacity-[0.07] mix-blend-overlay ${GRAIN}`} />;
 }
 
-// A section's outer element: the page colour, grain, and its id for the menu.
-export function Frame({ children, className = "" }: { children: ReactNode; className?: string }) {
-  const id = useSectionId();
+// A section's outer element: the page colour, grain, and its id for the menu (also its address: `#work`).
+// `sectionId` names a second block of a section on its own (the contact, held in the About section).
+export function Frame({ children, className = "", sectionId }: { children: ReactNode; className?: string; sectionId?: string }) {
+  const own = useSectionId();
+  const id = sectionId ?? own;
   return (
-    <section data-section={id} className={`relative scroll-mt-16 bg-card text-foreground ${className}`}>
+    <section id={id} data-section={id} className={`relative scroll-mt-16 bg-card text-foreground ${className}`}>
       <Grain />
       <div className="relative z-[2]">{children}</div>
     </section>

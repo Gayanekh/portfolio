@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useMotionValue, useSpring, useTransform, type MotionValue } from "framer-motion";
+import { motion, useMotionValue, useReducedMotion, useSpring, useTransform, type MotionValue } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { FieldPicture } from "../../core/blocks";
 import { useField, useTemplate } from "../../core/context";
-import { FieldValue, Frame, gutter, Label, SplitTitle, type, useScrollProgress, useWide, useStillAfterHydration } from "./kit";
+import { ease, FieldValue, Frame, gutter, Label, SplitTitle, type, useScrollProgress, useWide, useStillAfterHydration } from "./kit";
 
 // Selected work: a horizontal gallery pinned while the page scrolls. The
 // introduction first, then one tall card per project sliding in from the
@@ -120,25 +120,47 @@ function Card({ n, index, total, className }: { n: number; index: number; total:
   const { edit } = useTemplate();
   const url = useField(`work${n}Url`).value;
   const title = useField(`work${n}Title`).value;
+  // With the section's `viewFixed` field set, the round View stays in the middle of the card instead of following the pointer.
+  const fixed = useField("viewFixed").value !== "";
+  // With `viewStyle` "templates" the bubble moves as the /templates page's View bubble does (components/gallery/ViewArea):
+  // for a mouse only, it starts under the pointer as it enters (no gliding in from a corner), follows on a quick, firm
+  // spring, scales in and out over 0.35s, and sits exactly at the pointer with reduced motion. The bubble itself keeps
+  // its own size and look. (The card's overlay link sits above the card, so ViewArea itself cannot wrap it.)
+  const templates = useField("viewStyle").value === "templates";
+  const reduced = useReducedMotion();
   const cx = useMotionValue(0);
   const cy = useMotionValue(0);
-  const sx = useSpring(cx, { stiffness: 300, damping: 28 });
-  const sy = useSpring(cy, { stiffness: 300, damping: 28 });
+  const spring = templates ? { stiffness: 420, damping: 36, mass: 0.5 } : { stiffness: 300, damping: 28 };
+  const sx = useSpring(cx, spring);
+  const sy = useSpring(cy, spring);
   const [over, setOver] = useState(false);
 
   return (
     <article
       onPointerMove={(event) => {
+        if (templates && event.pointerType !== "mouse") return;
         const box = event.currentTarget.getBoundingClientRect();
         cx.set(event.clientX - box.left);
         cy.set(event.clientY - box.top);
       }}
-      onPointerEnter={() => setOver(true)}
+      onPointerEnter={(event) => {
+        if (templates) {
+          if (event.pointerType !== "mouse") return;
+          const box = event.currentTarget.getBoundingClientRect();
+          const px = event.clientX - box.left;
+          const py = event.clientY - box.top;
+          cx.set(px);
+          cy.set(py);
+          sx.jump(px);
+          sy.jump(py);
+        }
+        setOver(true);
+      }}
       onPointerLeave={() => setOver(false)}
       className={`group/work relative flex flex-col ${className}`}
     >
       <div className="relative min-h-0 flex-1 overflow-hidden rounded-[3px] bg-foreground/5">
-        <div className="absolute inset-0 transition-[transform,filter] duration-[1.2s] ease-[cubic-bezier(0.22,1,0.36,1)] [filter:grayscale(0.9)_brightness(0.7)] group-hover/work:scale-[1.05] group-hover/work:[filter:grayscale(0)_brightness(0.95)]">
+        <div className="absolute inset-0 transition-[transform,filter] duration-[1.2s] ease-[cubic-bezier(0.22,1,0.36,1)] [filter:var(--cover-filter,grayscale(0.9)_brightness(0.7))] group-hover/work:scale-[1.05] group-hover/work:[filter:grayscale(0)_brightness(0.95)]">
           <FieldPicture field={`work${n}Image`} alt={title} className="absolute inset-0 block h-full w-full object-cover" />
         </div>
         <div className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between p-5">
@@ -149,14 +171,28 @@ function Card({ n, index, total, className }: { n: number; index: number; total:
             <FieldValue field={`work${n}Category`} />
           </span>
         </div>
-        {/* The round "View", following the pointer */}
-        {!edit && (
+        {/* The round "View", following the pointer (or fixed in the middle) */}
+        {!edit && templates && (
+          <motion.span aria-hidden="true" style={{ x: reduced ? cx : sx, y: reduced ? cy : sy }} className="pointer-events-none absolute left-0 top-0 z-10 block">
+            <span className="block -translate-x-1/2 -translate-y-1/2">
+              <motion.span
+                initial={false}
+                animate={{ scale: over ? 1 : 0, opacity: over ? 1 : 0 }}
+                transition={{ duration: reduced ? 0 : 0.35, ease }}
+                className="grid size-24 place-items-center rounded-full bg-primary font-mono text-[11px] uppercase tracking-[0.14em] text-card"
+              >
+                <FieldValue field="viewLabel" />
+              </motion.span>
+            </span>
+          </motion.span>
+        )}
+        {!edit && !templates && (
           <motion.span
             aria-hidden="true"
-            style={{ x: sx, y: sy }}
+            style={fixed ? undefined : { x: sx, y: sy }}
             animate={{ scale: over ? 1 : 0, opacity: over ? 1 : 0 }}
             transition={{ duration: 0.35 }}
-            className="pointer-events-none absolute -left-12 -top-12 grid size-24 place-items-center rounded-full bg-primary font-mono text-[11px] uppercase tracking-[0.14em] text-card"
+            className={`pointer-events-none absolute ${fixed ? "left-1/2 top-1/2 -ml-12 -mt-12" : "-left-12 -top-12"} grid size-24 place-items-center rounded-full bg-primary font-mono text-[11px] uppercase tracking-[0.14em] text-card`}
           >
             <FieldValue field="viewLabel" />
           </motion.span>
@@ -165,7 +201,7 @@ function Card({ n, index, total, className }: { n: number; index: number; total:
       <div className="flex items-end justify-between gap-6 pt-5">
         <div className="flex min-w-0 flex-col gap-2">
           <h3 className={`m-0 ${type.name}`}>
-            <a href={edit ? undefined : url || undefined} target="_blank" rel="noreferrer" className="text-foreground no-underline after:absolute after:inset-0">
+            <a href={edit ? undefined : url || undefined} target="_blank" rel="noreferrer" className="-my-3 inline-block cursor-[var(--work-cursor,pointer)] py-3 text-foreground no-underline after:absolute after:inset-0">
               <FieldValue field={`work${n}Title`} />
             </a>
           </h3>

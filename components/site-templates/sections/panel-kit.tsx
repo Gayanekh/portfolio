@@ -327,21 +327,32 @@ export function useActiveSection(ref: RefObject<HTMLElement | null>) {
     const parent = scrollParent(ref.current);
     const scroller: HTMLElement | Window = parent ?? window;
     const ids = template.sections.filter((section) => inMenu(content, section)).map((section) => section.id);
+    // The sections are looked up once, and the check runs at most once a frame (a scroll can fire several events
+    // in one, and each check reads the layout).
+    const elements = ids.map((id) => ({ id, element: root.querySelector(`[data-section="${id}"]`) }));
     const update = () => {
       const view = viewOf(parent);
       let current = "";
-      for (const id of ids) {
-        const element = root.querySelector(`[data-section="${id}"]`);
+      for (const { id, element } of elements) {
         if (element && element.getBoundingClientRect().top - view.top <= view.height / 2) current = id;
       }
       setActive(current);
     };
+    let frame = 0;
+    const schedule = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        update();
+      });
+    };
     update();
-    scroller.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
+    scroller.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
     return () => {
-      scroller.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
+      cancelAnimationFrame(frame);
+      scroller.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
     };
   }, [ref, template, content]);
   return active;

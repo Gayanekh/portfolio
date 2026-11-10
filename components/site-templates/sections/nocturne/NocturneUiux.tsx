@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
+import { useField } from "../../core/context";
 import { DashboardMock, PhoneMock, SystemMock } from "./mocks";
 import { FieldValue, Frame, gutter, In, Label, soft, SplitTitle, Tilt, type, useStillAfterHydration } from "./kit";
 
@@ -10,6 +11,9 @@ import { FieldValue, Frame, gutter, In, Label, soft, SplitTitle, Tilt, type, use
 // alternating sides: an interface drawn in code (a phone booking flow, a
 // dashboard, a design-system sheet) that tilts towards the pointer, and its
 // name, role, story and three figures.
+//
+// An optional `figNote` field adds a small caption under each drawing (for a portfolio whose drawings
+// recreate work it cannot show); without it nothing is added.
 //
 // Its section's fields: `label`, `title`, `intro`, `step1Title`,
 // `step1Text`..., and for each case (`case1`...): Title, Meta, Text,
@@ -21,6 +25,7 @@ export default function NocturneUiux({ steps, cases, stats }: { steps: number[];
   const lineRef = useRef<HTMLDivElement>(null);
   const seen = useInView(lineRef, { once: true, margin: "0px 0px -15% 0px" });
   const still = useStillAfterHydration();
+  const note = useField("figNote").value;
 
   return (
     <Frame>
@@ -67,7 +72,7 @@ export default function NocturneUiux({ steps, cases, stats }: { steps: number[];
           return (
             <div key={n} className="grid grid-cols-1 items-center gap-10 @xl:grid-cols-[1.35fr_1fr] @xl:gap-[6cqw]">
               <In className={flip ? "@xl:order-2" : undefined}>
-                <div className="relative rounded-[4px] border border-solid border-border bg-[radial-gradient(ellipse_at_30%_20%,color-mix(in_srgb,var(--primary)_14%,transparent),transparent_60%)] p-[clamp(1.25rem,3.5cqw,3.5rem)]">
+                <div className="relative rounded-[4px] border border-solid border-border bg-[radial-gradient(ellipse_at_30%_20%,color-mix(in_srgb,var(--primary)_14%,transparent),transparent_60%)] p-[clamp(1.25rem,3.5cqw,3.5rem)] pt-[clamp(2.75rem,5cqw,4.5rem)]">
                   <span className="absolute left-4 top-3 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
                     Fig. 0{i + 1}
                   </span>
@@ -75,6 +80,7 @@ export default function NocturneUiux({ steps, cases, stats }: { steps: number[];
                     <Mock />
                   </Tilt>
                 </div>
+                {note && <p className="m-0 mt-3 font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground">{note}</p>}
               </In>
               <div className="flex flex-col gap-6">
                 <In>

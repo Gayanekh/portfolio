@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { Bell, Check, ChevronRight, LayoutGrid, Search, Star, Users } from "lucide-react";
 import { FieldPicture } from "../../core/blocks";
+import { useField } from "../../core/context";
 import { ease, useStillAfterHydration } from "./kit";
 
 // Interfaces drawn in code for the UI/UX case studies: a phone booking flow,
@@ -48,7 +49,7 @@ export function PhoneMock({ imageField }: { imageField: string }) {
           </Part>
           <Part className={`flex gap-3 p-3 ${tile}`}>
             <span className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-foreground/10">
-              <FieldPicture field={imageField} className="absolute inset-0 block h-full w-full object-cover" />
+              <FieldPicture field={imageField} alt="A doctor's photo in the sample booking screen" className="absolute inset-0 block h-full w-full object-cover" />
             </span>
             <span className="flex min-w-0 flex-col gap-0.5">
               <span className="text-[11px] font-semibold text-foreground">Dr. Elena Rowe</span>
@@ -120,15 +121,17 @@ const ROWS = [
   ["Dr. Mariam Sargsyan", "Doctor", "Pending"],
 ];
 
+// The address in the dashboard's window is `mockDomain` when the section has one (a portfolio can show a generic address).
 export function DashboardMock() {
   const still = useStillAfterHydration();
+  const domain = useField("mockDomain").value || "admin.zema.health/overview";
   return (
     <div className={`w-full overflow-hidden shadow-[0_40px_80px_-30px_rgb(0_0_0/0.8)] ${screen}`}>
       <div className="flex items-center gap-2 border-0 border-b border-solid border-border px-4 py-2.5">
         {[0, 1, 2].map((dot) => (
           <span key={dot} className="size-2 rounded-full bg-foreground/15" />
         ))}
-        <span className="ml-3 rounded-md bg-foreground/5 px-3 py-0.5 font-mono text-[9px] text-muted-foreground">admin.zema.health/overview</span>
+        <span className="ml-3 rounded-md bg-foreground/5 px-3 py-0.5 font-mono text-[9px] text-muted-foreground">{domain}</span>
       </div>
       <div className="flex text-[10px]">
         <div className="hidden w-[22%] flex-col gap-1 border-0 border-r border-solid border-border p-3 @xl:flex">
@@ -195,8 +198,10 @@ export function DashboardMock() {
 
 /* ---------- A design-system sheet ---------- */
 
+// The sample address in the input is `mockEmail` when the section has one.
 export function SystemMock() {
   const still = useStillAfterHydration();
+  const email = useField("mockEmail").value || "ani@zema.health";
   const [on, setOn] = useState(true);
   useEffect(() => {
     if (still) return;
@@ -217,7 +222,7 @@ export function SystemMock() {
         <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground">Input · focus</span>
         <span className="text-foreground">Email address</span>
         <span className="flex items-center rounded-md border border-solid border-primary px-2.5 py-2 text-foreground shadow-[0_0_0_3px_color-mix(in_srgb,var(--primary)_25%,transparent)]">
-          ani@zema.health
+          <span className="min-w-0 truncate">{email}</span>
           <motion.span animate={still ? undefined : { opacity: [1, 0, 1] }} transition={{ duration: 1, repeat: Infinity }} className="ml-px h-3 w-px bg-foreground" />
         </span>
         <span className="text-muted-foreground">We&apos;ll send the confirmation here.</span>
