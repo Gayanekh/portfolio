@@ -195,6 +195,15 @@ export default function CaseStudy({ item }: { item: Case }) {
               ))}
             </ul>
           </Section>
+          {item.status && (
+            <Section index="04" title="Status">
+              {item.status.map((paragraph, i) => (
+                <Reveal key={i} delay={i * 0.06}>
+                  <p className={`${body} m-0`}>{paragraph}</p>
+                </Reveal>
+              ))}
+            </Section>
+          )}
         </div>
 
         {/* The pictures she adds: one wide, then in pairs. */}

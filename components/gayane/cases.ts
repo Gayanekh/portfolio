@@ -29,6 +29,8 @@ export interface Case {
   about: string[];
   origin: string[];
   inside: string[];
+  // Where the project stands, when it is not finished: its own short section.
+  status?: string[];
   facts: { value: string; label: string }[];
   link: { href: string; label: string };
 }
@@ -71,6 +73,7 @@ export const CASES: Case[] = [
       "Three steps: pick a layout, fill in your details, get your own address at portory.net/you.",
       "Free, and no code needed.",
     ],
+    status: ["Portory is a work in progress. Its functionality and database are still being developed."],
     facts: [
       { value: "6", label: "templates" },
       { value: PALETTES, label: "colour palettes" },
