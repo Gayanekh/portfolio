@@ -57,13 +57,14 @@ export default function Footer({ aside, close = true, mark = true, logo }: { asi
       </div>
       )}
 
-      <div className="grid bg-[#16171a] text-[#f8f7f6] lg:grid-cols-[1fr_minmax(0,34rem)]">
+      {/* A size container, so the left column can start where the page's other sections start (their 90rem frame). */}
+      <div className="grid bg-[#16171a] text-[#f8f7f6] [container-type:inline-size] lg:grid-cols-[1fr_minmax(0,34rem)]">
         {/* The footer's own part (redesigned at the user's request): the logo and
             tagline, then the site's links in a labelled column and where your
             site lives; under a hairline the year. The
             column labels are small mono capitals after a square, like the page's
             section labels; the text is small and soft white, brightening on hover. */}
-        <div className="flex flex-col justify-between gap-14 px-5 py-14 sm:px-10">
+        <div className="flex flex-col justify-between gap-14 py-14 pl-[max(clamp(1.5rem,3vw,3rem),calc((100cqw_-_90rem)/2_+_clamp(1.5rem,3vw,3rem)))] pr-5 sm:pr-10">
           <div className="grid grid-cols-2 gap-x-8 gap-y-12 md:grid-cols-[1.4fr_1fr_1.2fr]">
             <div className="col-span-2 flex flex-col gap-5 md:col-span-1">
               {logo ?? (
