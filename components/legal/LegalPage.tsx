@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Logo from "@/components/brand/Logo";
-import { UPDATED, type Block, type Doc } from "@/components/legal/content";
+import { CONTACT_EMAIL, UPDATED, type Block, type Doc } from "@/components/legal/content";
 import { fonts, serif } from "@/components/template-landing/ui";
 
 // One layout for the Privacy and Terms pages: the Portory wordmark (home), the title with its last word in the serif
@@ -64,6 +64,19 @@ export default function LegalPage({ doc }: { doc: Doc }) {
                 <Blocks blocks={section.blocks} />
               </section>
             ))}
+
+            <section aria-labelledby="legal-contact" className={row}>
+              <h2 id="legal-contact" className={`${label} m-0 font-normal`}>
+                {String(doc.sections.length + 1).padStart(2, "0")} — Contact
+              </h2>
+              <p className={body}>
+                Questions about this page? Write to{" "}
+                <a href={`mailto:${CONTACT_EMAIL}`} className={link}>
+                  {CONTACT_EMAIL}
+                </a>
+                .
+              </p>
+            </section>
           </div>
         </div>
 

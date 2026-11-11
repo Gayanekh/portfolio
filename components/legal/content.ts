@@ -3,6 +3,9 @@
 
 export const UPDATED = "10 November 2026";
 
+// Where people can write about privacy or the terms: a forwarding address that reaches the owner.
+export const CONTACT_EMAIL = "hello@portory.net";
+
 export type Block = { p: string } | { ul: string[] };
 export type Section = { title: string; blocks: Block[] };
 export type Doc = { title: string; italic: string; intro: string; sections: Section[]; other: { href: string; label: string } };
