@@ -21,8 +21,8 @@ export const useSetAuthBusy = () => useContext(AuthBusyContext);
 // set beside it, and the link inviting you to the other mode.
 const copy = {
   login: {
-    lines: ["Welcome", "back to your", "portfolio"],
-    noteTop: "Portory is where designers, photographers and makers shape their work into a portfolio worth sharing.",
+    lines: ["Welcome", "back to your", "website"],
+    noteTop: "Beautiful websites, made from the right template.",
     noteSide: "Log in to pick up where you left off. Your templates and every edit are waiting.",
     switchLead: "New here?",
     switchAction: "Create an account",
@@ -30,7 +30,7 @@ const copy = {
   },
   register: {
     lines: ["Where", "your work finds", "its stage"],
-    noteTop: "Choose a template, make it yours and publish a portfolio that tells your story.",
+    noteTop: "Choose a template, make it yours and publish it.",
     noteSide: "Create your account in a minute. No card needed, just your name and email.",
     switchLead: "Have an account?",
     switchAction: "Log in",
@@ -38,7 +38,7 @@ const copy = {
   },
   // The second step of signing up: the link sent by email.
   verify: {
-    lines: ["One last", "step to your", "portfolio"],
+    lines: ["One last", "step to your", "website"],
     noteTop: "We sent a link to your email, so we know the address is really yours.",
     noteSide: "No email? Check your spam folder, or send it again.",
     switchLead: "Wrong email?",
@@ -49,7 +49,7 @@ const copy = {
   recover: {
     lines: ["A fresh", "start for your", "password"],
     noteTop: "It happens to everyone. A secure link sends you straight to a new password.",
-    noteSide: "Your portfolio, templates and every edit stay exactly as you left them.",
+    noteSide: "Your pages and every edit stay exactly as you left them.",
     switchLead: "Remembered it?",
     switchAction: "Log in",
     target: "login",
@@ -112,7 +112,7 @@ export default function AuthShell({ header, children }: { header: React.ReactNod
             </div>
 
             <div className={`${enter} fade-in delay-700 duration-700 flex items-center gap-5`}>
-              <AuthBadge text="Portory · Portfolios · " />
+              <AuthBadge text="Portory · Websites · " />
               <p className="m-0 grid gap-1">
                 <span className="text-[0.6875rem] uppercase tracking-[0.2em] text-foreground/55">{text.switchLead}</span>
                 <Link

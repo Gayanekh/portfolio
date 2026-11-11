@@ -96,8 +96,8 @@ export default function LoginExperience(props: LoginExperienceProps) {
   return (
     <div data-mode={mode} className="group/auth grid w-full gap-6 [@media(max-height:720px)]:gap-4 animate-in fade-in slide-in-from-bottom-2 duration-500 motion-reduce:animate-none">
       <div className="grid gap-2">
-        <h1 ref={heading} tabIndex={-1} className={`${authDisplay.className} ${fluidText.authFormTitle} font-light leading-tight tracking-[-0.035em] outline-none`}>{isRegister ? "Welcome to Portory" : <>Welcome back<span className="sm:hidden"> to your portfolio</span></>}</h1>
-        <p className="text-[0.9375rem] leading-relaxed text-foreground/70">{isRegister ? "Join Portory for free to build a portfolio worth sharing." : "Log in to keep editing your portfolio."}</p>
+        <h1 ref={heading} tabIndex={-1} className={`${authDisplay.className} ${fluidText.authFormTitle} font-light leading-tight tracking-[-0.035em] outline-none`}>{isRegister ? "Welcome to Portory" : <>Welcome back<span className="sm:hidden"> to your website</span></>}</h1>
+        <p className="text-[0.9375rem] leading-relaxed text-foreground/70">{isRegister ? "Join Portory for free to make a website worth sharing." : "Log in to keep editing your website."}</p>
       </div>
 
       {!isRegister && props.verified && <div data-status className="rounded bg-success/10 px-3.5 py-2.5 text-sm text-success-foreground" role="status">Email verified successfully. You can now sign in.</div>}
