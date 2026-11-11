@@ -1,7 +1,6 @@
 "use client";
 
 import { type FormEvent, type ReactNode, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Camera, Check, Eye, EyeOff, ImageUp, KeyRound, LayoutTemplate, type LucideIcon, LogOut, Mail, ShieldCheck, Trash2, UserRound } from "lucide-react";
 import Link from "next/link";
@@ -240,7 +239,6 @@ export default function AccountPage(props: {
   withGoogle: boolean;
 }) {
   const { userId, email } = props;
-  const router = useRouter();
   const [supabase] = useState(() => createClient());
   const [editing, setEditing] = useState<Editing>(null);
 
@@ -459,8 +457,8 @@ export default function AccountPage(props: {
       setSigningOut(false);
       return setSessionError("Could not sign out everywhere. Try again.");
     }
-    router.replace("/login");
-    router.refresh();
+    // Signed out everywhere: on to the login page (a full load, so every part of the page starts signed out).
+    window.location.assign("/login");
   }
 
   /* ---------- Delete account (confirmed in a dialog) ---------- */

@@ -99,7 +99,13 @@ export function useAccount() {
     }
     setUser(null);
     setProfile(null);
-    router.replace("/");
+    // Always on to the login page. On the account page (which needs a signed-in user) a full page load is
+    // used, so the page cannot redirect somewhere else first.
+    if (window.location.pathname.startsWith("/account")) {
+      window.location.assign("/login");
+      return true;
+    }
+    router.replace("/login");
     router.refresh();
     return true;
   };
