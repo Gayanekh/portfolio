@@ -97,7 +97,18 @@ export default function Footer({ aside, close = true, mark = true, logo }: { asi
               </div>
             </div>
           </div>
-          <p className="m-0 border-0 border-t border-solid border-[#f8f7f6]/10 pt-6 text-[0.8125rem] text-[#f8f7f6]/40">{FOOTER.note}</p>
+          <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-3 border-0 border-t border-solid border-[#f8f7f6]/10 pt-6 text-[0.8125rem] text-[#f8f7f6]/40">
+            <p className="m-0">{FOOTER.note}</p>
+            <ul className="m-0 flex list-none gap-6 p-0">
+              {FOOTER.legal.map((item) => (
+                <li key={item.label}>
+                  <Link href={item.href} className={`${focusRing} rounded text-[#f8f7f6]/55 no-underline transition-colors hover:text-[#f8f7f6]`}>
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
         {/* The picture (or the page's own aside): first when the footer stacks on
             narrower screens (Browse templates, then the rest; the user asked). */}

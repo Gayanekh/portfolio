@@ -150,4 +150,8 @@ export const FOOTER = {
   ],
   image: "/images/stack/exhibition-2026-10.jpg",
   note: "© 2026 Portory",
+  legal: [
+    { href: "/privacy", label: "Privacy" },
+    { href: "/terms", label: "Terms" },
+  ],
 };

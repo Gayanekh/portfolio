@@ -153,6 +153,18 @@ export default function LoginExperience(props: LoginExperienceProps) {
         Continue with Google
       </Button>
 
+      <p className="text-[0.8125rem] leading-relaxed text-foreground/55">
+        By continuing you agree to the{" "}
+        <Link href="/terms" target="_blank" rel="noopener" className={textLinkClass}>
+          Terms
+        </Link>{" "}
+        and the{" "}
+        <Link href="/privacy" target="_blank" rel="noopener" className={textLinkClass}>
+          Privacy policy
+        </Link>
+        .
+      </p>
+
       <p className="text-sm text-foreground/60">
         {isRegister ? "Already have an account? " : "Don't have an account? "}
         <Link href={isRegister ? props.loginHref : props.registerHref} aria-disabled={busy || undefined} onClick={(event) => onAuthLinkClick(event, isRegister ? "login" : "register")} className={`${textLinkClass} aria-disabled:pointer-events-none aria-disabled:opacity-50`}>
