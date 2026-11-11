@@ -64,7 +64,7 @@ function Swap({ id, block = false, children }: { id: string; block?: boolean; ch
 
 const spinner = <span aria-hidden="true" className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />;
 
-type Editing = "name" | "password" | null;
+type Editing = "name" | "email" | "password" | null;
 
 // Is this photo one of ours (in the user's folder of the images bucket)? Only
 // those are deleted when replaced; a Google photo is just forgotten.
@@ -393,6 +393,59 @@ export default function AccountPage(props: {
     say(wasSet ? "Password updated" : "Password set");
   }
 
+  /* ---------- Email ---------- */
+
+  // Changing it sends a confirmation link (to the new address, and to the current one too while
+  // Supabase's "secure email change" is on); the email changes once the link is used. With a
+  // password, it is asked for first, as for a new password. A Google-only account keeps the email
+  // of its Google account.
+  const [newEmail, setNewEmail] = useState("");
+  const [emailPassword, setEmailPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [savingEmail, setSavingEmail] = useState(false);
+  const [sentTo, setSentTo] = useState("");
+  const emailReady = newEmail.trim().length > 0 && (!hasPassword || emailPassword.length > 0);
+
+  const closeEmail = () => {
+    setNewEmail("");
+    setEmailPassword("");
+    setEmailError("");
+    setEditing(null);
+  };
+
+  async function changeEmail(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!emailReady) return;
+    setEmailError("");
+    const next = newEmail.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(next)) return setEmailError("Enter a valid email address.");
+    if (next === email.toLowerCase()) return setEmailError("That is already your email address.");
+    setSavingEmail(true);
+    if (hasPassword) {
+      const { error: checkError } = await supabase.auth.signInWithPassword({ email, password: emailPassword });
+      if (checkError) {
+        setSavingEmail(false);
+        return setEmailError("Your password is not right.");
+      }
+    }
+    const { error } = await supabase.auth.updateUser({ email: next }, { emailRedirectTo: `${window.location.origin}/auth/callback?${new URLSearchParams({ next: "/account" })}` });
+    setSavingEmail(false);
+    if (error) {
+      return setEmailError(
+        error.code === "email_exists"
+          ? "That email address is already used by another account."
+          : error.code === "over_email_send_rate_limit"
+            ? "Too many emails were sent just now. Wait a few minutes and try again."
+            : error.code === "reauthentication_needed"
+              ? "For your security, log out and in again, then change your email."
+              : "Your email could not be changed. Try again.",
+      );
+    }
+    closeEmail();
+    setSentTo(next);
+    say("Check your email");
+  }
+
   /* ---------- Sessions ---------- */
 
   const [signingOut, setSigningOut] = useState(false);
@@ -572,7 +625,49 @@ export default function AccountPage(props: {
                 </div>
               </form>
             </Item>
-            <Item Icon={Mail} step={6} title="Email" value={email} action={<span className="inline-flex h-9 items-center rounded border border-dashed border-[var(--line)] px-3.5 text-[0.8125rem] text-[var(--dim)]">Changing email · coming soon</span>} />
+            <Item
+              Icon={Mail}
+              step={6}
+              title="Email"
+              value={sentTo ? `We sent a link to ${sentTo}. Your email changes when you use it.` : hasPassword ? email : `${email}, from your Google account.`}
+              open={editing === "email"}
+              action={
+                hasPassword &&
+                editing !== "email" && (
+                  <button type="button" onClick={() => setEditing("email")} className={small}>
+                    Change email
+                  </button>
+                )
+              }
+            >
+              <form onSubmit={changeEmail} className="grid gap-3">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="new-email" className={label}>
+                      New email
+                    </label>
+                    <input id="new-email" autoFocus type="email" autoComplete="email" value={newEmail} onChange={(event) => setNewEmail(event.target.value)} className={field} />
+                  </div>
+                  <div>
+                    <label htmlFor="email-password" className={label}>
+                      Your password
+                    </label>
+                    <input id="email-password" type="password" autoComplete="current-password" value={emailPassword} onChange={(event) => setEmailPassword(event.target.value)} className={field} />
+                  </div>
+                </div>
+                <p className="m-0 text-[0.8125rem] text-[var(--dim)]">We email a confirmation link. Your email changes only when you use it.</p>
+                <ErrorText text={emailError} />
+                <div className="flex gap-2">
+                  <button type="submit" disabled={!emailReady || savingEmail} className={solid}>
+                    {savingEmail && spinner}
+                    {savingEmail ? "Sending..." : "Send confirmation"}
+                  </button>
+                  <button type="button" onClick={closeEmail} className={quiet}>
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </Item>
             <Item
               Icon={KeyRound}
               step={7}
